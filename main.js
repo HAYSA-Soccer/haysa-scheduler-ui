@@ -1,14 +1,13 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const calendarEl = document.getElementById("calendar");
 
-  // --- Calculate the Monday of the current week ---
+  // Monday of current week
   const today = new Date();
-  const day = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+  const day = today.getDay();
   const diffToMonday = (day === 0 ? -6 : 1 - day);
   const monday = new Date(today);
   monday.setDate(today.getDate() + diffToMonday);
 
-  // --- Fetch events from your standalone Apps Script ---
   let events = [];
 
   try {
@@ -19,22 +18,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.error("Fetch failed:", err);
   }
 
-  // --- Initialize FullCalendar with HAYSA-optimized settings ---
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "timeGridWeek",   // Weekly view
-    firstDay: 1,                   // Monday start
-    initialDate: monday,           // Always show this week's Monday
+    initialView: "timeGridWeek",
+    firstDay: 1,
+    initialDate: monday,
     height: "auto",
-
-    // --- Limit visible hours to real field usage ---
-    slotMinTime: "08:00:00",       // earliest time shown
-    slotMaxTime: "21:00:00",       // latest time shown
-
-    // --- Clean, readable grid ---
-    slotDuration: "00:30:00",      // 30-minute increments
-    slotLabelInterval: "01:00",    // hour labels only
-    allDaySlot: false,             // no all-day row (not needed for fields)
-
+    slotMinTime: "08:00:00",
+    slotMaxTime: "21:00:00",
+    slotDuration: "00:30:00",
+    slotLabelInterval: "01:00",
+    allDaySlot: false,
     events: events
   });
 
