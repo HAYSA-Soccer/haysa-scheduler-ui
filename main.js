@@ -1,15 +1,20 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const calendarEl = document.getElementById("calendar");
 
-  // 1. Fetch events from Apps Script
-  const response = await fetch("https://script.google.com/macros/s/AKfycbwvP6cJtzbPL2-k8GjdyipWj7JWd_PMYpfBL1ItWvYRzehH3GlifErjbyqGQZwz55YRpA/exec");
-  const data = await response.json();
+  let events = [];
 
-  // 2. Initialize the calendar with real events
+  try {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbwvP6cJtzbPL2-k8GjdyipWj7JWd_PMYpfBL1ItWvYRzehH3GlifErjbyqGQZwz55YRpA/exec");
+    const data = await response.json();
+    events = data.events || [];
+  } catch (err) {
+    console.error("Fetch failed:", err);
+  }
+
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     height: "auto",
-    events: data.events || []
+    events: events
   });
 
   calendar.render();
