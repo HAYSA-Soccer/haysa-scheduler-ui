@@ -19,18 +19,24 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.error("Fetch failed:", err);
   }
 
-  // --- Initialize FullCalendar ---
+  // --- Initialize FullCalendar with HAYSA-optimized settings ---
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "timeGridWeek",
-    firstDay: 1,
-    initialDate: monday,
+    initialView: "timeGridWeek",   // Weekly view
+    firstDay: 1,                   // Monday start
+    initialDate: monday,           // Always show this week's Monday
     height: "auto",
-  
-    // --- Limit visible hours ---
-    slotMinTime: "08:00:00",   // earliest time shown
-    slotMaxTime: "21:00:00",   // latest time shown (end boundary)
-  
+
+    // --- Limit visible hours to real field usage ---
+    slotMinTime: "08:00:00",       // earliest time shown
+    slotMaxTime: "21:00:00",       // latest time shown
+
+    // --- Clean, readable grid ---
+    slotDuration: "00:30:00",      // 30-minute increments
+    slotLabelInterval: "01:00",    // hour labels only
+    allDaySlot: false,             // no all-day row (not needed for fields)
+
     events: events
   });
+
   calendar.render();
 });
