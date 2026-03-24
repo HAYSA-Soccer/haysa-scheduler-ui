@@ -10,10 +10,30 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   let events = [];
 
+  const url = "https://script.google.com/macros/s/AKfycbwvP6cJtzbPL2-k8GjdyipWj7JWd_PMYpfBL1ItWvYRzehH3GlifErjbyqGQZwz55YRpA/exec";
+
   try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbwvP6cJtzbPL2-k8GjdyipWj7JWd_PMYpfBL1ItWvYRzehH3GlifErjbyqGQZwz55YRpA/exec");
-    const data = await response.json();
+    console.log("Fetching events from:", url);
+
+    const response = await fetch(url, {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    console.log("Fetch response status:", response.status);
+
+    const text = await response.text();
+    console.log("Raw response text:", text);
+
+    const data = JSON.parse(text);
+    console.log("Parsed JSON:", data);
+
     events = data.events || [];
+    console.log("Loaded events:", events.length);
+
   } catch (err) {
     console.error("Fetch failed:", err);
   }
@@ -31,5 +51,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     events: events
   });
 
+  console.log("Rendering calendar with events:", events.length);
   calendar.render();
 });
