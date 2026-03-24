@@ -21,12 +21,16 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // --- Initialize FullCalendar ---
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "timeGridWeek",   // Weekly view
-    firstDay: 1,                   // Monday start
-    initialDate: monday,           // Always show this week's Monday
+    initialView: "timeGridWeek",
+    firstDay: 1,
+    initialDate: monday,
     height: "auto",
+  
+    // --- Limit visible hours ---
+    slotMinTime: "08:00:00",   // earliest time shown
+    slotMaxTime: "21:00:00",   // latest time shown (end boundary)
+  
     events: events
   });
-
   calendar.render();
 });
