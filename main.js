@@ -1,6 +1,14 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const calendarEl = document.getElementById("calendar");
 
+  // --- Calculate the Monday of the current week ---
+  const today = new Date();
+  const day = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+  const diffToMonday = (day === 0 ? -6 : 1 - day);
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + diffToMonday);
+
+  // --- Fetch events from your standalone Apps Script ---
   let events = [];
 
   try {
@@ -11,8 +19,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.error("Fetch failed:", err);
   }
 
+  // --- Initialize FullCalendar ---
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
+    initialView: "timeGridWeek",   // Weekly view
+    firstDay: 1,                   // Monday start
+    initialDate: monday,           // Always show this week's Monday
     height: "auto",
     events: events
   });
