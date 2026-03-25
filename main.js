@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   let unavailable = [];
 
   const url = "https://api.allorigins.win/raw?url=" +
-            encodeURIComponent("https://script.google.com/macros/s/AKfycbzMY8dqa2GxcQMIpLPy7pPVIYACGPmwXsYMyUNpuwC56UFlMpu11KtfLqrJTxEaO0VRmw/exec");
+            encodeURIComponent("https://script.google.com/macros/s/AKfycbzBFkMetDSlDlFsFCznfAbY3ldlPiGiWVduopbzNXWkb05f7Gq3H2UrJlIlxLjyABdKiA/exec");
 
   try {
     console.log("Fetching calendar data from:", url);
