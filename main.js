@@ -9,11 +9,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   monday.setDate(today.getDate() + diffToMonday);
 
   let events = [];
+  let availability = [];
+  let unavailable = [];
 
   const url = "https://corsproxy.io/?https://script.google.com/macros/s/AKfycbzMY8dqa2GxcQMIpLPy7pPVIYACGPmwXsYMyUNpuwC56UFlMpu11KtfLqrJTxEaO0VRmw/exec";
-  
+
   try {
-    console.log("Fetching events from:", url);
+    console.log("Fetching calendar data from:", url);
 
     const response = await fetch(url, {
       method: "GET",
@@ -23,19 +25,24 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     });
 
-    console.log("Fetch response status:", response.status);
-
     const text = await response.text();
-    console.log("Raw response text:", text);
-
     const data = JSON.parse(text);
-    console.log("Parsed JSON:", data);
 
+    // NEW: update timestamp banner
+    document.getElementById("last-updated").innerText =
+      `Calendar last updated: ${data.lastUpdate}`;
+
+    // NEW: extract all data sets
     events = data.events || [];
+    availability = data.availability || [];
+    unavailable = data.unavailable || [];
+
     console.log("Loaded events:", events.length);
 
   } catch (err) {
     console.error("Fetch failed:", err);
+    document.getElementById("last-updated").innerText =
+      "Error loading calendar data";
   }
 
   const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -51,6 +58,5 @@ document.addEventListener("DOMContentLoaded", async function () {
     events: events
   });
 
-  console.log("Rendering calendar with events:", events.length);
   calendar.render();
 });
