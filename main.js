@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   let events = [];
 
-  const url = "https://script.google.com/macros/s/AKfycbzMY8dqa2GxcQMIpLPy7pPVIYACGPmwXsYMyUNpuwC56UFlMpu11KtfLqrJTxEaO0VRmw/exec";
+  const url = "https://corsproxy.io/?https://script.google.com/macros/s/AKfycbzMY8dqa2GxcQMIpLPy7pPVIYACGPmwXsYMyUNpuwC56UFlMpu11KtfLqrJTxEaO0VRmw/exec";
   
   try {
     console.log("Fetching events from:", url);
