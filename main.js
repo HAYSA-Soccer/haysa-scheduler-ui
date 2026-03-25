@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   let events = [];
 
-  const url = "https://script.google.com/macros/s/AKfycbwvP6cJtzbPL2-k8GjdyipWj7JWd_PMYpfBL1ItWvYRzehH3GlifErjbyqGQZwz55YRpA/exec";
+  const url = "https://script.google.com/macros/s/AKfycbzirRDr_v6zAzmxaZNnYTXjeV1sTso64SJ-20qe0rrpsYiWSDiXxPYUpcvy7D1eXGjFpA/exec";
 
   try {
     console.log("Fetching events from:", url);
