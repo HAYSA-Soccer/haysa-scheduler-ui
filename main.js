@@ -9,12 +9,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   monday.setDate(today.getDate() + diffToMonday);
 
   let events = [];
-  let availability = [];
-  let unavailable = [];
 
   const url = "https://api.allorigins.win/raw?url=" +
-            encodeURIComponent("https://script.google.com/macros/s/AKfycbzPuMevowzuEn18F5j2VDLlC1p8zgjB6RCkN6dHOyHdYQVKRhY-EleGAVtUPS2_oeSZmg/exec");
-  
+              encodeURIComponent("https://script.google.com/macros/s/AKfycbzPuMevowzuEn18F5j2VDLlC1p8zgjB6RCkN6dHOyHdYQVKRhY-EleGAVtUPS2_oeSZmg/exec");
+
   try {
     console.log("Fetching calendar data from:", url);
 
@@ -29,14 +27,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     const text = await response.text();
     const data = JSON.parse(text);
 
-    // NEW: update timestamp banner
+    // Update timestamp banner
     document.getElementById("last-updated").innerText =
       `Calendar last updated: ${data.lastUpdate}`;
 
-    // NEW: extract all data sets
+    // Unified event list
     events = data.events || [];
-    availability = data.availability || [];
-    unavailable = data.unavailable || [];
 
     console.log("Loaded events:", events.length);
 
