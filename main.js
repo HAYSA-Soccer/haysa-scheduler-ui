@@ -1,6 +1,12 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const calendarEl = document.getElementById("calendar");
 
+  // ⭐ STEP 1: Add this helper function near the top
+  function getSelectedFields() {
+    return Array.from(document.querySelectorAll('#field-filters input:checked'))
+                .map(cb => cb.value);
+  }
+
   // Monday of current week
   const today = new Date();
   const day = today.getDay();
@@ -32,6 +38,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       "Error loading calendar data";
   }
 
+  // ⭐ STEP 2: Modify your FullCalendar initialization
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "timeGridWeek",
     firstDay: 1,
@@ -42,8 +49,26 @@ document.addEventListener("DOMContentLoaded", async function () {
     slotDuration: "00:30:00",
     slotLabelInterval: "01:00",
     allDaySlot: false,
-    events: events
+    events: events,
+
+    // ⭐ This is the filter logic
+    eventDidMount: function(info) {
+      const selected = getSelectedFields();
+      const eventSurface = info.event.extendedProps.surface;
+
+      if (!selected.includes(eventSurface)) {
+        info.el.style.display = "none";
+      }
+    }
   });
 
   calendar.render();
+
+  // ⭐ STEP 3: Re-render when checkboxes change
+  document.querySelectorAll('#field-filters input').forEach(cb => {
+    cb.addEventListener('change', () => {
+      calendar.refetchEvents();
+      calendar.render();
+    });
+  });
 });
