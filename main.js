@@ -10,28 +10,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   let events = [];
 
-  const url = "https://api.allorigins.win/raw?url=" +
-              encodeURIComponent("https://script.google.com/macros/s/AKfycbzPuMevowzuEn18F5j2VDLlC1p8zgjB6RCkN6dHOyHdYQVKRhY-EleGAVtUPS2_oeSZmg/exec");
+  // DIRECT CALL — no AllOrigins
+  const url = "https://script.google.com/macros/s/AKfycbzPuMevowzuEn18F5j2VDLlC1p8zgjB6RCkN6dHOyHdYQVKRhY-EleGAVtUPS2_oeSZmg/exec";
 
   try {
     console.log("Fetching calendar data from:", url);
 
-    const response = await fetch(url, {
-      method: "GET",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+    const response = await fetch(url);
+    const data = await response.json();
 
-    const text = await response.text();
-    const data = JSON.parse(text);
-
-    // Update timestamp banner
     document.getElementById("last-updated").innerText =
       `Calendar last updated: ${data.lastUpdate}`;
 
-    // Unified event list
     events = data.events || [];
 
     console.log("Loaded events:", events.length);
