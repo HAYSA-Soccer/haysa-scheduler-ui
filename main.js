@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const calendarEl = document.getElementById("calendar");
 
-  // ⭐ STEP 1: Add this helper function near the top
+  // ⭐ FIELD FILTER HELPER
   function getSelectedFields() {
     return Array.from(document.querySelectorAll('#field-filters input:checked'))
                 .map(cb => cb.value);
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       "Error loading calendar data";
   }
 
-  // ⭐ STEP 2: Modify your FullCalendar initialization
+  // ⭐ FULLCALENDAR INITIALIZATION
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "timeGridWeek",
     firstDay: 1,
@@ -51,20 +51,30 @@ document.addEventListener("DOMContentLoaded", async function () {
     allDaySlot: false,
     events: events,
 
-    // ⭐ This is the filter logic
+    // ⭐ FIELD FILTER LOGIC
     eventDidMount: function(info) {
       const selected = getSelectedFields();
-      const eventSurface = info.event.extendedProps.surface;
+      const ep = info.event.extendedProps || {};
 
-      if (!selected.includes(eventSurface)) {
+      // Prefer field → canonical → surface
+      const eventField =
+        ep.field ||
+        ep.canonical ||
+        ep.surface ||
+        null;
+
+      if (!selected.includes(eventField)) {
         info.el.style.display = "none";
       }
     }
   });
 
+  // Expose for debugging
+  window.calendar = calendar;
+
   calendar.render();
 
-  // ⭐ STEP 3: Re-render when checkboxes change
+  // ⭐ RE-RENDER WHEN CHECKBOXES CHANGE
   document.querySelectorAll('#field-filters input').forEach(cb => {
     cb.addEventListener('change', () => {
       calendar.refetchEvents();
