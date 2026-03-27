@@ -8,16 +8,37 @@ h1 {
   margin-bottom: 10px;
 }
 
-#field-filters {
+#field-filters,
+#type-filters,
+#legend {
   max-width: 900px;
   margin: 0 auto 10px auto;
   text-align: center;
 }
 
-#field-filters label {
+#field-filters label,
+#type-filters label {
   margin-right: 15px;
   font-size: 14px;
 }
+
+#legend {
+  margin-top: 5px;
+}
+
+.legend-item {
+  display: inline-block;
+  padding: 4px 8px;
+  margin-right: 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: white;
+}
+
+.legend-item.availability { background-color: #6FCF97; }
+.legend-item.game { background-color: #2D9CDB; }
+.legend-item.block { background-color: #F2C94C; color: black; }
+.legend-item.closure { background-color: #EB5757; }
 
 #last-updated {
   max-width: 900px;
