@@ -2,6 +2,7 @@
 // Helper functions for merging and subtracting time windows
 // ------------------------------------------------------------
 function mergeWindows(events) {
+  if (!events.length) return [];
   const windows = events.map(e => ({
     start: new Date(e.start),
     end: new Date(e.end)
@@ -34,21 +35,25 @@ function subtractWindows(avail, blockers) {
     const updated = [];
 
     for (const w of free) {
+      // no overlap
       if (block.end <= w.start || block.start >= w.end) {
         updated.push(w);
         continue;
       }
 
+      // left piece
       if (block.start > w.start) {
         updated.push({ start: w.start, end: block.start });
       }
 
+      // right piece
       if (block.end < w.end) {
         updated.push({ start: block.end, end: w.end });
       }
     }
 
     free = updated;
+    if (!free.length) break;
   }
 
   return free;
@@ -83,25 +88,93 @@ document.addEventListener("DOMContentLoaded", async function () {
   monday.setDate(today.getDate() + diffToMonday);
 
   let allEvents = [];
+  let collapsedAvailabilityByField = {}; // cache: field -> collapsed availability events
 
   const url = "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
+  async function loadData() {
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
 
-    if (lastUpdatedEl) {
-      lastUpdatedEl.innerText = `Calendar last updated: ${data.lastUpdate}`;
-    }
+      if (lastUpdatedEl) {
+        lastUpdatedEl.innerText = `Calendar last updated: ${data.lastUpdate}`;
+      }
 
-    allEvents = data.events || [];
+      allEvents = data.events || [];
+      precomputeCollapsedAvailability();
 
-  } catch (err) {
-    console.error("Fetch failed:", err);
-    if (lastUpdatedEl) {
-      lastUpdatedEl.innerText = "Error loading calendar data";
+    } catch (err) {
+      console.error("Fetch failed:", err);
+      if (lastUpdatedEl) {
+        lastUpdatedEl.innerText = "Error loading calendar data";
+      }
     }
   }
+
+  function precomputeCollapsedAvailability() {
+    collapsedAvailabilityByField = {};
+
+    // Group by canonical field
+    const grouped = {};
+    for (const ev of allEvents) {
+      const field =
+        (ev.extendedProps && ev.extendedProps.field) ||
+        (ev.extendedProps && ev.extendedProps.canonical) ||
+        null;
+
+      if (!field) continue;
+
+      const normField = normalizeFieldName(field);
+      if (!grouped[normField]) grouped[normField] = [];
+      grouped[normField].push(ev);
+    }
+
+    for (const field of Object.keys(grouped)) {
+      const events = grouped[field];
+
+      const availability = events.filter(e => e.extendedProps.type === "availability");
+      const blockers = events.filter(e => e.extendedProps.type !== "availability");
+
+      if (!availability.length) {
+        collapsedAvailabilityByField[field] = [];
+        continue;
+      }
+
+      // Merge all availability windows for this complex
+      const merged = mergeWindows(availability);
+
+      // Treat ANY non-availability event as making the full complex unavailable
+      const freeWindows = subtractWindows(merged, blockers);
+
+      if (!freeWindows.length) {
+        collapsedAvailabilityByField[field] = [];
+        continue;
+      }
+
+      // Collect surfaces just for tooltip detail
+      const surfaces = availability
+        .map(a => a.extendedProps.surface)
+        .filter(Boolean);
+
+      const collapsed = freeWindows.map(win => ({
+        title: "Available",
+        start: win.start,
+        end: win.end,
+        backgroundColor: "#6FCF97",
+        borderColor: "#4CAF50",
+        extendedProps: {
+          type: "availability",
+          field: field,
+          freeSurfaces: surfaces
+        }
+      }));
+
+      collapsedAvailabilityByField[field] = collapsed;
+    }
+  }
+
+  await loadData();
 
   const initialDate = allEvents.length ? allEvents[0].start : monday;
 
@@ -116,69 +189,55 @@ document.addEventListener("DOMContentLoaded", async function () {
     slotLabelInterval: "01:00",
     allDaySlot: false,
 
-    // ------------------------------------------------------------
-    // COLLAPSING AVAILABILITY LOGIC
-    // ------------------------------------------------------------
     events: function (fetchInfo, successCallback, failureCallback) {
       try {
         const selectedFields = getSelectedFields();
         const selectedTypes = getSelectedTypes();
 
-        const grouped = {};
-        for (const ev of allEvents) {
-          const field =
-            (ev.extendedProps && ev.extendedProps.field) ||
-            (ev.extendedProps && ev.extendedProps.canonical) ||
-            null;
-
-          if (!field) continue;
-
-          const normField = normalizeFieldName(field);
-          if (!grouped[normField]) grouped[normField] = [];
-          grouped[normField].push(ev);
+        // If no fields selected, show nothing
+        if (!selectedFields.length) {
+          successCallback([]);
+          return;
         }
 
-        const collapsedEvents = [];
-
-        for (const field of Object.keys(grouped)) {
-          if (selectedFields.length > 0 && !selectedFields.includes(field)) {
-            continue;
-          }
-
-          const events = grouped[field];
-
-          const availability = events.filter(e => e.extendedProps.type === "availability");
-          const blockers = events.filter(e => e.extendedProps.type !== "availability");
-
-          if (availability.length === 0) continue;
-
-          const merged = mergeWindows(availability);
-          const freeWindows = subtractWindows(merged, blockers);
-
-          const surfaces = availability.map(a => a.extendedProps.surface).filter(Boolean);
-
-          for (const win of freeWindows) {
-            collapsedEvents.push({
-              title: "Available",
-              start: win.start,
-              end: win.end,
-              backgroundColor: "#6FCF97",
-              borderColor: "#4CAF50",
-              extendedProps: {
-                type: "availability",
-                field: field,
-                freeSurfaces: surfaces
-              }
-            });
+        // Collapsed availability for selected fields
+        let collapsed = [];
+        if (selectedTypes.includes("availability")) {
+          for (const field of selectedFields) {
+            const fieldEvents = collapsedAvailabilityByField[field] || [];
+            // Filter by visible date range
+            const inRange = fieldEvents.filter(e =>
+              new Date(e.end) > fetchInfo.start && new Date(e.start) < fetchInfo.end
+            );
+            collapsed = collapsed.concat(inRange);
           }
         }
 
-        const realEvents = allEvents.filter(e => e.extendedProps.type !== "availability");
-        const filteredReal = realEvents.filter(e =>
-          selectedTypes.includes(e.extendedProps.type)
+        // Real events (games, blocks, closures)
+        const realEvents = allEvents.filter(e =>
+          e.extendedProps &&
+          e.extendedProps.type &&
+          e.extendedProps.type !== "availability"
         );
 
-        successCallback([...collapsedEvents, ...filteredReal]);
+        const filteredReal = realEvents.filter(e => {
+          const field =
+            (e.extendedProps && e.extendedProps.field) ||
+            (e.extendedProps && e.extendedProps.canonical) ||
+            null;
+          if (!field) return false;
+
+          const normField = normalizeFieldName(field);
+          if (!selectedFields.includes(normField)) return false;
+
+          if (!selectedTypes.includes(e.extendedProps.type)) return false;
+
+          const start = new Date(e.start);
+          const end = new Date(e.end);
+          return end > fetchInfo.start && start < fetchInfo.end;
+        });
+
+        successCallback([...collapsed, ...filteredReal]);
 
       } catch (e) {
         console.error("Error in events function:", e);
@@ -186,16 +245,19 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     },
 
-    // ------------------------------------------------------------
-    // TOOLTIP LOGIC
-    // ------------------------------------------------------------
     eventDidMount: function(info) {
       if (info.event.extendedProps.type === "availability") {
         const props = info.event.extendedProps;
+        const startStr = info.event.start.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+        const endStr = info.event.end.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+        const surfaces = (props.freeSurfaces && props.freeSurfaces.length)
+          ? props.freeSurfaces.join(", ")
+          : "N/A";
+
         const tooltip =
           `${props.field}\n` +
-          `Available: ${info.event.start.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})} - ${info.event.end.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})}\n` +
-          `Free surfaces: ${props.freeSurfaces.join(", ")}`;
+          `Available: ${startStr} - ${endStr}\n` +
+          `Free surfaces: ${surfaces}`;
 
         info.el.title = tooltip;
       }
