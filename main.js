@@ -1,119 +1,77 @@
-document.addEventListener("DOMContentLoaded", async function () {
-  const calendarEl = document.getElementById("calendar");
-  const lastUpdatedEl = document.getElementById("last-updated");
-
-  // Normalize field names to match backend canonical style
-  function normalizeFieldName(name) {
-    if (!name) return "";
-    return name.toUpperCase().trim();
-  }
-
-  // FIELD FILTERS
-  function getSelectedFields() {
-    return Array.from(document.querySelectorAll('#field-filters input:checked'))
-      .map(cb => normalizeFieldName(cb.value));
-  }
-
-  // EVENT TYPE FILTERS
-  function getSelectedTypes() {
-    return Array.from(document.querySelectorAll('#type-filters input:checked'))
-      .map(cb => cb.value.toLowerCase());
-  }
-
-  // Compute Monday of current week (fallback)
-  const today = new Date();
-  const day = today.getDay();
-  const diffToMonday = (day === 0 ? -6 : 1 - day);
-  const monday = new Date(today);
-  monday.setDate(today.getDate() + diffToMonday);
-
-  let allEvents = [];
-
-  const url = "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
-
+events: function (fetchInfo, successCallback, failureCallback) {
   try {
-    console.log("Fetching calendar data from:", url);
-    const response = await fetch(url);
-    const data = await response.json();
+    const selectedFields = getSelectedFields();
+    const selectedTypes = getSelectedTypes();
 
-    if (lastUpdatedEl) {
-      lastUpdatedEl.innerText = `Calendar last updated: ${data.lastUpdate}`;
+    // STEP 1 — Group events by field
+    const grouped = {};
+    for (const ev of allEvents) {
+      const field =
+        (ev.extendedProps && ev.extendedProps.field) ||
+        (ev.extendedProps && ev.extendedProps.canonical) ||
+        null;
+
+      if (!field) continue;
+
+      const normField = normalizeFieldName(field);
+      if (!grouped[normField]) grouped[normField] = [];
+      grouped[normField].push(ev);
     }
 
-    allEvents = data.events || [];
-    console.log("Loaded events:", allEvents.length);
+    const collapsedEvents = [];
 
-  } catch (err) {
-    console.error("Fetch failed:", err);
-    if (lastUpdatedEl) {
-      lastUpdatedEl.innerText = "Error loading calendar data";
-    }
-  }
+    // STEP 2 — Process each field independently
+    for (const field of Object.keys(grouped)) {
+      if (selectedFields.length > 0 && !selectedFields.includes(field)) {
+        continue;
+      }
 
-  // Start calendar on first event if available
-  const initialDate = allEvents.length
-    ? allEvents[0].start
-    : monday;
+      const events = grouped[field];
 
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "timeGridWeek",
-    firstDay: 1,
-    initialDate: initialDate,
-    height: "auto",
-    slotMinTime: "08:00:00",
-    slotMaxTime: "21:00:00",
-    slotDuration: "00:30:00",
-    slotLabelInterval: "01:00",
-    allDaySlot: false,
+      // Separate availability vs non-availability
+      const availability = events.filter(e => e.extendedProps.type === "availability");
+      const blockers = events.filter(e => e.extendedProps.type !== "availability");
 
-    events: function (fetchInfo, successCallback, failureCallback) {
-      try {
-        const selectedFields = getSelectedFields();
-        const selectedTypes = getSelectedTypes();
+      if (availability.length === 0) continue;
 
-        const filtered = allEvents.filter(ev => {
-          const field =
-            (ev.extendedProps && ev.extendedProps.field) ||
-            (ev.extendedProps && ev.extendedProps.canonical) ||
-            null;
+      // STEP 3 — Merge availability windows
+      const merged = mergeWindows(availability);
 
-          const type =
-            (ev.extendedProps && ev.extendedProps.type) ||
-            "unknown";
+      // STEP 4 — Subtract blockers (games, blocks, closures)
+      const freeWindows = subtractWindows(merged, blockers);
 
-          const normField = normalizeFieldName(field);
+      // STEP 5 — Determine free surfaces
+      const surfaces = availability.map(a => a.extendedProps.surface).filter(Boolean);
 
-          // Field filter
-          if (selectedFields.length > 0 && !selectedFields.includes(normField)) {
-            return false;
+      for (const win of freeWindows) {
+        collapsedEvents.push({
+          title: "Available",
+          start: win.start,
+          end: win.end,
+          backgroundColor: "#6FCF97",
+          borderColor: "#4CAF50",
+          extendedProps: {
+            type: "availability",
+            field: field,
+            fullAvailable: surfaces.length > 1,
+            freeSurfaces: surfaces
           }
-
-          // Type filter
-          if (!selectedTypes.includes(type.toLowerCase())) {
-            return false;
-          }
-
-          return true;
         });
-
-        successCallback(filtered);
-      } catch (e) {
-        console.error("Error in events function:", e);
-        if (failureCallback) failureCallback(e);
       }
     }
-  });
 
-  calendar.render();
+    // STEP 6 — Add non-availability events normally
+    const realEvents = allEvents.filter(e => e.extendedProps.type !== "availability");
 
-  // Re-filter when checkboxes change
-  document.querySelectorAll('#field-filters input, #type-filters input').forEach(cb => {
-    cb.addEventListener('change', () => {
-      calendar.refetchEvents();
-    });
-  });
+    // STEP 7 — Apply type filters
+    const filteredReal = realEvents.filter(e =>
+      selectedTypes.includes(e.extendedProps.type)
+    );
 
-  // Debug helpers
-  window._calendar = calendar;
-  window._events = allEvents;
-});
+    successCallback([...collapsedEvents, ...filteredReal]);
+
+  } catch (e) {
+    console.error("Error in events function:", e);
+    if (failureCallback) failureCallback(e);
+  }
+},
