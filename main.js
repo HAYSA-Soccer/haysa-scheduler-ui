@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   monday.setDate(today.getDate() + diffToMonday);
 
   let allEvents = [];
-  let collapsedAvailabilityByField = {}; // cache: field -> collapsed availability events
+  let collapsedAvailabilityByField = {}; // field -> collapsed availability events
 
   const url = "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
@@ -101,7 +101,30 @@ document.addEventListener("DOMContentLoaded", async function () {
         lastUpdatedEl.innerText = `Calendar last updated: ${data.lastUpdate}`;
       }
 
-      allEvents = data.events || [];
+      allEvents = (data.events || []).map(ev => {
+        const ext = ev.extendedProps || {};
+
+        // Normalize type: only "availability" vs "game"
+        let t = (ext.type || "").toLowerCase();
+        if (t !== "availability") {
+          t = "game"; // ICS games, practices, blocks tab, closures → all treated as "game"
+        }
+
+        // Normalize field key once
+        const fieldRaw = ext.field || ext.canonical || "";
+        const fieldKey = normalizeFieldName(fieldRaw);
+
+        return {
+          ...ev,
+          extendedProps: {
+            ...ext,
+            type: t,
+            field: fieldRaw,
+            fieldKey: fieldKey
+          }
+        };
+      });
+
       precomputeCollapsedAvailability();
 
     } catch (err) {
@@ -115,40 +138,34 @@ document.addEventListener("DOMContentLoaded", async function () {
   function precomputeCollapsedAvailability() {
     collapsedAvailabilityByField = {};
 
-    // Group by canonical field
+    // Group by canonical fieldKey
     const grouped = {};
     for (const ev of allEvents) {
-      const field =
-        (ev.extendedProps && ev.extendedProps.field) ||
-        (ev.extendedProps && ev.extendedProps.canonical) ||
-        null;
-
-      if (!field) continue;
-
-      const normField = normalizeFieldName(field);
-      if (!grouped[normField]) grouped[normField] = [];
-      grouped[normField].push(ev);
+      const fieldKey = ev.extendedProps.fieldKey;
+      if (!fieldKey) continue;
+      if (!grouped[fieldKey]) grouped[fieldKey] = [];
+      grouped[fieldKey].push(ev);
     }
 
-    for (const field of Object.keys(grouped)) {
-      const events = grouped[field];
+    for (const fieldKey of Object.keys(grouped)) {
+      const events = grouped[fieldKey];
 
       const availability = events.filter(e => e.extendedProps.type === "availability");
-      const blockers = events.filter(e => e.extendedProps.type !== "availability");
+      const blockers = events.filter(e => e.extendedProps.type === "game");
 
       if (!availability.length) {
-        collapsedAvailabilityByField[field] = [];
+        collapsedAvailabilityByField[fieldKey] = [];
         continue;
       }
 
       // Merge all availability windows for this complex
       const merged = mergeWindows(availability);
 
-      // Treat ANY non-availability event as making the full complex unavailable
+      // Any "game" (ICS, practice, block tab, closure) removes availability in that window
       const freeWindows = subtractWindows(merged, blockers);
 
       if (!freeWindows.length) {
-        collapsedAvailabilityByField[field] = [];
+        collapsedAvailabilityByField[fieldKey] = [];
         continue;
       }
 
@@ -165,12 +182,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         borderColor: "#4CAF50",
         extendedProps: {
           type: "availability",
-          field: field,
+          field: events[0].extendedProps.field, // any representative
+          fieldKey: fieldKey,
           freeSurfaces: surfaces
         }
       }));
 
-      collapsedAvailabilityByField[field] = collapsed;
+      collapsedAvailabilityByField[fieldKey] = collapsed;
     }
   }
 
@@ -200,44 +218,36 @@ document.addEventListener("DOMContentLoaded", async function () {
           return;
         }
 
+        const results = [];
+
         // Collapsed availability for selected fields
-        let collapsed = [];
         if (selectedTypes.includes("availability")) {
-          for (const field of selectedFields) {
-            const fieldEvents = collapsedAvailabilityByField[field] || [];
-            // Filter by visible date range
+          for (const fieldKey of selectedFields) {
+            const fieldEvents = collapsedAvailabilityByField[fieldKey] || [];
             const inRange = fieldEvents.filter(e =>
               new Date(e.end) > fetchInfo.start && new Date(e.start) < fetchInfo.end
             );
-            collapsed = collapsed.concat(inRange);
+            results.push(...inRange);
           }
         }
 
-        // Real events (games, blocks, closures)
-        const realEvents = allEvents.filter(e =>
-          e.extendedProps &&
-          e.extendedProps.type &&
-          e.extendedProps.type !== "availability"
-        );
+        // Real "game" events (ICS, practices, blocks tab, closures)
+        if (selectedTypes.includes("game")) {
+          const realEvents = allEvents.filter(e => e.extendedProps.type === "game");
 
-        const filteredReal = realEvents.filter(e => {
-          const field =
-            (e.extendedProps && e.extendedProps.field) ||
-            (e.extendedProps && e.extendedProps.canonical) ||
-            null;
-          if (!field) return false;
+          const filteredReal = realEvents.filter(e => {
+            const fieldKey = e.extendedProps.fieldKey;
+            if (!selectedFields.includes(fieldKey)) return false;
 
-          const normField = normalizeFieldName(field);
-          if (!selectedFields.includes(normField)) return false;
+            const start = new Date(e.start);
+            const end = new Date(e.end);
+            return end > fetchInfo.start && start < fetchInfo.end;
+          });
 
-          if (!selectedTypes.includes(e.extendedProps.type)) return false;
+          results.push(...filteredReal);
+        }
 
-          const start = new Date(e.start);
-          const end = new Date(e.end);
-          return end > fetchInfo.start && start < fetchInfo.end;
-        });
-
-        successCallback([...collapsed, ...filteredReal]);
+        successCallback(results);
 
       } catch (e) {
         console.error("Error in events function:", e);
