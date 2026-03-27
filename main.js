@@ -2,14 +2,19 @@ document.addEventListener("DOMContentLoaded", async function () {
   const calendarEl = document.getElementById("calendar");
   const lastUpdatedEl = document.getElementById("last-updated");
 
-  // 🔹 Helper: which fields are checked in the UI?
-  // Make sure your checkboxes have values like: TURF, BUTLER, SUMNER, BROOKVILLE
-  function getSelectedFields() {
-    return Array.from(document.querySelectorAll('#field-filters input:checked'))
-      .map(cb => cb.value);
+  // Normalize field names to match backend canonical style
+  function normalizeFieldName(name) {
+    if (!name) return "";
+    return name.toUpperCase().trim();
   }
 
-  // 🔹 Compute Monday of current week (so we land somewhere sane)
+  // Which fields are checked in the UI?
+  function getSelectedFields() {
+    return Array.from(document.querySelectorAll('#field-filters input:checked'))
+      .map(cb => normalizeFieldName(cb.value));
+  }
+
+  // Compute Monday of current week (fallback if no events)
   const today = new Date();
   const day = today.getDay(); // 0 = Sun, 1 = Mon, ...
   const diffToMonday = (day === 0 ? -6 : 1 - day);
@@ -39,11 +44,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  // 🔹 FullCalendar with dynamic filtering
+  // Decide initial date: first event if available, otherwise current week Monday
+  const initialDate = allEvents.length
+    ? allEvents[0].start
+    : monday;
+
+  // FullCalendar with dynamic filtering
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "timeGridWeek",
     firstDay: 1,
-    initialDate: monday,
+    initialDate: initialDate,
     height: "auto",
     slotMinTime: "08:00:00",
     slotMaxTime: "21:00:00",
@@ -51,25 +61,26 @@ document.addEventListener("DOMContentLoaded", async function () {
     slotLabelInterval: "01:00",
     allDaySlot: false,
 
-    // We use a function source so we can re-filter on checkbox changes
+    // Function source so we can re-filter on checkbox changes
     events: function (fetchInfo, successCallback, failureCallback) {
       try {
         const selectedFields = getSelectedFields();
 
-        // Filter by field (NOT surface)
         const filtered = allEvents.filter(ev => {
           const field =
             (ev.extendedProps && ev.extendedProps.field) ||
             (ev.extendedProps && ev.extendedProps.canonical) ||
             null;
 
-          // If no field info, keep it visible (or change to false if you want to hide)
-          if (!field) return true;
+          const normField = normalizeFieldName(field);
+
+          // If no field info, keep it visible
+          if (!normField) return true;
 
           // If no filters selected, show everything
           if (selectedFields.length === 0) return true;
 
-          return selectedFields.includes(field);
+          return selectedFields.includes(normField);
         });
 
         successCallback(filtered);
@@ -79,16 +90,15 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     },
 
-    // Optional: tweak how events render, but we don’t hide them here anymore
     eventDidMount: function (info) {
-      // You can add tooltips, etc., here if you want
+      // Hook for future tooltips or debugging
       // console.log(info.event.extendedProps);
     }
   });
 
   calendar.render();
 
-  // 🔹 Re-filter when checkboxes change
+  // Re-filter when checkboxes change
   document.querySelectorAll('#field-filters input').forEach(cb => {
     cb.addEventListener('change', () => {
       calendar.refetchEvents();
