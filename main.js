@@ -8,15 +8,21 @@ document.addEventListener("DOMContentLoaded", async function () {
     return name.toUpperCase().trim();
   }
 
-  // Which fields are checked in the UI?
+  // FIELD FILTERS
   function getSelectedFields() {
     return Array.from(document.querySelectorAll('#field-filters input:checked'))
       .map(cb => normalizeFieldName(cb.value));
   }
 
-  // Compute Monday of current week (fallback if no events)
+  // EVENT TYPE FILTERS
+  function getSelectedTypes() {
+    return Array.from(document.querySelectorAll('#type-filters input:checked'))
+      .map(cb => cb.value.toLowerCase());
+  }
+
+  // Compute Monday of current week (fallback)
   const today = new Date();
-  const day = today.getDay(); // 0 = Sun, 1 = Mon, ...
+  const day = today.getDay();
   const diffToMonday = (day === 0 ? -6 : 1 - day);
   const monday = new Date(today);
   monday.setDate(today.getDate() + diffToMonday);
@@ -44,12 +50,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  // Decide initial date: first event if available, otherwise current week Monday
+  // Start calendar on first event if available
   const initialDate = allEvents.length
     ? allEvents[0].start
     : monday;
 
-  // FullCalendar with dynamic filtering
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "timeGridWeek",
     firstDay: 1,
@@ -61,10 +66,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     slotLabelInterval: "01:00",
     allDaySlot: false,
 
-    // Function source so we can re-filter on checkbox changes
     events: function (fetchInfo, successCallback, failureCallback) {
       try {
         const selectedFields = getSelectedFields();
+        const selectedTypes = getSelectedTypes();
 
         const filtered = allEvents.filter(ev => {
           const field =
@@ -72,15 +77,23 @@ document.addEventListener("DOMContentLoaded", async function () {
             (ev.extendedProps && ev.extendedProps.canonical) ||
             null;
 
+          const type =
+            (ev.extendedProps && ev.extendedProps.type) ||
+            "unknown";
+
           const normField = normalizeFieldName(field);
 
-          // If no field info, keep it visible
-          if (!normField) return true;
+          // Field filter
+          if (selectedFields.length > 0 && !selectedFields.includes(normField)) {
+            return false;
+          }
 
-          // If no filters selected, show everything
-          if (selectedFields.length === 0) return true;
+          // Type filter
+          if (!selectedTypes.includes(type.toLowerCase())) {
+            return false;
+          }
 
-          return selectedFields.includes(normField);
+          return true;
         });
 
         successCallback(filtered);
@@ -88,24 +101,19 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.error("Error in events function:", e);
         if (failureCallback) failureCallback(e);
       }
-    },
-
-    eventDidMount: function (info) {
-      // Hook for future tooltips or debugging
-      // console.log(info.event.extendedProps);
     }
   });
 
   calendar.render();
 
   // Re-filter when checkboxes change
-  document.querySelectorAll('#field-filters input').forEach(cb => {
+  document.querySelectorAll('#field-filters input, #type-filters input').forEach(cb => {
     cb.addEventListener('change', () => {
       calendar.refetchEvents();
     });
   });
 
-  // For quick debugging in console:
+  // Debug helpers
   window._calendar = calendar;
   window._events = allEvents;
 });
