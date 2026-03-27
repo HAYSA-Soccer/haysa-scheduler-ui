@@ -14,12 +14,30 @@
 
   <h1>HAYSA Scheduler UI</h1>
 
+  <!-- FIELD FILTERS -->
   <div id="field-filters">
-    <!-- Values now match canonical backend names -->
+    <strong>Fields:</strong>
     <label><input type="checkbox" value="TURF" checked> Turf</label>
     <label><input type="checkbox" value="BUTLER" checked> Butler</label>
     <label><input type="checkbox" value="SUMNER/SEAN JOYCE" checked> Sumner</label>
     <label><input type="checkbox" value="BROOKVILLE" checked> Brookville</label>
+  </div>
+
+  <!-- EVENT TYPE FILTERS -->
+  <div id="type-filters">
+    <strong>Show:</strong>
+    <label><input type="checkbox" value="availability" checked> Availability</label>
+    <label><input type="checkbox" value="game" checked> Games</label>
+    <label><input type="checkbox" value="block" checked> Blocks</label>
+    <label><input type="checkbox" value="closure" checked> Closures</label>
+  </div>
+
+  <!-- LEGEND -->
+  <div id="legend">
+    <span class="legend-item availability">Availability</span>
+    <span class="legend-item game">Game</span>
+    <span class="legend-item block">Block</span>
+    <span class="legend-item closure">Closure</span>
   </div>
 
   <div id="last-updated"></div>
