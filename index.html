@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>HAYSA Scheduler UI</title>
+  <title>HAYSA Scheduler</title>
 
   <link rel="stylesheet" href="styles.css">
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
 </head>
 <body>
 
-  <h1>HAYSA Scheduler UI</h1>
+  <h1>HAYSA Scheduler</h1>
 
   <!-- FIELD FILTERS -->
   <div id="field-filters">
@@ -20,17 +20,21 @@
     <label><input type="checkbox" value="BROOKVILLE" checked> Brookville</label>
   </div>
 
-  <!-- EVENT TYPE FILTERS (SIMPLIFIED) -->
+  <!-- TYPE FILTERS -->
   <div id="type-filters">
     <strong>Show:</strong>
     <label><input type="checkbox" value="availability" checked> Availability</label>
     <label><input type="checkbox" value="game" checked> Games</label>
+    <label><input type="checkbox" value="practice" checked> Practices</label>
+    <label><input type="checkbox" value="block" checked> Blocks</label>
   </div>
 
   <!-- LEGEND -->
   <div id="legend">
     <span class="legend-item availability">Availability</span>
-    <span class="legend-item game">Game / Practice / Block</span>
+    <span class="legend-item game">Game</span>
+    <span class="legend-item practice">Practice</span>
+    <span class="legend-item block">Block</span>
   </div>
 
   <div id="last-updated"></div>
