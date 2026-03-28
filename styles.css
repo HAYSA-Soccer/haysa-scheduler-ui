@@ -44,6 +44,21 @@ h1 {
   text-align: center;
 }
 
+/* Freshness indicators */
+#last-updated.stale {
+  background: #fff3cd;
+  color: #856404;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+#last-updated.very-stale {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
 #calendar {
   max-width: 900px;
   margin: 20px auto;
