@@ -35,18 +35,15 @@ function subtractWindows(avail, blockers) {
     const updated = [];
 
     for (const w of free) {
-      // no overlap
       if (block.end <= w.start || block.start >= w.end) {
         updated.push(w);
         continue;
       }
 
-      // left piece
       if (block.start > w.start) {
         updated.push({ start: w.start, end: block.start });
       }
 
-      // right piece
       if (block.end < w.end) {
         updated.push({ start: block.end, end: w.end });
       }
@@ -60,6 +57,26 @@ function subtractWindows(avail, blockers) {
 }
 
 // ------------------------------------------------------------
+// Classification Logic
+// ------------------------------------------------------------
+function classifyEvent(ev) {
+  const t = (ev.extendedProps.type || "").toLowerCase();
+  const title = (ev.title || "").toLowerCase();
+
+  if (t === "availability") return "availability";
+
+  if (title.includes("practice") || title.includes("prac")) return "practice";
+
+  if (title.includes("vs")) return "game";
+
+  if (t === "practice") return "practice";
+
+  if (t === "game") return "game";
+
+  return "block";
+}
+
+// ------------------------------------------------------------
 // Main UI logic
 // ------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", async function () {
@@ -67,8 +84,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const lastUpdatedEl = document.getElementById("last-updated");
 
   function normalizeFieldName(name) {
-    if (!name) return "";
-    return name.toUpperCase().trim();
+    return (name || "").toUpperCase().trim();
   }
 
   function getSelectedFields() {
@@ -81,68 +97,42 @@ document.addEventListener("DOMContentLoaded", async function () {
       .map(cb => cb.value.toLowerCase());
   }
 
-  const today = new Date();
-  const day = today.getDay();
-  const diffToMonday = (day === 0 ? -6 : 1 - day);
-  const monday = new Date(today);
-  monday.setDate(today.getDate() + diffToMonday);
-
   let allEvents = [];
-  let collapsedAvailabilityByField = {}; // field -> collapsed availability events
+  let collapsedAvailabilityByField = {};
 
   const url = "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
   async function loadData() {
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
+    const response = await fetch(url);
+    const data = await response.json();
 
-      if (lastUpdatedEl) {
-        lastUpdatedEl.innerText = `Calendar last updated: ${data.lastUpdate}`;
-      }
-
-      allEvents = (data.events || []).map(ev => {
-        const ext = ev.extendedProps || {};
-
-        // Normalize type: only "availability" vs "game"
-        let t = (ext.type || "").toLowerCase();
-        if (t !== "availability") {
-          t = "game"; // ICS games, practices, blocks tab, closures → all treated as "game"
-        }
-
-        // Normalize field key once
-        const fieldRaw = ext.field || ext.canonical || "";
-        const fieldKey = normalizeFieldName(fieldRaw);
-
-        return {
-          ...ev,
-          extendedProps: {
-            ...ext,
-            type: t,
-            field: fieldRaw,
-            fieldKey: fieldKey
-          }
-        };
-      });
-
-      precomputeCollapsedAvailability();
-
-    } catch (err) {
-      console.error("Fetch failed:", err);
-      if (lastUpdatedEl) {
-        lastUpdatedEl.innerText = "Error loading calendar data";
-      }
+    if (lastUpdatedEl) {
+      lastUpdatedEl.innerText = `Calendar last updated: ${data.lastUpdate}`;
     }
+
+    allEvents = (data.events || []).map(ev => {
+      const ext = ev.extendedProps || {};
+      const fieldKey = normalizeFieldName(ext.canonical || ext.field || "");
+
+      return {
+        ...ev,
+        extendedProps: {
+          ...ext,
+          fieldKey,
+          uiType: classifyEvent(ev)
+        }
+      };
+    });
+
+    precomputeCollapsedAvailability();
   }
 
   function precomputeCollapsedAvailability() {
     collapsedAvailabilityByField = {};
 
-    // Group by canonical fieldKey
     const grouped = {};
     for (const ev of allEvents) {
       const fieldKey = ev.extendedProps.fieldKey;
-      if (!fieldKey) continue;
       if (!grouped[fieldKey]) grouped[fieldKey] = [];
       grouped[fieldKey].push(ev);
     }
@@ -150,18 +140,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     for (const fieldKey of Object.keys(grouped)) {
       const events = grouped[fieldKey];
 
-      const availability = events.filter(e => e.extendedProps.type === "availability");
-      const blockers = events.filter(e => e.extendedProps.type === "game");
+      const availability = events.filter(e => e.extendedProps.uiType === "availability");
+      const blockers = events.filter(e => e.extendedProps.uiType !== "availability");
 
       if (!availability.length) {
         collapsedAvailabilityByField[fieldKey] = [];
         continue;
       }
 
-      // Merge all availability windows for this complex
       const merged = mergeWindows(availability);
-
-      // Any "game" (ICS, practice, block tab, closure) removes availability in that window
       const freeWindows = subtractWindows(merged, blockers);
 
       if (!freeWindows.length) {
@@ -169,107 +156,68 @@ document.addEventListener("DOMContentLoaded", async function () {
         continue;
       }
 
-      // Collect surfaces just for tooltip detail
-      const surfaces = availability
-        .map(a => a.extendedProps.surface)
-        .filter(Boolean);
+      const surfaces = availability.map(a => a.extendedProps.surface).filter(Boolean);
 
-      const collapsed = freeWindows.map(win => ({
+      collapsedAvailabilityByField[fieldKey] = freeWindows.map(win => ({
         title: "Available",
         start: win.start,
         end: win.end,
         backgroundColor: "#6FCF97",
         borderColor: "#4CAF50",
         extendedProps: {
-          type: "availability",
-          field: events[0].extendedProps.field, // any representative
-          fieldKey: fieldKey,
+          uiType: "availability",
+          fieldKey,
           freeSurfaces: surfaces
         }
       }));
-
-      collapsedAvailabilityByField[fieldKey] = collapsed;
     }
   }
 
   await loadData();
 
-  const initialDate = allEvents.length ? allEvents[0].start : monday;
-
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "timeGridWeek",
     firstDay: 1,
-    initialDate: initialDate,
     height: "auto",
     slotMinTime: "08:00:00",
     slotMaxTime: "21:00:00",
-    slotDuration: "00:30:00",
-    slotLabelInterval: "01:00",
     allDaySlot: false,
 
-    events: function (fetchInfo, successCallback, failureCallback) {
-      try {
-        const selectedFields = getSelectedFields();
-        const selectedTypes = getSelectedTypes();
+    events: function (fetchInfo, successCallback) {
+      const selectedFields = getSelectedFields();
+      const selectedTypes = getSelectedTypes();
 
-        // If no fields selected, show nothing
-        if (!selectedFields.length) {
-          successCallback([]);
-          return;
+      const results = [];
+
+      if (selectedTypes.includes("availability")) {
+        for (const fieldKey of selectedFields) {
+          const fieldEvents = collapsedAvailabilityByField[fieldKey] || [];
+          results.push(...fieldEvents);
         }
-
-        const results = [];
-
-        // Collapsed availability for selected fields
-        if (selectedTypes.includes("availability")) {
-          for (const fieldKey of selectedFields) {
-            const fieldEvents = collapsedAvailabilityByField[fieldKey] || [];
-            const inRange = fieldEvents.filter(e =>
-              new Date(e.end) > fetchInfo.start && new Date(e.start) < fetchInfo.end
-            );
-            results.push(...inRange);
-          }
-        }
-
-        // Real "game" events (ICS, practices, blocks tab, closures)
-        if (selectedTypes.includes("game")) {
-          const realEvents = allEvents.filter(e => e.extendedProps.type === "game");
-
-          const filteredReal = realEvents.filter(e => {
-            const fieldKey = e.extendedProps.fieldKey;
-            if (!selectedFields.includes(fieldKey)) return false;
-
-            const start = new Date(e.start);
-            const end = new Date(e.end);
-            return end > fetchInfo.start && start < fetchInfo.end;
-          });
-
-          results.push(...filteredReal);
-        }
-
-        successCallback(results);
-
-      } catch (e) {
-        console.error("Error in events function:", e);
-        if (failureCallback) failureCallback(e);
       }
+
+      const realEvents = allEvents.filter(e => {
+        const fieldKey = e.extendedProps.fieldKey;
+        const uiType = e.extendedProps.uiType;
+        return selectedFields.includes(fieldKey) && selectedTypes.includes(uiType);
+      });
+
+      results.push(...realEvents);
+
+      successCallback(results);
     },
 
     eventDidMount: function(info) {
-      if (info.event.extendedProps.type === "availability") {
-        const props = info.event.extendedProps;
+      const props = info.event.extendedProps;
+      const uiType = props.uiType;
+
+      if (uiType === "availability") {
         const startStr = info.event.start.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
         const endStr = info.event.end.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
-        const surfaces = (props.freeSurfaces && props.freeSurfaces.length)
-          ? props.freeSurfaces.join(", ")
-          : "N/A";
+        const surfaces = props.freeSurfaces ? props.freeSurfaces.join(", ") : "N/A";
 
-        const tooltip =
-          `${props.field}\n` +
-          `Available: ${startStr} - ${endStr}\n` +
-          `Free surfaces: ${surfaces}`;
-
-        info.el.title = tooltip;
+        info.el.title =
+          `Available\n${startStr} - ${endStr}\nFree surfaces: ${surfaces}`;
       }
     }
   });
@@ -277,11 +225,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   calendar.render();
 
   document.querySelectorAll('#field-filters input, #type-filters input').forEach(cb => {
-    cb.addEventListener('change', () => {
-      calendar.refetchEvents();
-    });
+    cb.addEventListener('change', () => calendar.refetchEvents());
   });
-
-  window._calendar = calendar;
-  window._events = allEvents;
 });
