@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     lastUpdatedEl.textContent = `Calendar last updated: ${rel} (${abs})`;
 
-    // Color coding
     const diffMs = Date.now() - new Date(iso).getTime();
     const mins = diffMs / 60000;
 
@@ -69,14 +68,53 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   // -----------------------------
+  // EVENT CLASSIFICATION
+  // -----------------------------
+  function classifyEvent(ev) {
+    const t = (ev.extendedProps && ev.extendedProps.type || "").toLowerCase();
+    const title = (ev.title || "").toLowerCase();
+
+    if (t === "availability") return "availability";
+    if (t === "practice") return "practice";
+    if (t === "game") return "game";
+
+    if (title.includes("practice") || title.includes("prac")) return "practice";
+    if (title.includes("vs")) return "game";
+
+    return "block";
+  }
+
+  // -----------------------------
   // AVAILABILITY COLLAPSE HELPERS
   // -----------------------------
-  function mergeWindows(events) {
-    if (!events.length) return [];
-    const windows = events.map(e => ({
-      start: new Date(e.start),
-      end: new Date(e.end)
-    }));
+  function arraysEqualIgnoringOrder(a, b) {
+    const aa = (a || []).slice().sort();
+    const bb = (b || []).slice().sort();
+    if (aa.length !== bb.length) return false;
+    for (let i = 0; i < aa.length; i++) {
+      if (aa[i] !== bb[i]) return false;
+    }
+    return true;
+  }
+
+  function collapseAvailabilityForField(eventsForField) {
+    const availability = eventsForField.filter(e => e.extendedProps.uiType === "availability");
+    const others = eventsForField.filter(e => e.extendedProps.uiType !== "availability");
+
+    if (!availability.length) return eventsForField;
+
+    const windows = availability.map(ev => {
+      const start = new Date(ev.start);
+      const end = new Date(ev.end);
+      const props = ev.extendedProps || {};
+      return {
+        original: ev,
+        start,
+        end,
+        practiceSurfaces: props.practiceSurfaces || [],
+        gameOnlySurfaces: props.gameOnlySurfaces || []
+      };
+    });
 
     windows.sort((a, b) => a.start - b.start);
 
@@ -85,57 +123,65 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     for (let i = 1; i < windows.length; i++) {
       const next = windows[i];
-      if (next.start <= current.end) {
-        current.end = new Date(Math.max(current.end, next.end));
+
+      const samePractice = arraysEqualIgnoringOrder(
+        current.practiceSurfaces,
+        next.practiceSurfaces
+      );
+      const sameGameOnly = arraysEqualIgnoringOrder(
+        current.gameOnlySurfaces,
+        next.gameOnlySurfaces
+      );
+
+      if (next.start <= current.end && samePractice && sameGameOnly) {
+        if (next.end > current.end) {
+          current.end = next.end;
+        }
       } else {
         merged.push(current);
         current = next;
       }
     }
-
     merged.push(current);
-    return merged;
+
+    const MIN_DURATION_MS = 60 * 60 * 1000;
+    const collapsedEvents = merged
+      .filter(w => (w.end - w.start) >= MIN_DURATION_MS)
+      .map(w => {
+        const base = w.original;
+        const props = base.extendedProps || {};
+        return {
+          title: "Available",
+          start: w.start.toISOString(),
+          end: w.end.toISOString(),
+          backgroundColor: "#6FCF97",
+          borderColor: "#4CAF50",
+          extendedProps: {
+            ...props,
+            uiType: "availability",
+            practiceSurfaces: w.practiceSurfaces,
+            gameOnlySurfaces: w.gameOnlySurfaces
+          }
+        };
+      });
+
+    return others.concat(collapsedEvents);
   }
 
-  function subtractWindows(avail, blockers) {
-    let free = [...avail];
-
-    for (const b of blockers) {
-      const block = { start: new Date(b.start), end: new Date(b.end) };
-      const updated = [];
-
-      for (const w of free) {
-        if (block.end <= w.start || block.start >= w.end) {
-          updated.push(w);
-          continue;
-        }
-
-        if (block.start > w.start) {
-          updated.push({ start: w.start, end: block.start });
-        }
-
-        if (block.end < w.end) {
-          updated.push({ start: block.end, end: w.end });
-        }
-      }
-
-      free = updated;
-      if (!free.length) break;
+  function collapseAvailability(allEvents) {
+    const grouped = {};
+    for (const ev of allEvents) {
+      const fieldKey = ev.extendedProps.fieldKey;
+      if (!grouped[fieldKey]) grouped[fieldKey] = [];
+      grouped[fieldKey].push(ev);
     }
 
-    return free;
-  }
-
-  function classifyEvent(ev) {
-    const t = (ev.extendedProps.type || "").toLowerCase();
-    const title = (ev.title || "").toLowerCase();
-
-    if (t === "availability") return "availability";
-    if (title.includes("practice") || title.includes("prac")) return "practice";
-    if (title.includes("vs")) return "game";
-    if (t === "practice") return "practice";
-    if (t === "game") return "game";
-    return "block";
+    const result = [];
+    for (const fieldKey of Object.keys(grouped)) {
+      const collapsed = collapseAvailabilityForField(grouped[fieldKey]);
+      result.push(...collapsed);
+    }
+    return result;
   }
 
   // -----------------------------
@@ -149,25 +195,26 @@ document.addEventListener("DOMContentLoaded", async function () {
     const response = await fetch(url);
     const data = await response.json();
 
-    // Update banner
     updateLastUpdatedBanner(data.lastUpdate);
 
-    allEvents = (data.events || []).map(ev => {
+    const rawEvents = (data.events || []).map(ev => {
       const ext = ev.extendedProps || {};
       const fieldKey = normalizeFieldName(ext.canonical || ext.field || "");
+
+      const uiType = classifyEvent(ev);
 
       return {
         ...ev,
         extendedProps: {
           ...ext,
           fieldKey,
-          uiType: classifyEvent(ev)
+          uiType
         }
       };
     });
 
+    allEvents = collapseAvailability(rawEvents);
   }
-
 
   await loadData();
 
@@ -185,13 +232,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     events: function (fetchInfo, successCallback) {
       const selectedFields = getSelectedFields();
       const selectedTypes = getSelectedTypes();
-    
+
       const results = allEvents.filter(e => {
         const fieldKey = e.extendedProps.fieldKey;
         const uiType = e.extendedProps.uiType;
         return selectedFields.includes(fieldKey) && selectedTypes.includes(uiType);
       });
-    
+
       successCallback(results);
     },
 
@@ -202,20 +249,20 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (uiType === "availability") {
         const startStr = info.event.start.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
         const endStr = info.event.end.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
-      
+
         const practice = props.practiceSurfaces || [];
         const gameOnly = props.gameOnlySurfaces || [];
-      
+
         let tooltip = `Available\n${startStr} - ${endStr}`;
-      
+
         if (practice.length > 0) {
           tooltip += `\nPractice surfaces: ${practice.join(", ")}`;
         }
-      
+
         if (gameOnly.length > 0) {
           tooltip += `\nGame-only surfaces: ${gameOnly.join(", ")}`;
         }
-      
+
         info.el.title = tooltip;
       }
     }
