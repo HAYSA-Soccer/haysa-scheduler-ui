@@ -149,7 +149,10 @@ async function loadSeasonData() {
     }
   });
 
+  // Default: all fields ON
   selectedFields = new Set(allFieldKeys);
+
+  // Sumner is visible now, so keep it selected by default
 
   initFieldLayersUI();
   startLastUpdateTicker();
@@ -164,6 +167,34 @@ async function loadSeasonData() {
 
 // ===== FIELD LAYERS UI =====
 
+function createFieldCheckbox(canonical, labelText) {
+  const container = document.getElementById('fieldLayersContainer');
+
+  const wrapper = document.createElement('label');
+  wrapper.className = 'field-layer-item';
+
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.checked = true;
+  checkbox.dataset.canonical = canonical;
+
+  checkbox.addEventListener('change', () => {
+    if (checkbox.checked) {
+      selectedFields.add(canonical);
+    } else {
+      selectedFields.delete(canonical);
+    }
+    if (calendar) calendar.refetchEvents();
+  });
+
+  const span = document.createElement('span');
+  span.textContent = labelText;
+
+  wrapper.appendChild(checkbox);
+  wrapper.appendChild(span);
+  container.appendChild(wrapper);
+}
+
 function initFieldLayersUI() {
   const container = document.getElementById('fieldLayersContainer');
   if (!container) return;
@@ -171,34 +202,13 @@ function initFieldLayersUI() {
   container.innerHTML = '';
 
   allFieldKeys.forEach(canonical => {
-    // Remove Sumner/Sean Joyce from UI
-    if (canonical === 'SUMNER/SEAN JOYCE') return;
+    if (canonical === 'SUMNER/SEAN JOYCE') {
+      createFieldCheckbox(canonical, 'Sumner');
+      return;
+    }
 
     const labelText = canonicalToLabel(canonical);
-
-    const wrapper = document.createElement('label');
-    wrapper.className = 'field-layer-item';
-
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = true;
-    checkbox.dataset.canonical = canonical;
-
-    checkbox.addEventListener('change', () => {
-      if (checkbox.checked) {
-        selectedFields.add(canonical);
-      } else {
-        selectedFields.delete(canonical);
-      }
-      if (calendar) calendar.refetchEvents();
-    });
-
-    const span = document.createElement('span');
-    span.textContent = labelText;
-
-    wrapper.appendChild(checkbox);
-    wrapper.appendChild(span);
-    container.appendChild(wrapper);
+    createFieldCheckbox(canonical, labelText);
   });
 }
 
@@ -212,7 +222,7 @@ function canonicalToLabel(canonical) {
     case 'BROOKVILLE': return 'Brookville';
     case 'BUTLER': return 'Butler';
     case 'TURF': return 'Turf';
-    case 'SUMNER/SEAN JOYCE': return 'Sumner/Sean Joyce';
+    case 'SUMNER/SEAN JOYCE': return 'Sumner';
     default:
       return upper.charAt(0) + upper.slice(1).toLowerCase();
   }
