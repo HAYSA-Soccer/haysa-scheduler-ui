@@ -2,12 +2,19 @@
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec';
 
+// Season range (from SeasonSettings)
+const SEASON_START = '2026-03-15';
+const SEASON_END   = '2026-06-30';
+
 
 // ===== STATE =====
+
 let calendar = null;
-let allEvents = [];          // raw events from backend
-let practiceOnly = false;    // toggle state
-let currentFieldComplex = "BROOKVILLE"; // ⭐ NEW
+let seasonEvents = [];          // all events for the entire season
+let practiceOnly = false;       // practice-only toggle
+let selectedFields = new Set(); // canonical field keys currently selected
+let allFieldKeys = new Set();   // all canonical field keys seen in the season
+let lastUpdateText = '';        // ICS last update from backend
 
 
 // ===== HELPERS =====
@@ -81,7 +88,7 @@ function buildTooltip(ev) {
   return lines.join('\n');
 }
 
-function filterEventsForPracticeToggle(events) {
+function filterByPractice(events) {
   if (!practiceOnly) return events;
 
   return events.filter(ev => {
@@ -90,18 +97,28 @@ function filterEventsForPracticeToggle(events) {
   });
 }
 
+function filterByFields(events) {
+  // If no fields selected, show nothing
+  if (!selectedFields || selectedFields.size === 0) return [];
 
-// ===== FIELD FILTER PIPELINE =====
-
-function applyFieldFilter(events) {
-  return events.filter(ev =>
-    ev.extendedProps &&
-    ev.extendedProps.canonical === currentFieldComplex
-  );
+  return events.filter(ev => {
+    const ext = ev.extendedProps || {};
+    const canonical = ext.canonical;
+    if (!canonical) return false;
+    return selectedFields.has(canonical);
+  });
 }
 
+function filterByDateRange(events, start, end) {
+  const startMs = start.getTime();
+  const endMs = end.getTime();
 
-// ===== DECORATION PIPELINE =====
+  return events.filter(ev => {
+    const evStart = new Date(ev.start).getTime();
+    const evEnd = new Date(ev.end || ev.start).getTime();
+    return evEnd > startMs && evStart < endMs;
+  });
+}
 
 function decorateEvents(events) {
   return events.map(ev => {
@@ -119,43 +136,108 @@ function decorateEvents(events) {
   });
 }
 
+// Canonical -> human label
+function canonicalToLabel(canonical) {
+  if (!canonical) return '';
+  const upper = String(canonical).toUpperCase();
+  switch (upper) {
+    case 'BROOKVILLE': return 'Brookville';
+    case 'SUMNER':     return 'Sumner';
+    case 'BUTLER':     return 'Butler';
+    case 'TURF':       return 'Turf';
+    default:
+      // Fallback: capitalize first letter, lower the rest
+      return upper.charAt(0) + upper.slice(1).toLowerCase();
+  }
+}
 
-// ===== FETCH + INIT =====
 
-async function fetchEvents(rangeStart, rangeEnd) {
+// ===== DATA LOAD (SEASON ONCE) =====
+
+async function fetchSeasonEvents() {
   const params = new URLSearchParams();
-  if (rangeStart) params.append('start', rangeStart.toISOString());
-  if (rangeEnd) params.append('end', rangeEnd.toISOString());
+  params.append('start', SEASON_START);
+  params.append('end', SEASON_END);
 
   const url = API_URL + (API_URL.includes('?') ? '&' : '?') + params.toString();
 
   const res = await fetch(url);
   if (!res.ok) {
-    console.error('Failed to fetch events', res.status, res.statusText);
+    console.error('Failed to fetch season events', res.status, res.statusText);
     return { lastUpdate: 'Unknown', events: [] };
   }
 
-  return await res.json();
+  const data = await res.json();
+  return data;
+}
+
+async function loadSeasonData() {
+  const data = await fetchSeasonEvents();
+  seasonEvents = data.events || [];
+  lastUpdateText = data.lastUpdate || '';
+
+  // Build field list from entire season
+  allFieldKeys = new Set();
+  seasonEvents.forEach(ev => {
+    const ext = ev.extendedProps || {};
+    if (ext.canonical) {
+      allFieldKeys.add(ext.canonical);
+    }
+  });
+
+  // Default: all fields ON
+  selectedFields = new Set(allFieldKeys);
+
+  // Update last update label
+  const lastUpdateEl = document.getElementById('lastUpdate');
+  if (lastUpdateEl) {
+    lastUpdateEl.textContent = lastUpdateText
+      ? `ICS Last Update: ${lastUpdateText}`
+      : '';
+  }
+
+  // Build field layer checkboxes
+  initFieldLayersUI();
 }
 
 
-// ===== RENDER PIPELINE =====
+// ===== UI: FIELD LAYERS =====
 
-function renderFilteredEvents() {
-  if (!calendar) return;
+function initFieldLayersUI() {
+  const container = document.getElementById('fieldLayersContainer');
+  if (!container) return;
 
-  // 1. Practice filter
-  let filtered = filterEventsForPracticeToggle(allEvents);
+  container.innerHTML = '';
 
-  // 2. Field filter
-  filtered = applyFieldFilter(filtered);
+  allFieldKeys.forEach(canonical => {
+    const labelText = canonicalToLabel(canonical);
 
-  // 3. Decorate
-  const decorated = decorateEvents(filtered);
+    const wrapper = document.createElement('label');
+    wrapper.className = 'field-layer-item';
 
-  // 4. Replace events
-  calendar.removeAllEvents();
-  calendar.addEventSource(decorated);
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = true;
+    checkbox.dataset.canonical = canonical;
+
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        selectedFields.add(canonical);
+      } else {
+        selectedFields.delete(canonical);
+      }
+      if (calendar) {
+        calendar.refetchEvents();
+      }
+    });
+
+    const span = document.createElement('span');
+    span.textContent = labelText;
+
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(span);
+    container.appendChild(wrapper);
+  });
 }
 
 
@@ -163,6 +245,7 @@ function renderFilteredEvents() {
 
 function initCalendar() {
   const calendarEl = document.getElementById('calendar');
+  if (!calendarEl) return;
 
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'timeGridWeek',
@@ -178,23 +261,24 @@ function initCalendar() {
       right: 'timeGridWeek,dayGridMonth'
     },
 
-    events: async (info, successCallback, failureCallback) => {
+    // Use cached seasonEvents; filter per view
+    events: (info, successCallback, failureCallback) => {
       try {
-        const data = await fetchEvents(info.start, info.end);
-        document.getElementById('lastUpdate').textContent =
-          data.lastUpdate ? `ICS Last Update: ${data.lastUpdate}` : '';
+        // 1) Filter by date range
+        let filtered = filterByDateRange(seasonEvents, info.start, info.end);
 
-        allEvents = data.events || [];
+        // 2) Practice filter
+        filtered = filterByPractice(filtered);
 
-        // Apply both filters
-        let filtered = filterEventsForPracticeToggle(allEvents);
-        filtered = applyFieldFilter(filtered);
+        // 3) Field filter
+        filtered = filterByFields(filtered);
 
+        // 4) Decorate
         const decorated = decorateEvents(filtered);
 
         successCallback(decorated);
       } catch (err) {
-        console.error('Error loading events', err);
+        console.error('Error building events', err);
         failureCallback(err);
       }
     },
@@ -210,7 +294,7 @@ function initCalendar() {
 }
 
 
-// ===== UI INIT =====
+// ===== UI: PRACTICE TOGGLE =====
 
 function initPracticeToggle() {
   const toggle = document.getElementById('practiceOnlyToggle');
@@ -218,25 +302,21 @@ function initPracticeToggle() {
 
   toggle.addEventListener('change', () => {
     practiceOnly = toggle.checked;
-    renderFilteredEvents();
-  });
-}
-
-function initFieldFilter() {
-  const select = document.getElementById('fieldFilter');
-  if (!select) return;
-
-  select.addEventListener('change', () => {
-    currentFieldComplex = select.value;
-    renderFilteredEvents();
+    if (calendar) {
+      calendar.refetchEvents();
+    }
   });
 }
 
 
 // ===== BOOTSTRAP =====
 
-document.addEventListener('DOMContentLoaded', () => {
-  initCalendar();
-  initPracticeToggle();
-  initFieldFilter();
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await loadSeasonData();   // fetch entire season once
+    initPracticeToggle();     // wire practice toggle
+    initCalendar();           // start calendar using cached data
+  } catch (err) {
+    console.error('Error during initialization', err);
+  }
 });
