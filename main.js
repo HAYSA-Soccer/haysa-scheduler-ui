@@ -4,6 +4,7 @@
 // For local testing, you can paste the full Apps Script URL.
 const API_URL = 'https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec';
 
+
 // ===== STATE =====
 let calendar = null;
 let allEvents = [];          // raw events from backend
