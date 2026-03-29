@@ -14,22 +14,30 @@
   <div class="app-container">
     <header class="app-header">
       <h1>HAYSA Field Calendar</h1>
-      <div class="controls">
 
+      <div class="controls">
         <!-- Practice toggle -->
         <label class="toggle-label">
           <input type="checkbox" id="practiceOnlyToggle" />
           <span>Practice Only</span>
         </label>
 
-        <!-- ⭐ FIELD COMPLEX FILTER -->
-        <label for="fieldFilter">Field:</label>
-        <select id="fieldFilter">
-          <option value="BROOKVILLE">Brookville</option>
-          <option value="SUMNER">Sumner</option>
-          <option value="BUTLER">Butler</option>
-          <option value="TURF">Turf</option>
-        </select>
+        <!-- Field layers (dynamic checkboxes go here) -->
+        <div class="field-layers">
+          <div class="field-layers-label">Field Layers:</div>
+          <div id="fieldLayersContainer" class="field-layers-container">
+            <!-- JS will inject checkboxes here -->
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+          <span class="legend-label">Legend:</span>
+          <span class="legend-item legend-practice">Practice Available</span>
+          <span class="legend-item legend-gameonly">Game-Only Availability</span>
+          <span class="legend-item legend-game">Game</span>
+          <span class="legend-item legend-block">Block / Closure</span>
+        </div>
 
         <span id="lastUpdate" class="last-update"></span>
       </div>
