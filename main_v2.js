@@ -6,6 +6,14 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWw
 const SEASON_START = '2026-03-15';
 const SEASON_END   = '2026-06-30';
 
+// Canonical normalization map
+// Everything Sumner-related collapses to "SUMNER/SEAN JOYCE"
+const CANONICAL_MAP = {
+  'SUMNER': 'SUMNER/SEAN JOYCE',
+  'SEAN JOYCE': 'SUMNER/SEAN JOYCE',
+  'SUMNER/SEAN JOYCE': 'SUMNER/SEAN JOYCE'
+};
+
 
 // ===== STATE =====
 
@@ -98,7 +106,6 @@ function filterByPractice(events) {
 }
 
 function filterByFields(events) {
-  // If no fields selected, show nothing
   if (!selectedFields || selectedFields.size === 0) return [];
 
   return events.filter(ev => {
@@ -141,12 +148,13 @@ function canonicalToLabel(canonical) {
   if (!canonical) return '';
   const upper = String(canonical).toUpperCase();
   switch (upper) {
-    case 'BROOKVILLE': return 'Brookville';
-    case 'SUMNER':     return 'Sumner';
-    case 'BUTLER':     return 'Butler';
-    case 'TURF':       return 'Turf';
+    case 'BROOKVILLE':          return 'Brookville';
+    case 'SUMNER':              return 'Sumner/Sean Joyce'; // normalized anyway
+    case 'SEAN JOYCE':          return 'Sumner/Sean Joyce';
+    case 'SUMNER/SEAN JOYCE':   return 'Sumner/Sean Joyce';
+    case 'BUTLER':              return 'Butler';
+    case 'TURF':                return 'Turf';
     default:
-      // Fallback: capitalize first letter, lower the rest
       return upper.charAt(0) + upper.slice(1).toLowerCase();
   }
 }
@@ -173,8 +181,25 @@ async function fetchSeasonEvents() {
 
 async function loadSeasonData() {
   const data = await fetchSeasonEvents();
-  seasonEvents = data.events || [];
+  const rawEvents = data.events || [];
   lastUpdateText = data.lastUpdate || '';
+
+  // Normalize canonical values and store
+  seasonEvents = rawEvents.map(ev => {
+    const ext = ev.extendedProps || {};
+    const rawCanonical = ext.canonical;
+    const normalizedCanonical = rawCanonical
+      ? (CANONICAL_MAP[rawCanonical.toUpperCase()] || rawCanonical)
+      : rawCanonical;
+
+    return {
+      ...ev,
+      extendedProps: {
+        ...ext,
+        canonical: normalizedCanonical
+      }
+    };
+  });
 
   // Build field list from entire season
   allFieldKeys = new Set();
@@ -261,21 +286,12 @@ function initCalendar() {
       right: 'timeGridWeek,dayGridMonth'
     },
 
-    // Use cached seasonEvents; filter per view
     events: (info, successCallback, failureCallback) => {
       try {
-        // 1) Filter by date range
         let filtered = filterByDateRange(seasonEvents, info.start, info.end);
-
-        // 2) Practice filter
         filtered = filterByPractice(filtered);
-
-        // 3) Field filter
         filtered = filterByFields(filtered);
-
-        // 4) Decorate
         const decorated = decorateEvents(filtered);
-
         successCallback(decorated);
       } catch (err) {
         console.error('Error building events', err);
