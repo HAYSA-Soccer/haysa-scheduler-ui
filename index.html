@@ -13,41 +13,42 @@
 <body>
   <div class="app-container">
     <header class="app-header">
+
+      <!-- Row 1: Title + Last Update -->
       <div class="header-top">
         <h1>HAYSA Field Calendar</h1>
         <span id="lastUpdate" class="last-update"></span>
       </div>
 
-      <div class="controls">
-        <!-- Row 1: Practice toggle -->
-        <div class="controls-row">
-          <label class="toggle-label">
-            <input type="checkbox" id="practiceOnlyToggle" />
-            <span>Practice Only</span>
-          </label>
-        </div>
+      <!-- Row 2: Practice Only -->
+      <div class="controls-row">
+        <label class="toggle-label">
+          <input type="checkbox" id="practiceOnlyToggle" />
+          <span>Practice Only</span>
+        </label>
+      </div>
 
-        <!-- Row 2: Field layers -->
-        <div class="controls-row">
-          <div class="field-layers">
-            <div class="field-layers-label">Field Layers:</div>
-            <div id="fieldLayersContainer" class="field-layers-container">
-              <!-- JS will inject checkboxes here -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 3: Legend -->
-        <div class="controls-row">
-          <div class="legend">
-            <span class="legend-label">Legend:</span>
-            <span class="legend-item legend-practice">Practice Available</span>
-            <span class="legend-item legend-gameonly">Game-Only Availability</span>
-            <span class="legend-item legend-game">Game</span>
-            <span class="legend-item legend-block">Block / Closure</span>
+      <!-- Row 3: Field Layers -->
+      <div class="controls-row">
+        <div class="field-layers">
+          <div class="field-layers-label">Field Layers:</div>
+          <div id="fieldLayersContainer" class="field-layers-container">
+            <!-- JS injects checkboxes here -->
           </div>
         </div>
       </div>
+
+      <!-- Row 4: Legend -->
+      <div class="controls-row">
+        <div class="legend">
+          <span class="legend-label">Legend:</span>
+          <span class="legend-item legend-practice">Practice Available</span>
+          <span class="legend-item legend-gameonly">Game-Only Availability</span>
+          <span class="legend-item legend-game">Game</span>
+          <span class="legend-item legend-block">Block / Closure</span>
+        </div>
+      </div>
+
     </header>
 
     <main>
