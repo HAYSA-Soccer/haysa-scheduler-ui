@@ -7,7 +7,6 @@ const SEASON_START = '2026-03-15';
 const SEASON_END   = '2026-06-30';
 
 // Canonical normalization map
-// Everything Sumner-related collapses to "SUMNER/SEAN JOYCE"
 const CANONICAL_MAP = {
   'SUMNER': 'SUMNER/SEAN JOYCE',
   'SEAN JOYCE': 'SUMNER/SEAN JOYCE',
@@ -18,147 +17,87 @@ const CANONICAL_MAP = {
 // ===== STATE =====
 
 let calendar = null;
-let seasonEvents = [];          // all events for the entire season
-let practiceOnly = false;       // practice-only toggle
-let selectedFields = new Set(); // canonical field keys currently selected
-let allFieldKeys = new Set();   // all canonical field keys seen in the season
-let lastUpdateText = '';        // ICS last update from backend
+let seasonEvents = [];
+let practiceOnly = false;
+let selectedFields = new Set();
+let allFieldKeys = new Set();
+
+let lastUpdateText = '';      // ICS timestamp from backend
+let lastCheckedTime = null;   // When frontend fetched the feed
+let previousIcsTimestamp = ''; // To detect real updates
 
 
-// ===== HELPERS =====
+// ===== TIME HELPERS =====
 
-function isAvailabilityEvent(ev) {
-  return ev.extendedProps && ev.extendedProps.type === 'availability';
+function timeAgo(ts) {
+  if (!ts) return '';
+
+  const now = Date.now();
+  const then = new Date(ts).getTime();
+  const diffMs = now - then;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHr / 24);
+
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? '' : 's'} ago`;
+  if (diffHr < 24) return `${diffHr} hour${diffHr === 1 ? '' : 's'} ago`;
+  if (diffDay === 1) return 'yesterday';
+
+  return new Date(ts).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  });
 }
 
-function isPracticeAllowed(ev) {
-  if (!isAvailabilityEvent(ev)) return false;
-  const ps = ev.extendedProps.practiceSurfaces || [];
-  return ps.length > 0;
-}
 
-function isGameOnlyAvailability(ev) {
-  if (!isAvailabilityEvent(ev)) return false;
-  const ps = ev.extendedProps.practiceSurfaces || [];
-  const gs = ev.extendedProps.gameOnlySurfaces || [];
-  return ps.length === 0 && gs.length > 0;
-}
+// ===== LAST UPDATE TICKER =====
 
-function decorateEventClasses(ev) {
-  const classes = [];
+function startLastUpdateTicker() {
+  const el = document.getElementById('lastUpdate');
+  if (!el) return;
 
-  if (isAvailabilityEvent(ev)) {
-    if (isPracticeAllowed(ev)) {
-      classes.push('avail-practice');
-    } else if (isGameOnlyAvailability(ev)) {
-      classes.push('avail-game-only');
+  function refresh() {
+    if (!lastCheckedTime) return;
+
+    const checkedAgo = timeAgo(lastCheckedTime);
+    const updatedAgo = lastUpdateText ? timeAgo(lastUpdateText) : null;
+
+    if (!lastUpdateText) {
+      el.textContent = `Last checked ${checkedAgo}`;
+      return;
     }
-  }
 
-  if (ev.extendedProps && ev.extendedProps.type === 'game') {
-    classes.push('game-event');
-  }
+    const icsChanged = lastUpdateText !== previousIcsTimestamp;
 
-  if (ev.extendedProps && ev.extendedProps.reasonType === 'closure') {
-    classes.push('block-event');
-  }
-
-  return classes;
-}
-
-function buildTooltip(ev) {
-  const ext = ev.extendedProps || {};
-  const type = ext.type;
-
-  if (type === 'availability') {
-    const ps = ext.practiceSurfaces || [];
-    const gs = ext.gameOnlySurfaces || [];
-
-    if (ps.length > 0) {
-      return [
-        'Practice Available',
-        ps.length ? 'Practice Surfaces: ' + ps.join(', ') : ''
-      ].filter(Boolean).join('\n');
+    if (icsChanged) {
+      el.textContent = `Data updated ${updatedAgo}`;
     } else {
-      return [
-        'Available for Games Only',
-        gs.length ? 'Game Surfaces: ' + gs.join(', ') : ''
-      ].filter(Boolean).join('\n');
+      el.textContent = `Last checked ${checkedAgo}`;
     }
   }
 
-  if (ext.tooltip) return ext.tooltip;
-
-  const lines = [];
-  if (ev.title) lines.push(ev.title);
-  if (ext.field) lines.push('Field: ' + ext.field);
-  if (ext.status) lines.push('Status: ' + ext.status);
-  return lines.join('\n');
-}
-
-function filterByPractice(events) {
-  if (!practiceOnly) return events;
-
-  return events.filter(ev => {
-    if (!isAvailabilityEvent(ev)) return true;
-    return isPracticeAllowed(ev);
-  });
-}
-
-function filterByFields(events) {
-  if (!selectedFields || selectedFields.size === 0) return [];
-
-  return events.filter(ev => {
-    const ext = ev.extendedProps || {};
-    const canonical = ext.canonical;
-    if (!canonical) return false;
-    return selectedFields.has(canonical);
-  });
-}
-
-function filterByDateRange(events, start, end) {
-  const startMs = start.getTime();
-  const endMs = end.getTime();
-
-  return events.filter(ev => {
-    const evStart = new Date(ev.start).getTime();
-    const evEnd = new Date(ev.end || ev.start).getTime();
-    return evEnd > startMs && evStart < endMs;
-  });
-}
-
-function decorateEvents(events) {
-  return events.map(ev => {
-    const extraClasses = decorateEventClasses(ev);
-    const tooltip = buildTooltip(ev);
-
-    return {
-      ...ev,
-      classNames: (ev.classNames || []).concat(extraClasses),
-      extendedProps: {
-        ...ev.extendedProps,
-        tooltip
-      }
-    };
-  });
-}
-
-// Canonical -> human label
-function canonicalToLabel(canonical) {
-  if (!canonical) return '';
-  const upper = String(canonical).toUpperCase();
-  switch (upper) {
-    case 'BROOKVILLE': return 'Brookville';
-    case 'BUTLER': return 'Butler';
-    case 'TURF': return 'Turf';
-    case 'SUMNER/SEAN JOYCE': return 'Sumner/Sean Joyce';
-    default:
-      return upper.charAt(0) + upper.slice(1).toLowerCase();
-  }
+  refresh();
+  setInterval(refresh, 60000);
 }
 
 
-// ===== DATA LOAD (SEASON ONCE) =====
+// ===== LOADING OVERLAY =====
+
+function showLoading() {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+
+// ===== DATA LOAD =====
 
 async function fetchSeasonEvents() {
   const params = new URLSearchParams();
@@ -173,16 +112,20 @@ async function fetchSeasonEvents() {
     return { lastUpdate: 'Unknown', events: [] };
   }
 
-  const data = await res.json();
-  return data;
+  return await res.json();
 }
 
 async function loadSeasonData() {
+  showLoading();
+
   const data = await fetchSeasonEvents();
   const rawEvents = data.events || [];
-  lastUpdateText = data.lastUpdate || '';
 
-  // Normalize canonical values FIRST
+  previousIcsTimestamp = lastUpdateText;
+  lastUpdateText = data.lastUpdate || '';
+  lastCheckedTime = Date.now();
+
+  // Normalize canonical values
   seasonEvents = rawEvents.map(ev => {
     const ext = ev.extendedProps || {};
     const rawCanonical = (ext.canonical || '').toUpperCase();
@@ -197,7 +140,7 @@ async function loadSeasonData() {
     };
   });
 
-  // Build field list AFTER normalization
+  // Build field list
   allFieldKeys = new Set();
   seasonEvents.forEach(ev => {
     const ext = ev.extendedProps || {};
@@ -206,23 +149,16 @@ async function loadSeasonData() {
     }
   });
 
-  // Default: all fields ON
   selectedFields = new Set(allFieldKeys);
 
-  // Update last update label
-  const lastUpdateEl = document.getElementById('lastUpdate');
-  if (lastUpdateEl) {
-    lastUpdateEl.textContent = lastUpdateText
-      ? `ICS Last Update: ${lastUpdateText}`
-      : '';
-  }
-
-  // Build field layer checkboxes
   initFieldLayersUI();
+  startLastUpdateTicker();
+
+  hideLoading();
 }
 
 
-// ===== UI: FIELD LAYERS =====
+// ===== FIELD LAYERS UI =====
 
 function initFieldLayersUI() {
   const container = document.getElementById('fieldLayersContainer');
@@ -232,7 +168,7 @@ function initFieldLayersUI() {
 
   allFieldKeys.forEach(canonical => {
 
-    // ❌ REMOVE THIS FIELD FROM THE UI COMPLETELY
+    // ❌ Remove Sumner/Sean Joyce from UI
     if (canonical === 'SUMNER/SEAN JOYCE') return;
 
     const labelText = canonicalToLabel(canonical);
@@ -251,9 +187,7 @@ function initFieldLayersUI() {
       } else {
         selectedFields.delete(canonical);
       }
-      if (calendar) {
-        calendar.refetchEvents();
-      }
+      if (calendar) calendar.refetchEvents();
     });
 
     const span = document.createElement('span');
@@ -266,7 +200,23 @@ function initFieldLayersUI() {
 }
 
 
-// ===== CALENDAR INIT =====
+// ===== LABEL HELPERS =====
+
+function canonicalToLabel(canonical) {
+  if (!canonical) return '';
+  const upper = canonical.toUpperCase();
+  switch (upper) {
+    case 'BROOKVILLE': return 'Brookville';
+    case 'BUTLER': return 'Butler';
+    case 'TURF': return 'Turf';
+    case 'SUMNER/SEAN JOYCE': return 'Sumner/Sean Joyce';
+    default:
+      return upper.charAt(0) + upper.slice(1).toLowerCase();
+  }
+}
+
+
+// ===== CALENDAR =====
 
 function initCalendar() {
   const calendarEl = document.getElementById('calendar');
@@ -286,21 +236,21 @@ function initCalendar() {
       right: 'timeGridWeek,dayGridMonth'
     },
 
-    events: (info, successCallback, failureCallback) => {
+    events: (info, success, fail) => {
       try {
         let filtered = filterByDateRange(seasonEvents, info.start, info.end);
         filtered = filterByPractice(filtered);
         filtered = filterByFields(filtered);
-        const decorated = decorateEvents(filtered);
-        successCallback(decorated);
+        filtered = decorateEvents(filtered);
+        success(filtered);
       } catch (err) {
-        console.error('Error building events', err);
-        failureCallback(err);
+        console.error(err);
+        fail(err);
       }
     },
 
     eventDidMount(info) {
-      if (info.event.extendedProps && info.event.extendedProps.tooltip) {
+      if (info.event.extendedProps?.tooltip) {
         info.el.title = info.event.extendedProps.tooltip;
       }
     }
@@ -310,7 +260,83 @@ function initCalendar() {
 }
 
 
-// ===== UI: PRACTICE TOGGLE =====
+// ===== FILTERS =====
+
+function filterByPractice(events) {
+  if (!practiceOnly) return events;
+  return events.filter(ev => !isAvailabilityEvent(ev) || isPracticeAllowed(ev));
+}
+
+function filterByFields(events) {
+  if (!selectedFields.size) return [];
+  return events.filter(ev => selectedFields.has(ev.extendedProps?.canonical));
+}
+
+function filterByDateRange(events, start, end) {
+  const s = start.getTime();
+  const e = end.getTime();
+  return events.filter(ev => {
+    const evStart = new Date(ev.start).getTime();
+    const evEnd = new Date(ev.end || ev.start).getTime();
+    return evEnd > s && evStart < e;
+  });
+}
+
+function decorateEvents(events) {
+  return events.map(ev => ({
+    ...ev,
+    classNames: (ev.classNames || []).concat(decorateEventClasses(ev)),
+    extendedProps: {
+      ...ev.extendedProps,
+      tooltip: buildTooltip(ev)
+    }
+  }));
+}
+
+
+// ===== EVENT CLASS HELPERS =====
+
+function isAvailabilityEvent(ev) {
+  return ev.extendedProps?.type === 'availability';
+}
+
+function isPracticeAllowed(ev) {
+  return (ev.extendedProps?.practiceSurfaces || []).length > 0;
+}
+
+function isGameOnlyAvailability(ev) {
+  const ps = ev.extendedProps?.practiceSurfaces || [];
+  const gs = ev.extendedProps?.gameOnlySurfaces || [];
+  return ps.length === 0 && gs.length > 0;
+}
+
+function decorateEventClasses(ev) {
+  const classes = [];
+  if (isAvailabilityEvent(ev)) {
+    if (isPracticeAllowed(ev)) classes.push('avail-practice');
+    else if (isGameOnlyAvailability(ev)) classes.push('avail-game-only');
+  }
+  if (ev.extendedProps?.type === 'game') classes.push('game-event');
+  if (ev.extendedProps?.reasonType === 'closure') classes.push('block-event');
+  return classes;
+}
+
+function buildTooltip(ev) {
+  const ext = ev.extendedProps || {};
+  if (ext.type === 'availability') {
+    const ps = ext.practiceSurfaces || [];
+    const gs = ext.gameOnlySurfaces || [];
+    if (ps.length > 0) {
+      return `Practice Available\nPractice Surfaces: ${ps.join(', ')}`;
+    }
+    return `Available for Games Only\nGame Surfaces: ${gs.join(', ')}`;
+  }
+  if (ext.tooltip) return ext.tooltip;
+  return ev.title || '';
+}
+
+
+// ===== PRACTICE TOGGLE =====
 
 function initPracticeToggle() {
   const toggle = document.getElementById('practiceOnlyToggle');
@@ -318,9 +344,7 @@ function initPracticeToggle() {
 
   toggle.addEventListener('change', () => {
     practiceOnly = toggle.checked;
-    if (calendar) {
-      calendar.refetchEvents();
-    }
+    if (calendar) calendar.refetchEvents();
   });
 }
 
@@ -328,11 +352,7 @@ function initPracticeToggle() {
 // ===== BOOTSTRAP =====
 
 document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    await loadSeasonData();   // fetch entire season once
-    initPracticeToggle();     // wire practice toggle
-    initCalendar();           // start calendar using cached data
-  } catch (err) {
-    console.error('Error during initialization', err);
-  }
+  await loadSeasonData();
+  initPracticeToggle();
+  initCalendar();
 });
