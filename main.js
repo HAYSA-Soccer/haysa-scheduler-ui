@@ -2,7 +2,7 @@
 
 // If you deploy as a web app, this can be just the relative URL.
 // For local testing, you can paste the full Apps Script URL.
-const API_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+const API_URL = 'https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec';
 
 // ===== STATE =====
 let calendar = null;
