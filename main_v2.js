@@ -22,9 +22,9 @@ let practiceOnly = false;
 let selectedFields = new Set();
 let allFieldKeys = new Set();
 
-let lastUpdateText = '';       // ICS timestamp from backend
-let lastCheckedTime = null;    // when frontend fetched
-let previousIcsTimestamp = ''; // to detect real updates
+let lastUpdateText = '';
+let lastCheckedTime = null;
+let previousIcsTimestamp = '';
 
 
 // ===== TIME HELPERS =====
@@ -125,7 +125,7 @@ async function loadSeasonData() {
   lastUpdateText = data.lastUpdate || '';
   lastCheckedTime = Date.now();
 
-  // Normalize canonical values
+  // Normalize canonical values BEFORE building field list
   seasonEvents = rawEvents.map(ev => {
     const ext = ev.extendedProps || {};
     const rawCanonical = (ext.canonical || '').toUpperCase();
@@ -140,7 +140,7 @@ async function loadSeasonData() {
     };
   });
 
-  // Build field list
+  // Build field list using normalized canonical names
   allFieldKeys = new Set();
   seasonEvents.forEach(ev => {
     const ext = ev.extendedProps || {};
@@ -151,8 +151,6 @@ async function loadSeasonData() {
 
   // Default: all fields ON
   selectedFields = new Set(allFieldKeys);
-
-  // Sumner is visible now, so keep it selected by default
 
   initFieldLayersUI();
   startLastUpdateTicker();
@@ -203,7 +201,7 @@ function initFieldLayersUI() {
 
   allFieldKeys.forEach(canonical => {
     if (canonical === 'SUMNER/SEAN JOYCE') {
-      createFieldCheckbox(canonical, 'Sumner');
+      createFieldCheckbox(canonical, 'Sumner / Sean Joyce');
       return;
     }
 
@@ -222,7 +220,7 @@ function canonicalToLabel(canonical) {
     case 'BROOKVILLE': return 'Brookville';
     case 'BUTLER': return 'Butler';
     case 'TURF': return 'Turf';
-    case 'SUMNER/SEAN JOYCE': return 'Sumner';
+    case 'SUMNER/SEAN JOYCE': return 'Sumner / Sean Joyce';
     default:
       return upper.charAt(0) + upper.slice(1).toLowerCase();
   }
