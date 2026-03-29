@@ -15,10 +15,22 @@
     <header class="app-header">
       <h1>HAYSA Field Calendar</h1>
       <div class="controls">
+
+        <!-- Practice toggle -->
         <label class="toggle-label">
           <input type="checkbox" id="practiceOnlyToggle" />
           <span>Practice Only</span>
         </label>
+
+        <!-- ⭐ FIELD COMPLEX FILTER -->
+        <label for="fieldFilter">Field:</label>
+        <select id="fieldFilter">
+          <option value="BROOKVILLE">Brookville</option>
+          <option value="SUMNER">Sumner</option>
+          <option value="BUTLER">Butler</option>
+          <option value="TURF">Turf</option>
+        </select>
+
         <span id="lastUpdate" class="last-update"></span>
       </div>
     </header>
