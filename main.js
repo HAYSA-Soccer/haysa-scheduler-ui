@@ -142,7 +142,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   // LOAD DATA FROM API
   // -----------------------------
   let allEvents = [];
-  let collapsedAvailabilityByField = {};
 
   const url = "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
@@ -167,54 +166,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       };
     });
 
-    precomputeCollapsedAvailability();
   }
 
-  function precomputeCollapsedAvailability() {
-    collapsedAvailabilityByField = {};
-
-    const grouped = {};
-    for (const ev of allEvents) {
-      const fieldKey = ev.extendedProps.fieldKey;
-      if (!grouped[fieldKey]) grouped[fieldKey] = [];
-      grouped[fieldKey].push(ev);
-    }
-
-    for (const fieldKey of Object.keys(grouped)) {
-      const events = grouped[fieldKey];
-
-      const availability = events.filter(e => e.extendedProps.uiType === "availability");
-      const blockers = events.filter(e => e.extendedProps.uiType !== "availability");
-
-      if (!availability.length) {
-        collapsedAvailabilityByField[fieldKey] = [];
-        continue;
-      }
-
-      const merged = mergeWindows(availability);
-      const freeWindows = subtractWindows(merged, blockers);
-
-      if (!freeWindows.length) {
-        collapsedAvailabilityByField[fieldKey] = [];
-        continue;
-      }
-
-      const surfaces = availability.map(a => a.extendedProps.surface).filter(Boolean);
-
-      collapsedAvailabilityByField[fieldKey] = freeWindows.map(win => ({
-        title: "Available",
-        start: win.start,
-        end: win.end,
-        backgroundColor: "#6FCF97",
-        borderColor: "#4CAF50",
-        extendedProps: {
-          uiType: "availability",
-          fieldKey,
-          freeSurfaces: surfaces
-        }
-      }));
-    }
-  }
 
   await loadData();
 
@@ -232,24 +185,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     events: function (fetchInfo, successCallback) {
       const selectedFields = getSelectedFields();
       const selectedTypes = getSelectedTypes();
-
-      const results = [];
-
-      if (selectedTypes.includes("availability")) {
-        for (const fieldKey of selectedFields) {
-          const fieldEvents = collapsedAvailabilityByField[fieldKey] || [];
-          results.push(...fieldEvents);
-        }
-      }
-
-      const realEvents = allEvents.filter(e => {
+    
+      const results = allEvents.filter(e => {
         const fieldKey = e.extendedProps.fieldKey;
         const uiType = e.extendedProps.uiType;
         return selectedFields.includes(fieldKey) && selectedTypes.includes(uiType);
       });
-
-      results.push(...realEvents);
-
+    
       successCallback(results);
     },
 
@@ -260,10 +202,21 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (uiType === "availability") {
         const startStr = info.event.start.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
         const endStr = info.event.end.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
-        const surfaces = props.freeSurfaces ? props.freeSurfaces.join(", ") : "N/A";
-
-        info.el.title =
-          `Available\n${startStr} - ${endStr}\nFree surfaces: ${surfaces}`;
+      
+        const practice = props.practiceSurfaces || [];
+        const gameOnly = props.gameOnlySurfaces || [];
+      
+        let tooltip = `Available\n${startStr} - ${endStr}`;
+      
+        if (practice.length > 0) {
+          tooltip += `\nPractice surfaces: ${practice.join(", ")}`;
+        }
+      
+        if (gameOnly.length > 0) {
+          tooltip += `\nGame-only surfaces: ${gameOnly.join(", ")}`;
+        }
+      
+        info.el.title = tooltip;
       }
     }
   });
