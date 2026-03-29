@@ -14,8 +14,8 @@ body {
 
 .app-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
@@ -27,6 +27,7 @@ body {
 /* Controls */
 .controls {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
 }
@@ -44,9 +45,74 @@ body {
   height: 16px;
 }
 
-#fieldFilter {
-  padding: 4px 6px;
-  font-size: 0.9rem;
+/* Field layers */
+.field-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-layers-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.field-layers-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.field-layer-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.field-layer-item input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.legend-label {
+  font-weight: 600;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #eee;
+}
+
+/* Color chips in legend (match event colors) */
+.legend-practice {
+  border-left: 8px solid #6FCF97;
+}
+
+.legend-gameonly {
+  border-left: 8px solid #A5D6A7;
+}
+
+.legend-game {
+  border-left: 8px solid #4A90E2;
+}
+
+.legend-block {
+  border-left: 8px solid #F2C94C;
 }
 
 .last-update {
