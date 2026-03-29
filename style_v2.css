@@ -44,6 +44,11 @@ body {
   height: 16px;
 }
 
+#fieldFilter {
+  padding: 4px 6px;
+  font-size: 0.9rem;
+}
+
 .last-update {
   font-size: 0.8rem;
   color: #666;
@@ -57,33 +62,27 @@ body {
   padding: 8px;
 }
 
-/* Event colors (we still let backend send colors, but we define meaning here) */
-
-/* Practice-allowed availability (bright green) */
+/* Event colors */
 .fc-event.avail-practice {
   background-color: #6FCF97 !important;
   border-color: #4CAF50 !important;
 }
 
-/* Game-only availability (muted green) */
 .fc-event.avail-game-only {
   background-color: #A5D6A7 !important;
   border-color: #81C784 !important;
 }
 
-/* Games (blue) – backend already sets these, but we can reinforce */
 .fc-event.game-event {
   background-color: #4A90E2 !important;
   border-color: #357ABD !important;
 }
 
-/* Blocks / closures (amber) – if you ever style them differently */
 .fc-event.block-event {
   background-color: #F2C94C !important;
   border-color: #D4A62F !important;
 }
 
-/* Tooltip (simple browser title for now; can be upgraded later) */
 .fc-event {
   font-size: 0.8rem;
 }
