@@ -1,50 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>HAYSA Scheduler</title>
+  <meta charset="UTF-8" />
+  <title>HAYSA Field Availability</title>
 
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <!-- FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
+
+  <!-- Our styles -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>HAYSA Field Calendar</h1>
+      <div class="controls">
+        <label class="toggle-label">
+          <input type="checkbox" id="practiceOnlyToggle" />
+          <span>Practice Only</span>
+        </label>
+        <span id="lastUpdate" class="last-update"></span>
+      </div>
+    </header>
 
-  <h1>HAYSA Scheduler</h1>
-
-  <!-- FIELD FILTERS -->
-  <div id="field-filters">
-    <strong>Fields:</strong>
-    <label><input type="checkbox" value="TURF" checked> Turf</label>
-    <label><input type="checkbox" value="BUTLER" checked> Butler</label>
-    <label><input type="checkbox" value="SUMNER/SEAN JOYCE" checked> Sumner/Sean Joyce</label>
-    <label><input type="checkbox" value="BROOKVILLE" checked> Brookville</label>
+    <main>
+      <div id="calendar"></div>
+    </main>
   </div>
 
-  <!-- TYPE FILTERS -->
-  <div id="type-filters">
-    <strong>Show:</strong>
-    <label><input type="checkbox" value="availability" checked> Availability</label>
-    <label><input type="checkbox" value="game" checked> Games</label>
-    <label><input type="checkbox" value="practice" checked> Practices</label>
-    <label><input type="checkbox" value="block" checked> Blocks</label>
-  </div>
+  <!-- FullCalendar JS -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
-  <!-- LEGEND -->
-  <div id="legend">
-    <span class="legend-item availability">Availability</span>
-    <span class="legend-item game">Game</span>
-    <span class="legend-item practice">Practice</span>
-    <span class="legend-item block">Block</span>
-  </div>
-
-  <!-- LAST UPDATED -->
-  <div id="last-updated"></div>
-
-  <!-- CALENDAR -->
-  <div id="calendar"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script src="main.js?v=20260329"></script>
-
+  <!-- Our logic -->
+  <script src="main.js"></script>
 </body>
 </html>
