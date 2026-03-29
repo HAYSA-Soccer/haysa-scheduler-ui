@@ -1,7 +1,5 @@
 // ===== CONFIG =====
 
-// If you deploy as a web app, this can be just the relative URL.
-// For local testing, you can paste the full Apps Script URL.
 const API_URL = 'https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec';
 
 
@@ -9,6 +7,8 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWw
 let calendar = null;
 let allEvents = [];          // raw events from backend
 let practiceOnly = false;    // toggle state
+let currentFieldComplex = "BROOKVILLE"; // ⭐ NEW
+
 
 // ===== HELPERS =====
 
@@ -72,7 +72,6 @@ function buildTooltip(ev) {
     }
   }
 
-  // For games/other, backend already sends tooltip; fall back if missing
   if (ext.tooltip) return ext.tooltip;
 
   const lines = [];
@@ -85,14 +84,41 @@ function buildTooltip(ev) {
 function filterEventsForPracticeToggle(events) {
   if (!practiceOnly) return events;
 
-  // Practice Only ON → keep:
-  // - all non-availability events (games, blocks)
-  // - only availability events where practice is allowed
   return events.filter(ev => {
     if (!isAvailabilityEvent(ev)) return true;
     return isPracticeAllowed(ev);
   });
 }
+
+
+// ===== FIELD FILTER PIPELINE =====
+
+function applyFieldFilter(events) {
+  return events.filter(ev =>
+    ev.extendedProps &&
+    ev.extendedProps.canonical === currentFieldComplex
+  );
+}
+
+
+// ===== DECORATION PIPELINE =====
+
+function decorateEvents(events) {
+  return events.map(ev => {
+    const extraClasses = decorateEventClasses(ev);
+    const tooltip = buildTooltip(ev);
+
+    return {
+      ...ev,
+      classNames: (ev.classNames || []).concat(extraClasses),
+      extendedProps: {
+        ...ev.extendedProps,
+        tooltip
+      }
+    };
+  });
+}
+
 
 // ===== FETCH + INIT =====
 
@@ -109,9 +135,31 @@ async function fetchEvents(rangeStart, rangeEnd) {
     return { lastUpdate: 'Unknown', events: [] };
   }
 
-  const data = await res.json();
-  return data;
+  return await res.json();
 }
+
+
+// ===== RENDER PIPELINE =====
+
+function renderFilteredEvents() {
+  if (!calendar) return;
+
+  // 1. Practice filter
+  let filtered = filterEventsForPracticeToggle(allEvents);
+
+  // 2. Field filter
+  filtered = applyFieldFilter(filtered);
+
+  // 3. Decorate
+  const decorated = decorateEvents(filtered);
+
+  // 4. Replace events
+  calendar.removeAllEvents();
+  calendar.addEventSource(decorated);
+}
+
+
+// ===== CALENDAR INIT =====
 
 function initCalendar() {
   const calendarEl = document.getElementById('calendar');
@@ -136,27 +184,13 @@ function initCalendar() {
         document.getElementById('lastUpdate').textContent =
           data.lastUpdate ? `ICS Last Update: ${data.lastUpdate}` : '';
 
-        // Store raw events
         allEvents = data.events || [];
 
-        // Apply toggle filter
-        const filtered = filterEventsForPracticeToggle(allEvents);
+        // Apply both filters
+        let filtered = filterEventsForPracticeToggle(allEvents);
+        filtered = applyFieldFilter(filtered);
 
-        // Add CSS classes + tooltips
-        const decorated = filtered.map(ev => {
-          const extraClasses = decorateEventClasses(ev);
-          const tooltip = buildTooltip(ev);
-
-          return {
-            ...ev,
-            classNames: (ev.classNames || []).concat(extraClasses),
-            title: ev.title,
-            extendedProps: {
-              ...ev.extendedProps,
-              tooltip
-            }
-          };
-        });
+        const decorated = decorateEvents(filtered);
 
         successCallback(decorated);
       } catch (err) {
@@ -165,8 +199,7 @@ function initCalendar() {
       }
     },
 
-    eventDidMount: function(info) {
-      // Use browser native tooltip for now
+    eventDidMount(info) {
       if (info.event.extendedProps && info.event.extendedProps.tooltip) {
         info.el.title = info.event.extendedProps.tooltip;
       }
@@ -176,44 +209,34 @@ function initCalendar() {
   calendar.render();
 }
 
+
+// ===== UI INIT =====
+
 function initPracticeToggle() {
   const toggle = document.getElementById('practiceOnlyToggle');
   if (!toggle) return;
 
   toggle.addEventListener('change', () => {
     practiceOnly = toggle.checked;
-
-    // Re-apply filter to already-fetched events if we have them
-    if (!calendar) return;
-    if (!allEvents || allEvents.length === 0) {
-      calendar.refetchEvents();
-      return;
-    }
-
-    const filtered = filterEventsForPracticeToggle(allEvents);
-    const decorated = filtered.map(ev => {
-      const extraClasses = decorateEventClasses(ev);
-      const tooltip = buildTooltip(ev);
-
-      return {
-        ...ev,
-        classNames: (ev.classNames || []).concat(extraClasses),
-        title: ev.title,
-        extendedProps: {
-          ...ev.extendedProps,
-          tooltip
-        }
-      };
-    });
-
-    calendar.removeAllEvents();
-    calendar.addEventSource(decorated);
+    renderFilteredEvents();
   });
 }
+
+function initFieldFilter() {
+  const select = document.getElementById('fieldFilter');
+  if (!select) return;
+
+  select.addEventListener('change', () => {
+    currentFieldComplex = select.value;
+    renderFilteredEvents();
+  });
+}
+
 
 // ===== BOOTSTRAP =====
 
 document.addEventListener('DOMContentLoaded', () => {
   initCalendar();
   initPracticeToggle();
+  initFieldFilter();
 });
