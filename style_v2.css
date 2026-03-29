@@ -27,6 +27,12 @@ body {
   align-items: center;
 }
 
+.app-header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
 .update-group {
   display: flex;
   align-items: center;
@@ -39,7 +45,7 @@ body {
   background: #4A90E2;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 0.85rem;
 }
@@ -204,4 +210,40 @@ body {
 
 .fc-event {
   font-size: 0.8rem;
+}
+
+/* Mobile floating week nav */
+.mobile-week-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  display: none;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 999px;
+  z-index: 9998;
+}
+
+.week-nav-button {
+  border: none;
+  background: #4A90E2;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.week-nav-button:hover {
+  background: #357ABD;
+}
+
+/* Show floating nav only on small screens */
+@media (max-width: 768px) {
+  .mobile-week-nav {
+    display: flex;
+  }
 }
