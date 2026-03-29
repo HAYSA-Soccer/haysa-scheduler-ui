@@ -148,12 +148,10 @@ function canonicalToLabel(canonical) {
   if (!canonical) return '';
   const upper = String(canonical).toUpperCase();
   switch (upper) {
-    case 'BROOKVILLE':          return 'Brookville';
-    case 'SUMNER':              return 'Sumner/Sean Joyce'; // normalized anyway
-    case 'SEAN JOYCE':          return 'Sumner/Sean Joyce';
-    case 'SUMNER/SEAN JOYCE':   return 'Sumner/Sean Joyce';
-    case 'BUTLER':              return 'Butler';
-    case 'TURF':                return 'Turf';
+    case 'BROOKVILLE': return 'Brookville';
+    case 'BUTLER': return 'Butler';
+    case 'TURF': return 'Turf';
+    case 'SUMNER/SEAN JOYCE': return 'Sumner/Sean Joyce';
     default:
       return upper.charAt(0) + upper.slice(1).toLowerCase();
   }
@@ -184,13 +182,11 @@ async function loadSeasonData() {
   const rawEvents = data.events || [];
   lastUpdateText = data.lastUpdate || '';
 
-  // Normalize canonical values and store
+  // Normalize canonical values FIRST
   seasonEvents = rawEvents.map(ev => {
     const ext = ev.extendedProps || {};
-    const rawCanonical = ext.canonical;
-    const normalizedCanonical = rawCanonical
-      ? (CANONICAL_MAP[rawCanonical.toUpperCase()] || rawCanonical)
-      : rawCanonical;
+    const rawCanonical = (ext.canonical || '').toUpperCase();
+    const normalizedCanonical = CANONICAL_MAP[rawCanonical] || rawCanonical;
 
     return {
       ...ev,
@@ -201,7 +197,7 @@ async function loadSeasonData() {
     };
   });
 
-  // Build field list from entire season
+  // Build field list AFTER normalization
   allFieldKeys = new Set();
   seasonEvents.forEach(ev => {
     const ext = ev.extendedProps || {};
@@ -235,6 +231,10 @@ function initFieldLayersUI() {
   container.innerHTML = '';
 
   allFieldKeys.forEach(canonical => {
+
+    // ❌ REMOVE THIS FIELD FROM THE UI COMPLETELY
+    if (canonical === 'SUMNER/SEAN JOYCE') return;
+
     const labelText = canonicalToLabel(canonical);
 
     const wrapper = document.createElement('label');
