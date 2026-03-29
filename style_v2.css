@@ -19,6 +19,13 @@ body {
   margin-bottom: 12px;
 }
 
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
 .app-header h1 {
   margin: 0;
   font-size: 1.4rem;
@@ -27,9 +34,15 @@ body {
 /* Controls */
 .controls {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.controls-row {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .toggle-label {
