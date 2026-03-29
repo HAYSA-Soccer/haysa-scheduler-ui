@@ -11,13 +11,23 @@
   <link rel="stylesheet" href="style_v2.css" />
 </head>
 <body>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div>Loading data…</div>
+  </div>
+
   <div class="app-container">
     <header class="app-header">
 
-      <!-- Row 1: Title + Last Update -->
+      <!-- Row 1: Title + Last Update + Refresh Button -->
       <div class="header-top">
         <h1>HAYSA Field Calendar</h1>
-        <span id="lastUpdate" class="last-update"></span>
+        <div class="update-group">
+          <span id="lastUpdate" class="last-update"></span>
+          <button id="refreshButton" class="refresh-button">Refresh Now</button>
+        </div>
       </div>
 
       <!-- Row 2: Practice Only -->
