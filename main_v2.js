@@ -2,7 +2,7 @@
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec';
 
-// Season range (from SeasonSettings)
+// Season range
 const SEASON_START = '2026-03-15';
 const SEASON_END   = '2026-06-30';
 
@@ -22,9 +22,9 @@ let practiceOnly = false;
 let selectedFields = new Set();
 let allFieldKeys = new Set();
 
-let lastUpdateText = '';      // ICS timestamp from backend
-let lastCheckedTime = null;   // When frontend fetched the feed
-let previousIcsTimestamp = ''; // To detect real updates
+let lastUpdateText = '';       // ICS timestamp from backend
+let lastCheckedTime = null;    // when frontend fetched
+let previousIcsTimestamp = ''; // to detect real updates
 
 
 // ===== TIME HELPERS =====
@@ -109,7 +109,7 @@ async function fetchSeasonEvents() {
   const res = await fetch(url);
   if (!res.ok) {
     console.error('Failed to fetch season events', res.status, res.statusText);
-    return { lastUpdate: 'Unknown', events: [] };
+    return { lastUpdate: '', events: [] };
   }
 
   return await res.json();
@@ -155,6 +155,10 @@ async function loadSeasonData() {
   startLastUpdateTicker();
 
   hideLoading();
+
+  if (calendar) {
+    calendar.refetchEvents();
+  }
 }
 
 
@@ -167,8 +171,7 @@ function initFieldLayersUI() {
   container.innerHTML = '';
 
   allFieldKeys.forEach(canonical => {
-
-    // ❌ Remove Sumner/Sean Joyce from UI
+    // Remove Sumner/Sean Joyce from UI
     if (canonical === 'SUMNER/SEAN JOYCE') return;
 
     const labelText = canonicalToLabel(canonical);
@@ -349,10 +352,51 @@ function initPracticeToggle() {
 }
 
 
+// ===== REFRESH BUTTON =====
+
+function initRefreshButton() {
+  const btn = document.getElementById('refreshButton');
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+    await loadSeasonData();
+  });
+}
+
+
+// ===== MOBILE WEEK NAV =====
+
+function initMobileWeekNav() {
+  const prevBtn = document.getElementById('mobilePrevWeek');
+  const nextBtn = document.getElementById('mobileNextWeek');
+  const todayBtn = document.getElementById('mobileToday');
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (calendar) calendar.prev();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (calendar) calendar.next();
+    });
+  }
+
+  if (todayBtn) {
+    todayBtn.addEventListener('click', () => {
+      if (calendar) calendar.today();
+    });
+  }
+}
+
+
 // ===== BOOTSTRAP =====
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadSeasonData();
   initPracticeToggle();
+  initRefreshButton();
   initCalendar();
+  initMobileWeekNav();
 });
