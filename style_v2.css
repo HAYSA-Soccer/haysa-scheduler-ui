@@ -124,7 +124,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 8px;
+  padding: 3px 8px 3px 4px; /* left padding so chips show */
   border-radius: 4px;
   background: #eee;
 }
@@ -148,7 +148,7 @@ body {
 
 /* ⭐ NEW: Actual scheduled practices (manual or ICS) */
 .legend-realpractice {
-  border-left: 10px solid #9E9E9E; /* same gray as practice events */
+  border-left: 10px solid #757575; /* darker gray for visibility */
 }
 
 .last-update {
