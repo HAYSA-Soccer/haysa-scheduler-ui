@@ -146,6 +146,11 @@ body {
   border-left: 10px solid #F2C94C;
 }
 
+/* ⭐ NEW: Actual scheduled practices (manual or ICS) */
+.legend-realpractice {
+  border-left: 10px solid #9E9E9E; /* same gray as practice events */
+}
+
 .last-update {
   font-size: 0.85rem;
   color: #666;
