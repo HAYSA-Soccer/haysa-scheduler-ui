@@ -1,6 +1,6 @@
 // ===== CONFIG =====
 
-// Hard-coded season dates (should be populated from backend)
+// Hard-coded season dates (kept unless backend provides them)
 let SEASON_START = "2026-03-15";
 let SEASON_END = "2026-06-30";
 
@@ -117,9 +117,9 @@ async function loadSeasonData() {
 
   const data = await fetchSeasonEvents();
 
-  // Populate dynamic season dates
-  SEASON_START = data.seasonStart;
-  SEASON_END = data.seasonEnd;
+  // ⭐ Only overwrite if backend provides values
+  if (data.seasonStart) SEASON_START = data.seasonStart;
+  if (data.seasonEnd) SEASON_END = data.seasonEnd;
 
   const rawEvents = data.events || [];
 
@@ -323,7 +323,7 @@ function decorateEvents(events) {
   return events.map((ev) => {
     const ext = ev.extendedProps || {};
 
-    // Rewrite game titles to "Team A vs Team B"
+    // ⭐ Rewrite game titles using backend-provided homeTeam/awayTeam
     let newTitle = ev.title;
     if (ext.type === "game") {
       const home = ext.homeTeam || "";
@@ -395,7 +395,7 @@ function buildTooltip(ev) {
   if (ext.type === "game") {
     const parts = [];
 
-    if (ev.title) parts.push(ev.title); // "Team A vs Team B"
+    if (ev.title) parts.push(ev.title);
     if (ext.division) parts.push(`Division: ${ext.division}`);
     if (ext.ageGroup) parts.push(`Age Group: ${ext.ageGroup}`);
     if (ext.surface) parts.push(`Surface: ${ext.surface}`);
