@@ -1,18 +1,18 @@
 // ===== CONFIG =====
 
-const API_URL = 'https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec';
+// Dynamic season dates (populated from backend)
+let SEASON_START = null;
+let SEASON_END = null;
 
-// Season range
-const SEASON_START = '2026-03-15';
-const SEASON_END   = '2026-06-30';
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
 // Canonical normalization map
 const CANONICAL_MAP = {
-  'SUMNER': 'SUMNER/SEAN JOYCE',
-  'SEAN JOYCE': 'SUMNER/SEAN JOYCE',
-  'SUMNER/SEAN JOYCE': 'SUMNER/SEAN JOYCE'
+  SUMNER: "SUMNER/SEAN JOYCE",
+  "SEAN JOYCE": "SUMNER/SEAN JOYCE",
+  "SUMNER/SEAN JOYCE": "SUMNER/SEAN JOYCE",
 };
-
 
 // ===== STATE =====
 
@@ -22,15 +22,14 @@ let practiceOnly = false;
 let selectedFields = new Set();
 let allFieldKeys = new Set();
 
-let lastUpdateText = '';
+let lastUpdateText = "";
 let lastCheckedTime = null;
-let previousIcsTimestamp = '';
-
+let previousIcsTimestamp = "";
 
 // ===== TIME HELPERS =====
 
 function timeAgo(ts) {
-  if (!ts) return '';
+  if (!ts) return "";
 
   const now = Date.now();
   const then = new Date(ts).getTime();
@@ -39,24 +38,23 @@ function timeAgo(ts) {
   const diffHr = Math.floor(diffMin / 60);
   const diffDay = Math.floor(diffHr / 24);
 
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? '' : 's'} ago`;
-  if (diffHr < 24) return `${diffHr} hour${diffHr === 1 ? '' : 's'} ago`;
-  if (diffDay === 1) return 'yesterday';
+  if (diffMin < 1) return "just now";
+  if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? "" : "s"} ago`;
+  if (diffHr < 24) return `${diffHr} hour${diffHr === 1 ? "" : "s"} ago`;
+  if (diffDay === 1) return "yesterday";
 
-  return new Date(ts).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit'
+  return new Date(ts).toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   });
 }
-
 
 // ===== LAST UPDATE TICKER =====
 
 function startLastUpdateTicker() {
-  const el = document.getElementById('lastUpdate');
+  const el = document.getElementById("lastUpdate");
   if (!el) return;
 
   function refresh() {
@@ -83,33 +81,32 @@ function startLastUpdateTicker() {
   setInterval(refresh, 60000);
 }
 
-
 // ===== LOADING OVERLAY =====
 
 function showLoading() {
-  const overlay = document.getElementById('loadingOverlay');
-  if (overlay) overlay.style.display = 'flex';
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.display = "flex";
 }
 
 function hideLoading() {
-  const overlay = document.getElementById('loadingOverlay');
-  if (overlay) overlay.style.display = 'none';
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.display = "none";
 }
-
 
 // ===== DATA LOAD =====
 
 async function fetchSeasonEvents() {
   const params = new URLSearchParams();
-  params.append('start', SEASON_START);
-  params.append('end', SEASON_END);
+  params.append("start", SEASON_START);
+  params.append("end", SEASON_END);
 
-  const url = API_URL + (API_URL.includes('?') ? '&' : '?') + params.toString();
+  const url =
+    API_URL + (API_URL.includes("?") ? "&" : "?") + params.toString();
 
   const res = await fetch(url);
   if (!res.ok) {
-    console.error('Failed to fetch season events', res.status, res.statusText);
-    return { lastUpdate: '', events: [] };
+    console.error("Failed to fetch season events", res.status, res.statusText);
+    return { lastUpdate: "", events: [] };
   }
 
   return await res.json();
@@ -119,30 +116,35 @@ async function loadSeasonData() {
   showLoading();
 
   const data = await fetchSeasonEvents();
+
+  // Populate dynamic season dates
+  SEASON_START = data.seasonStart;
+  SEASON_END = data.seasonEnd;
+
   const rawEvents = data.events || [];
 
   previousIcsTimestamp = lastUpdateText;
-  lastUpdateText = data.lastUpdate || '';
+  lastUpdateText = data.lastUpdate || "";
   lastCheckedTime = Date.now();
 
   // Normalize canonical values BEFORE building field list
-  seasonEvents = rawEvents.map(ev => {
+  seasonEvents = rawEvents.map((ev) => {
     const ext = ev.extendedProps || {};
-    const rawCanonical = (ext.canonical || '').toUpperCase();
+    const rawCanonical = (ext.canonical || "").toUpperCase();
     const normalizedCanonical = CANONICAL_MAP[rawCanonical] || rawCanonical;
 
     return {
       ...ev,
       extendedProps: {
         ...ext,
-        canonical: normalizedCanonical
-      }
+        canonical: normalizedCanonical,
+      },
     };
   });
 
   // Build field list using normalized canonical names
   allFieldKeys = new Set();
-  seasonEvents.forEach(ev => {
+  seasonEvents.forEach((ev) => {
     const ext = ev.extendedProps || {};
     if (ext.canonical) {
       allFieldKeys.add(ext.canonical);
@@ -162,21 +164,20 @@ async function loadSeasonData() {
   }
 }
 
-
 // ===== FIELD LAYERS UI =====
 
 function createFieldCheckbox(canonical, labelText) {
-  const container = document.getElementById('fieldLayersContainer');
+  const container = document.getElementById("fieldLayersContainer");
 
-  const wrapper = document.createElement('label');
-  wrapper.className = 'field-layer-item';
+  const wrapper = document.createElement("label");
+  wrapper.className = "field-layer-item";
 
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
   checkbox.checked = true;
   checkbox.dataset.canonical = canonical;
 
-  checkbox.addEventListener('change', () => {
+  checkbox.addEventListener("change", () => {
     if (checkbox.checked) {
       selectedFields.add(canonical);
     } else {
@@ -185,7 +186,7 @@ function createFieldCheckbox(canonical, labelText) {
     if (calendar) calendar.refetchEvents();
   });
 
-  const span = document.createElement('span');
+  const span = document.createElement("span");
   span.textContent = labelText;
 
   wrapper.appendChild(checkbox);
@@ -194,14 +195,14 @@ function createFieldCheckbox(canonical, labelText) {
 }
 
 function initFieldLayersUI() {
-  const container = document.getElementById('fieldLayersContainer');
+  const container = document.getElementById("fieldLayersContainer");
   if (!container) return;
 
-  container.innerHTML = '';
+  container.innerHTML = "";
 
-  allFieldKeys.forEach(canonical => {
-    if (canonical === 'SUMNER/SEAN JOYCE') {
-      createFieldCheckbox(canonical, 'Sumner / Sean Joyce');
+  allFieldKeys.forEach((canonical) => {
+    if (canonical === "SUMNER/SEAN JOYCE") {
+      createFieldCheckbox(canonical, "Sumner / Sean Joyce");
       return;
     }
 
@@ -210,41 +211,47 @@ function initFieldLayersUI() {
   });
 }
 
-
 // ===== LABEL HELPERS =====
 
 function canonicalToLabel(canonical) {
-  if (!canonical) return '';
+  if (!canonical) return "";
   const upper = canonical.toUpperCase();
   switch (upper) {
-    case 'BROOKVILLE': return 'Brookville';
-    case 'BUTLER': return 'Butler';
-    case 'TURF': return 'Turf';
-    case 'SUMNER/SEAN JOYCE': return 'Sumner / Sean Joyce';
+    case "BROOKVILLE":
+      return "Brookville";
+    case "BUTLER":
+      return "Butler";
+    case "TURF":
+      return "Turf";
+    case "SUMNER/SEAN JOYCE":
+      return "Sumner / Sean Joyce";
     default:
       return upper.charAt(0) + upper.slice(1).toLowerCase();
   }
 }
 
-
 // ===== CALENDAR =====
 
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 function initCalendar() {
-  const calendarEl = document.getElementById('calendar');
+  const calendarEl = document.getElementById("calendar");
   if (!calendarEl) return;
 
   calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'timeGridWeek',
+    initialView: "timeGridWeek",
     nowIndicator: true,
     allDaySlot: false,
-    slotMinTime: '06:00:00',
-    slotMaxTime: '22:00:00',
-    height: 'auto',
+    slotMinTime: "06:00:00",
+    slotMaxTime: "22:00:00",
+    height: "auto",
 
     headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'timeGridWeek,dayGridMonth'
+      left: "prev,next today",
+      center: "title",
+      right: "timeGridWeek,dayGridMonth",
     },
 
     events: (info, success, fail) => {
@@ -261,54 +268,91 @@ function initCalendar() {
     },
 
     eventDidMount(info) {
-      if (info.event.extendedProps?.tooltip) {
-        info.el.title = info.event.extendedProps.tooltip;
+      const tooltip = info.event.extendedProps?.tooltip;
+
+      // Desktop hover
+      if (!isMobile() && tooltip) {
+        info.el.title = tooltip;
       }
-    }
+    },
+
+    eventClick(info) {
+      const tooltip = info.event.extendedProps?.tooltip;
+      if (!tooltip) return;
+
+      // Mobile popover
+      if (isMobile()) {
+        info.jsEvent.preventDefault();
+        alert(tooltip);
+      }
+    },
   });
 
   calendar.render();
 }
 
-
 // ===== FILTERS =====
 
 function filterByPractice(events) {
   if (!practiceOnly) return events;
-  return events.filter(ev => !isAvailabilityEvent(ev) || isPracticeAllowed(ev));
+  return events.filter(
+    (ev) => !isAvailabilityEvent(ev) || isPracticeAllowed(ev)
+  );
 }
 
 function filterByFields(events) {
   if (!selectedFields.size) return [];
-  return events.filter(ev => selectedFields.has(ev.extendedProps?.canonical));
+  return events.filter((ev) =>
+    selectedFields.has(ev.extendedProps?.canonical)
+  );
 }
 
 function filterByDateRange(events, start, end) {
   const s = start.getTime();
   const e = end.getTime();
-  return events.filter(ev => {
+  return events.filter((ev) => {
     const evStart = new Date(ev.start).getTime();
     const evEnd = new Date(ev.end || ev.start).getTime();
     return evEnd > s && evStart < e;
   });
 }
 
-function decorateEvents(events) {
-  return events.map(ev => ({
-    ...ev,
-    classNames: (ev.classNames || []).concat(decorateEventClasses(ev)),
-    extendedProps: {
-      ...ev.extendedProps,
-      tooltip: buildTooltip(ev)
-    }
-  }));
-}
+// ===== DECORATE EVENTS (rewrites game titles) =====
 
+function decorateEvents(events) {
+  return events.map((ev) => {
+    const ext = ev.extendedProps || {};
+
+    // Rewrite game titles to "Team A vs Team B"
+    let newTitle = ev.title;
+    if (ext.type === "game") {
+      const home = ext.homeTeam || "";
+      const away = ext.awayTeam || "";
+      if (home || away) {
+        newTitle = `${home} vs ${away}`.trim();
+      }
+    }
+
+    return {
+      ...ev,
+      title: newTitle,
+      classNames: (ev.classNames || []).concat(decorateEventClasses(ev)),
+      extendedProps: {
+        ...ext,
+        tooltip: buildTooltip({
+          ...ev,
+          title: newTitle,
+          extendedProps: ext,
+        }),
+      },
+    };
+  });
+}
 
 // ===== EVENT CLASS HELPERS =====
 
 function isAvailabilityEvent(ev) {
-  return ev.extendedProps?.type === 'availability';
+  return ev.extendedProps?.type === "availability";
 }
 
 function isPracticeAllowed(ev) {
@@ -324,84 +368,108 @@ function isGameOnlyAvailability(ev) {
 function decorateEventClasses(ev) {
   const classes = [];
   if (isAvailabilityEvent(ev)) {
-    if (isPracticeAllowed(ev)) classes.push('avail-practice');
-    else if (isGameOnlyAvailability(ev)) classes.push('avail-game-only');
+    if (isPracticeAllowed(ev)) classes.push("avail-practice");
+    else if (isGameOnlyAvailability(ev)) classes.push("avail-game-only");
   }
-  if (ev.extendedProps?.type === 'game') classes.push('game-event');
-  if (ev.extendedProps?.reasonType === 'closure') classes.push('block-event');
+  if (ev.extendedProps?.type === "game") classes.push("game-event");
+  if (ev.extendedProps?.reasonType === "closure") classes.push("block-event");
   return classes;
 }
 
+// ===== TOOLTIP BUILDER =====
+
 function buildTooltip(ev) {
   const ext = ev.extendedProps || {};
-  if (ext.type === 'availability') {
+
+  // Availability
+  if (ext.type === "availability") {
     const ps = ext.practiceSurfaces || [];
     const gs = ext.gameOnlySurfaces || [];
     if (ps.length > 0) {
-      return `Practice Available\nPractice Surfaces: ${ps.join(', ')}`;
+      return `Practice Available\nPractice Surfaces: ${ps.join(", ")}`;
     }
-    return `Available for Games Only\nGame Surfaces: ${gs.join(', ')}`;
+    return `Available for Games Only\nGame Surfaces: ${gs.join(", ")}`;
   }
-  if (ext.tooltip) return ext.tooltip;
-  return ev.title || '';
-}
 
+  // Games
+  if (ext.type === "game") {
+    const parts = [];
+
+    if (ev.title) parts.push(ev.title); // "Team A vs Team B"
+    if (ext.division) parts.push(`Division: ${ext.division}`);
+    if (ext.ageGroup) parts.push(`Age Group: ${ext.ageGroup}`);
+    if (ext.surface) parts.push(`Surface: ${ext.surface}`);
+    if (ext.canonical) parts.push(`Field: ${ext.canonical}`);
+    if (ext.source) parts.push(`Source: ${ext.source}`);
+    if (ext.gameId) parts.push(`Game ID: ${ext.gameId}`);
+
+    return parts.join("\n");
+  }
+
+  // Practices
+  if (ext.type === "practice") {
+    const parts = [];
+    if (ev.title) parts.push(ev.title);
+    if (ext.surface) parts.push(`Surface: ${ext.surface}`);
+    if (ext.canonical) parts.push(`Field: ${ext.canonical}`);
+    return parts.join("\n");
+  }
+
+  return ev.title || "";
+}
 
 // ===== PRACTICE TOGGLE =====
 
 function initPracticeToggle() {
-  const toggle = document.getElementById('practiceOnlyToggle');
+  const toggle = document.getElementById("practiceOnlyToggle");
   if (!toggle) return;
 
-  toggle.addEventListener('change', () => {
+  toggle.addEventListener("change", () => {
     practiceOnly = toggle.checked;
     if (calendar) calendar.refetchEvents();
   });
 }
 
-
 // ===== REFRESH BUTTON =====
 
 function initRefreshButton() {
-  const btn = document.getElementById('refreshButton');
+  const btn = document.getElementById("refreshButton");
   if (!btn) return;
 
-  btn.addEventListener('click', async () => {
+  btn.addEventListener("click", async () => {
     await loadSeasonData();
   });
 }
 
-
 // ===== MOBILE WEEK NAV =====
 
 function initMobileWeekNav() {
-  const prevBtn = document.getElementById('mobilePrevWeek');
-  const nextBtn = document.getElementById('mobileNextWeek');
-  const todayBtn = document.getElementById('mobileToday');
+  const prevBtn = document.getElementById("mobilePrevWeek");
+  const nextBtn = document.getElementById("mobileNextWeek");
+  const todayBtn = document.getElementById("mobileToday");
 
   if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
+    prevBtn.addEventListener("click", () => {
       if (calendar) calendar.prev();
     });
   }
 
   if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
+    nextBtn.addEventListener("click", () => {
       if (calendar) calendar.next();
     });
   }
 
   if (todayBtn) {
-    todayBtn.addEventListener('click', () => {
+    todayBtn.addEventListener("click", () => {
       if (calendar) calendar.today();
     });
   }
 }
 
-
 // ===== BOOTSTRAP =====
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   await loadSeasonData();
   initPracticeToggle();
   initRefreshButton();
