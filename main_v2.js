@@ -57,6 +57,75 @@ function timeAgo(ts) {
   });
 }
 
+
+// ===== DATA LOAD =====
+
+async function fetchSeasonEvents() {
+  const params = new URLSearchParams();
+  params.append("start", SEASON_START);
+  params.append("end", SEASON_END);
+
+  const url =
+    API_URL + (API_URL.includes("?") ? "&" : "?") + params.toString();
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    console.error("Failed to fetch season events", res.status, res.statusText);
+    return { lastUpdate: "", events: [] };
+  }
+
+  return await res.json();
+}
+
+async function loadSeasonData() {
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.display = "flex";
+
+  const data = await fetchSeasonEvents();
+
+  if (data.seasonStart) SEASON_START = data.seasonStart;
+  if (data.seasonEnd) SEASON_END = data.seasonEnd;
+
+  const rawEvents = data.events || [];
+
+  previousIcsTimestamp = lastUpdateText;
+  lastUpdateText = data.lastUpdate || "";
+  lastCheckedTime = Date.now();
+
+  seasonEvents = rawEvents.map((ev) => {
+    const ext = ev.extendedProps || {};
+    const rawCanonical = (ext.canonical || "").toUpperCase();
+    const normalizedCanonical = CANONICAL_MAP[rawCanonical] || rawCanonical;
+
+    return {
+      ...ev,
+      extendedProps: {
+        ...ext,
+        canonical: normalizedCanonical,
+      },
+    };
+  });
+
+  allFieldKeys = new Set();
+  seasonEvents.forEach((ev) => {
+    const ext = ev.extendedProps || {};
+    if (ext.canonical) {
+      allFieldKeys.add(ext.canonical);
+    }
+  });
+
+  selectedFields = new Set(allFieldKeys);
+
+  initFieldLayersUI();
+
+  if (overlay) overlay.style.display = "none";
+
+  if (calendar) {
+    calendar.refetchEvents();
+  }
+}
+
+
 // ===== FIELD LAYERS UI =====
 
 function createFieldCheckbox(canonical, labelText) {
