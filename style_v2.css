@@ -56,11 +56,11 @@
 #practiceActionPanel {
   position: fixed;
   right: 20px;
-  bottom: -320px;
-  width: 280px;
+  bottom: -350px;
+  width: 300px;
   background: white;
-  border-radius: 10px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 18px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   transition: bottom 0.3s ease;
   z-index: 99999;
@@ -74,13 +74,14 @@
   text-align: center;
   border-radius: 6px;
   text-decoration: none;
-  margin-top: 10px;
+  margin-top: 14px;
+  font-size: 0.95rem;
 }
 
 .practice-close-btn {
-  margin-top: 12px;
+  margin-top: 14px;
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   background: #ccc;
   border: none;
   border-radius: 6px;
@@ -88,9 +89,27 @@
 }
 
 .practice-note {
-  margin-top: 10px;
+  margin-top: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.practice-emails {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.practice-details {
+  margin: 8px 0 0 20px;
+  padding: 0;
   font-size: 0.9rem;
-  color: #555;
+  color: #444;
+}
+
+.practice-details li {
+  margin-bottom: 6px;
 }
 
 /* Mobile: full-width panel */
@@ -99,7 +118,7 @@
     left: 0;
     right: 0;
     width: 100%;
-    bottom: -350px;
+    bottom: -380px;
     border-radius: 12px 12px 0 0;
   }
 }
