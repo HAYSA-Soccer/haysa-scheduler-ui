@@ -513,7 +513,6 @@ function buildTooltip(ev) {
     if (ext.ageGroup) parts.push(`Age Group: ${ext.ageGroup}`);
     if (ext.surface) parts.push(`Surface: ${ext.surface}`);
     if (ext.canonical) parts.push(`Field: ${ext.canonical}`);
-    if (ext.source) parts.push(`Source: ${ext.source}`);
     if (ext.gameId) parts.push(`Game ID: ${ext.gameId}`);
 
     return parts.join("\n");
