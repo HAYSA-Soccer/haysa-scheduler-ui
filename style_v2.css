@@ -179,15 +179,15 @@ body {
 }
 
 /* --------------------------------------------------
-   HEADER (BRANDED)
+   HEADER (SOFT BLUE → SOFT ORANGE GRADIENT)
 -------------------------------------------------- */
 
 .app-header {
-  background: var(--haysa-blue);
-  color: white;
-  padding: 16px;
+  background: linear-gradient(to right, #E8EEF9, #FFF4E8);
   border-bottom: 4px solid var(--haysa-orange);
+  padding: 16px;
   margin-bottom: 16px;
+  color: var(--haysa-blue);
 }
 
 .header-top {
@@ -200,7 +200,7 @@ body {
   margin: 0;
   font-size: 1.6rem;
   font-weight: 700;
-  color: white;
+  color: var(--haysa-blue);
 }
 
 .update-group {
@@ -318,7 +318,7 @@ body {
 
 .last-update {
   font-size: 0.85rem;
-  color: #e0e0e0;
+  color: #666;
 }
 
 /* --------------------------------------------------
