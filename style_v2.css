@@ -1,27 +1,62 @@
 /* --------------------------------------------------
-   FLOATING PRACTICE ACTION BUTTON + PANEL
+   DESKTOP PRACTICE BUTTON
 -------------------------------------------------- */
 
-/* Floating Action Button */
-#practiceActionFab {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
+.desktop-practice-btn {
+  padding: 6px 12px;
   background: #0078d4;
   color: white;
-  padding: 12px 18px;
-  border-radius: 30px;
-  font-size: 15px;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  font-size: 0.85rem;
+}
+
+.desktop-practice-btn:hover {
+  background: #005fa3;
+}
+
+/* Hide desktop button on mobile */
+@media (max-width: 768px) {
+  .desktop-practice-btn {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------
+   MOBILE STICKY PRACTICE BAR
+-------------------------------------------------- */
+
+.mobile-practice-bar {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0078d4;
+  color: white;
+  text-align: center;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
   z-index: 9999;
 }
 
-/* Slide-up Panel */
+@media (max-width: 768px) {
+  .mobile-practice-bar {
+    display: block;
+  }
+}
+
+/* --------------------------------------------------
+   SLIDE-UP PANEL
+-------------------------------------------------- */
+
 #practiceActionPanel {
   position: fixed;
   right: 20px;
-  bottom: -300px; /* hidden by default */
+  bottom: -320px;
   width: 280px;
   background: white;
   border-radius: 10px;
@@ -52,17 +87,14 @@
   cursor: pointer;
 }
 
-/* Mobile: full-width bottom bar */
-@media (max-width: 600px) {
-  #practiceActionFab {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 0;
-    width: 100%;
-    text-align: center;
-  }
+.practice-note {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #555;
+}
 
+/* Mobile: full-width panel */
+@media (max-width: 600px) {
   #practiceActionPanel {
     left: 0;
     right: 0;
@@ -75,6 +107,7 @@
 /* --------------------------------------------------
    GLOBAL LAYOUT
 -------------------------------------------------- */
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -186,6 +219,7 @@ body {
 /* --------------------------------------------------
    LEGEND
 -------------------------------------------------- */
+
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -207,26 +241,11 @@ body {
   background: #eee;
 }
 
-/* Legend color chips */
-.legend-practice {
-  border-left: 10px solid #6FCF97;
-}
-
-.legend-gameonly {
-  border-left: 10px solid #A8D5BA;
-}
-
-.legend-game {
-  border-left: 10px solid #6FA8DC;
-}
-
-.legend-block {
-  border-left: 10px solid #F4C542;
-}
-
-.legend-realpractice {
-  border-left: 10px solid #BDBDBD;
-}
+.legend-practice { border-left: 10px solid #6FCF97; }
+.legend-gameonly { border-left: 10px solid #A8D5BA; }
+.legend-game { border-left: 10px solid #6FA8DC; }
+.legend-block { border-left: 10px solid #F4C542; }
+.legend-realpractice { border-left: 10px solid #BDBDBD; }
 
 .last-update {
   font-size: 0.85rem;
@@ -236,6 +255,7 @@ body {
 /* --------------------------------------------------
    LOADING OVERLAY
 -------------------------------------------------- */
+
 .loading-overlay {
   position: fixed;
   inset: 0;
@@ -266,6 +286,7 @@ body {
 /* --------------------------------------------------
    FULLCALENDAR BASE
 -------------------------------------------------- */
+
 .fc {
   background: #fff;
   border-radius: 6px;
@@ -273,14 +294,12 @@ body {
   padding: 8px;
 }
 
-/* Rounded event corners + compact layout */
 .fc-event {
   border-radius: 6px !important;
   padding: 0px 2px !important;
   margin: 0 !important;
 }
 
-/* Ultra-compact event text */
 .fc-event-title,
 .fc-event-time {
   font-size: 0.65rem !important;
@@ -289,53 +308,45 @@ body {
   color: #1a1a1a !important;
 }
 
-/* Time slightly lighter */
 .fc-event-time {
   color: #444 !important;
   font-weight: 400 !important;
 }
 
-/* Remove extra padding inside event wrapper */
 .fc-event-main {
   padding: 0 !important;
 }
 
 /* --------------------------------------------------
-   EVENT COLORS (NEW PALETTE)
+   EVENT COLORS
 -------------------------------------------------- */
 
-/* Availability (practice allowed) */
 .fc-event.avail-practice {
   background-color: #6FCF97 !important;
   border-color: #4CAF50 !important;
 }
 
-/* Availability (game only) */
 .fc-event.avail-game-only {
   background-color: #A8D5BA !important;
   border-color: #7FBF99 !important;
 }
 
-/* Games — lighter, more readable blue */
 .fc-event.game-event {
   background-color: #6FA8DC !important;
   border-color: #3D7FB1 !important;
 }
 
-/* Scheduled Practices — neutral gray */
 .fc-event.practice-event {
   background-color: #BDBDBD !important;
   border-color: #9E9E9E !important;
 }
 
-/* Blocks — richer amber with accent stripe */
 .fc-event.block-event {
   background-color: #F4C542 !important;
   border-color: #C89F2A !important;
   border-left: 4px solid #A67F1F !important;
 }
 
-/* Closures — strong red */
 .fc-event.closure-event {
   background-color: #D64541 !important;
   border-color: #B03A2E !important;
@@ -344,10 +355,11 @@ body {
 /* --------------------------------------------------
    MOBILE WEEK NAV
 -------------------------------------------------- */
+
 .mobile-week-nav {
   position: fixed;
   left: 50%;
-  bottom: 12px;
+  bottom: 60px;
   transform: translateX(-50%);
   display: none;
   gap: 8px;
@@ -381,6 +393,7 @@ body {
 /* --------------------------------------------------
    CUSTOM POPOVER
 -------------------------------------------------- */
+
 #fc-custom-popover {
   position: absolute;
   z-index: 9999;
