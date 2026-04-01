@@ -135,23 +135,23 @@ body {
 
 /* Legend color chips */
 .legend-practice {
-  border-left: 10px solid #6FCF97; /* availability practice */
+  border-left: 10px solid #6FCF97;
 }
 
 .legend-gameonly {
-  border-left: 10px solid #A8D5BA; /* availability game-only */
+  border-left: 10px solid #A8D5BA;
 }
 
 .legend-game {
-  border-left: 10px solid #6FA8DC; /* games (lighter blue) */
+  border-left: 10px solid #6FA8DC;
 }
 
 .legend-block {
-  border-left: 10px solid #F4C542; /* richer amber blocks */
+  border-left: 10px solid #F4C542;
 }
 
 .legend-realpractice {
-  border-left: 10px solid #BDBDBD; /* scheduled practices */
+  border-left: 10px solid #BDBDBD;
 }
 
 .last-update {
@@ -199,25 +199,31 @@ body {
   padding: 8px;
 }
 
-/* Rounded event corners */
+/* Rounded event corners + compact layout */
 .fc-event {
-  font-size: 0.8rem;
   border-radius: 6px !important;
+  padding: 0px 2px !important;
+  margin: 0 !important;
 }
 
-/* Better text contrast */
-/* Smaller, cleaner event text */
+/* Ultra-compact event text */
 .fc-event-title,
 .fc-event-time {
-  font-size: 0.72rem !important;
-  line-height: 1.1 !important;
+  font-size: 0.65rem !important;
+  line-height: 1.05 !important;
   font-weight: 500 !important;
   color: #1a1a1a !important;
 }
 
-/* Reduce padding inside events so more text fits */
-.fc-event {
-  padding: 1px 3px !important;
+/* Time slightly lighter */
+.fc-event-time {
+  color: #444 !important;
+  font-weight: 400 !important;
+}
+
+/* Remove extra padding inside event wrapper */
+.fc-event-main {
+  padding: 0 !important;
 }
 
 /* --------------------------------------------------
@@ -252,7 +258,7 @@ body {
 .fc-event.block-event {
   background-color: #F4C542 !important;
   border-color: #C89F2A !important;
-  border-left: 4px solid #A67F1F !important; /* accent stripe */
+  border-left: 4px solid #A67F1F !important;
 }
 
 /* Closures — strong red */
@@ -299,7 +305,7 @@ body {
 }
 
 /* --------------------------------------------------
-   CUSTOM POPOVER (REPLACES BROWSER DIALOG)
+   CUSTOM POPOVER
 -------------------------------------------------- */
 #fc-custom-popover {
   position: absolute;
@@ -318,7 +324,6 @@ body {
 }
 
 .fc-popover-header {
-  /* background is set dynamically from JS via getPopoverHeaderColor */
   color: white;
   padding: 10px 12px;
   font-weight: 600;
