@@ -288,13 +288,14 @@ function getPopoverHeaderColor(ext) {
   const type = (ext.type || "").toLowerCase();
   const reasonType = (ext.reasonType || "").toLowerCase();
 
-  if (type === "game") return "#4A6FA5"; // blue
-  if (type === "practice") return "#9E9E9E"; // gray
-  if (type === "availability") return "#6FCF97"; // green
-  if (reasonType === "closure") return "#C0392B"; // red
-  if (reasonType === "admin_block" || type === "block") return "#F7D154"; // amber
+  // Match the new, more readable palette
+  if (type === "game") return "#3D7FB1";          // darker edge of game blue
+  if (type === "practice") return "#757575";      // darker gray
+  if (type === "availability") return "#4CAF50";  // stronger green
+  if (reasonType === "closure") return "#B03A2E"; // strong red
+  if (reasonType === "admin_block" || type === "block") return "#C89F2A"; // rich amber
 
-  return "#4A6FA5"; // default blue
+  return "#3D7FB1"; // default: game blue edge
 }
 
 // ===== CALENDAR =====
@@ -365,7 +366,7 @@ function initCalendar() {
       titleEl.textContent = info.event.title || "";
       bodyEl.textContent = tooltip;
 
-      // Color-code header by type
+      // Color-code header by type (using darker edge colors for contrast)
       const headerColor = getPopoverHeaderColor(ext);
       headerEl.style.backgroundColor = headerColor;
       headerEl.style.color = "#ffffff";
