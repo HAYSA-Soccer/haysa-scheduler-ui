@@ -15,7 +15,7 @@ const CANONICAL_MAP = {
   // ⭐ Normalize all Butler variants
   "AVON BUTLER": "BUTLER",
   "AVON BUTLER ELEMENTARY SCHOOL": "BUTLER",
-  "BUTLER": "BUTLER",
+  BUTLER: "BUTLER",
 };
 
 // ===== STATE =====
@@ -243,25 +243,26 @@ function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-
-
+// ===== PRACTICE CHANGE PANEL LOGIC =====
 
 document.addEventListener("DOMContentLoaded", () => {
-  const fab = document.getElementById("practiceActionFab");
   const panel = document.getElementById("practiceActionPanel");
   const closeBtn = document.getElementById("closePracticePanel");
 
-  fab.addEventListener("click", () => {
-    panel.style.bottom = "20px"; // slide up
-  });
+  const desktopBtn = document.getElementById("practiceActionFab");
+  const mobileBtn = document.getElementById("practiceActionFabMobile");
+
+  function openPanel() {
+    panel.style.bottom = "20px";
+  }
+
+  if (desktopBtn) desktopBtn.addEventListener("click", openPanel);
+  if (mobileBtn) mobileBtn.addEventListener("click", openPanel);
 
   closeBtn.addEventListener("click", () => {
-    panel.style.bottom = "-300px"; // slide down
+    panel.style.bottom = "-350px";
   });
 });
-
-
-
 
 // ===== CUSTOM POPOVER HELPERS =====
 
@@ -312,14 +313,13 @@ function getPopoverHeaderColor(ext) {
   const type = (ext.type || "").toLowerCase();
   const reasonType = (ext.reasonType || "").toLowerCase();
 
-  // Match the new, more readable palette
-  if (type === "game") return "#3D7FB1";          // darker edge of game blue
-  if (type === "practice") return "#757575";      // darker gray
-  if (type === "availability") return "#4CAF50";  // stronger green
-  if (reasonType === "closure") return "#B03A2E"; // strong red
-  if (reasonType === "admin_block" || type === "block") return "#C89F2A"; // rich amber
+  if (type === "game") return "#3D7FB1";
+  if (type === "practice") return "#757575";
+  if (type === "availability") return "#4CAF50";
+  if (reasonType === "closure") return "#B03A2E";
+  if (reasonType === "admin_block" || type === "block") return "#C89F2A";
 
-  return "#3D7FB1"; // default: game blue edge
+  return "#3D7FB1";
 }
 
 // ===== CALENDAR =====
@@ -360,7 +360,6 @@ function initCalendar() {
     eventDidMount(info) {
       const tooltip = info.event.extendedProps?.tooltip;
 
-      // Desktop hover
       if (!isMobile() && tooltip) {
         info.el.title = tooltip;
       }
@@ -370,10 +369,8 @@ function initCalendar() {
       const tooltip = info.event.extendedProps?.tooltip;
       if (!tooltip) return;
 
-      // Desktop: rely on hover tooltip only
       if (!isMobile()) return;
 
-      // Mobile: custom popover
       info.jsEvent.preventDefault();
       info.jsEvent.stopPropagation();
 
@@ -386,16 +383,13 @@ function initCalendar() {
 
       const ext = info.event.extendedProps || {};
 
-      // Set content
       titleEl.textContent = info.event.title || "";
       bodyEl.textContent = tooltip;
 
-      // Color-code header by type (using darker edge colors for contrast)
       const headerColor = getPopoverHeaderColor(ext);
       headerEl.style.backgroundColor = headerColor;
       headerEl.style.color = "#ffffff";
 
-      // Position popover under the tapped event
       const rect = info.el.getBoundingClientRect();
       pop.style.left = rect.left + rect.width / 2 + "px";
       pop.style.top = rect.top + window.scrollY + rect.height + 8 + "px";
@@ -433,7 +427,8 @@ function filterByDateRange(events, start, end) {
   });
 }
 
-// ===== DECORATE EVENTS (rewrites game titles) =====
+// ===== DECORATE EVENTS =====
+
 function stripBackendColors(ev) {
   const clone = { ...ev };
   delete clone.backgroundColor;
@@ -443,14 +438,12 @@ function stripBackendColors(ev) {
   return clone;
 }
 
-
 function decorateEvents(events) {
   return events.map((ev) => {
-    ev = stripBackendColors(ev); // remove backend inline colors
-    
+    ev = stripBackendColors(ev);
+
     const ext = ev.extendedProps || {};
 
-    // ⭐ Rewrite game titles using backend-provided homeTeam/awayTeam
     let newTitle = ev.title;
     if (ext.type === "game") {
       const home = ext.homeTeam || "";
@@ -518,7 +511,6 @@ function decorateEventClasses(ev) {
 function buildTooltip(ev) {
   const ext = ev.extendedProps || {};
 
-  // Availability
   if (ext.type === "availability") {
     const ps = ext.practiceSurfaces || [];
     const gs = ext.gameOnlySurfaces || [];
@@ -528,7 +520,6 @@ function buildTooltip(ev) {
     return `Available for Games Only\nGame Surfaces: ${gs.join(", ")}`;
   }
 
-  // Games
   if (ext.type === "game") {
     const parts = [];
 
@@ -542,7 +533,6 @@ function buildTooltip(ev) {
     return parts.join("\n");
   }
 
-  // Practices
   if (ext.type === "practice") {
     const parts = [];
     if (ev.title) parts.push(ev.title);
