@@ -243,6 +243,26 @@ function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const fab = document.getElementById("practiceActionFab");
+  const panel = document.getElementById("practiceActionPanel");
+  const closeBtn = document.getElementById("closePracticePanel");
+
+  fab.addEventListener("click", () => {
+    panel.style.bottom = "20px"; // slide up
+  });
+
+  closeBtn.addEventListener("click", () => {
+    panel.style.bottom = "-300px"; // slide down
+  });
+});
+
+
+
+
 // ===== CUSTOM POPOVER HELPERS =====
 
 function ensurePopoverInitialized() {
