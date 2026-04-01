@@ -12,7 +12,6 @@ const CANONICAL_MAP = {
   "SEAN JOYCE": "SUMNER/SEAN JOYCE",
   "SUMNER/SEAN JOYCE": "SUMNER/SEAN JOYCE",
 
-  // ⭐ Normalize all Butler variants
   "AVON BUTLER": "BUTLER",
   "AVON BUTLER ELEMENTARY SCHOOL": "BUTLER",
   BUTLER: "BUTLER",
@@ -124,7 +123,6 @@ async function loadSeasonData() {
 
   const data = await fetchSeasonEvents();
 
-  // ⭐ Only overwrite if backend provides values
   if (data.seasonStart) SEASON_START = data.seasonStart;
   if (data.seasonEnd) SEASON_END = data.seasonEnd;
 
@@ -134,7 +132,6 @@ async function loadSeasonData() {
   lastUpdateText = data.lastUpdate || "";
   lastCheckedTime = Date.now();
 
-  // Normalize canonical values BEFORE building field list
   seasonEvents = rawEvents.map((ev) => {
     const ext = ev.extendedProps || {};
     const rawCanonical = (ext.canonical || "").toUpperCase();
@@ -149,7 +146,6 @@ async function loadSeasonData() {
     };
   });
 
-  // Build field list using normalized canonical names
   allFieldKeys = new Set();
   seasonEvents.forEach((ev) => {
     const ext = ev.extendedProps || {};
@@ -158,7 +154,6 @@ async function loadSeasonData() {
     }
   });
 
-  // Default: all fields ON
   selectedFields = new Set(allFieldKeys);
 
   initFieldLayersUI();
@@ -259,8 +254,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (desktopBtn) desktopBtn.addEventListener("click", openPanel);
   if (mobileBtn) mobileBtn.addEventListener("click", openPanel);
 
+  // ⭐ FIXED CLOSE BEHAVIOR — fully hides panel
   closeBtn.addEventListener("click", () => {
-    panel.style.bottom = "-350px";
+    panel.style.bottom = "calc(-100% - 40px)";
   });
 });
 
@@ -294,12 +290,10 @@ function ensurePopoverInitialized() {
 
   document.body.appendChild(pop);
 
-  // Close button behavior
   closeBtn.addEventListener("click", () => {
     pop.classList.add("fc-popover-hidden");
   });
 
-  // Click outside to close
   document.addEventListener("click", (e) => {
     if (!pop.contains(e.target) && !e.target.classList.contains("fc-event")) {
       pop.classList.add("fc-popover-hidden");
