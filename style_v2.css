@@ -1,4 +1,6 @@
-/* Layout */
+/* --------------------------------------------------
+   GLOBAL LAYOUT
+-------------------------------------------------- */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -107,7 +109,9 @@ body {
   height: 16px;
 }
 
-/* Legend */
+/* --------------------------------------------------
+   LEGEND
+-------------------------------------------------- */
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -124,31 +128,30 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 8px 3px 4px; /* left padding so chips show */
+  padding: 3px 8px 3px 4px;
   border-radius: 4px;
   background: #eee;
 }
 
 /* Legend color chips */
 .legend-practice {
-  border-left: 10px solid #6FCF97;
+  border-left: 10px solid #6FCF97; /* availability practice */
 }
 
 .legend-gameonly {
-  border-left: 10px solid #A5D6A7;
+  border-left: 10px solid #A8D5BA; /* availability game-only */
 }
 
 .legend-game {
-  border-left: 10px solid #4A90E2;
+  border-left: 10px solid #4A6FA5; /* games */
 }
 
 .legend-block {
-  border-left: 10px solid #F2C94C;
+  border-left: 10px solid #F7D154; /* amber blocks */
 }
 
-/* ⭐ NEW: Actual scheduled practices (manual or ICS) */
 .legend-realpractice {
-  border-left: 10px solid #757575; /* darker gray for visibility */
+  border-left: 10px solid #9E9E9E; /* scheduled practices */
 }
 
 .last-update {
@@ -156,7 +159,9 @@ body {
   color: #666;
 }
 
-/* Loading Overlay */
+/* --------------------------------------------------
+   LOADING OVERLAY
+-------------------------------------------------- */
 .loading-overlay {
   position: fixed;
   inset: 0;
@@ -184,7 +189,9 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* FullCalendar styling */
+/* --------------------------------------------------
+   FULLCALENDAR BASE
+-------------------------------------------------- */
 .fc {
   background: #fff;
   border-radius: 6px;
@@ -192,32 +199,63 @@ body {
   padding: 8px;
 }
 
-/* Event colors */
+/* Rounded event corners */
+.fc-event {
+  font-size: 0.8rem;
+  border-radius: 6px !important;
+}
+
+/* Better text contrast */
+.fc-event-title,
+.fc-event-time {
+  color: #1a1a1a !important;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------
+   EVENT COLORS
+-------------------------------------------------- */
+
+/* Availability (practice allowed) */
 .fc-event.avail-practice {
   background-color: #6FCF97 !important;
   border-color: #4CAF50 !important;
 }
 
+/* Availability (game only) */
 .fc-event.avail-game-only {
-  background-color: #A5D6A7 !important;
-  border-color: #81C784 !important;
+  background-color: #A8D5BA !important;
+  border-color: #7FBF99 !important;
 }
 
+/* Games */
 .fc-event.game-event {
-  background-color: #4A90E2 !important;
-  border-color: #357ABD !important;
+  background-color: #4A6FA5 !important;
+  border-color: #3A5A85 !important;
 }
 
+/* Scheduled Practices */
+.fc-event.practice-event {
+  background-color: #9E9E9E !important;
+  border-color: #7A7A7A !important;
+}
+
+/* Blocks (amber) */
 .fc-event.block-event {
-  background-color: #F2C94C !important;
-  border-color: #D4A62F !important;
+  background-color: #F7D154 !important;
+  border-color: #D6A738 !important;
+  border-left: 4px solid #D6A738 !important; /* accent stripe */
 }
 
-.fc-event {
-  font-size: 0.8rem;
+/* Closures */
+.fc-event.closure-event {
+  background-color: #C0392B !important;
+  border-color: #922B21 !important;
 }
 
-/* Mobile floating week nav */
+/* --------------------------------------------------
+   MOBILE WEEK NAV
+-------------------------------------------------- */
 .mobile-week-nav {
   position: fixed;
   left: 50%;
@@ -246,9 +284,52 @@ body {
   background: #357ABD;
 }
 
-/* Show floating nav only on small screens */
 @media (max-width: 768px) {
   .mobile-week-nav {
     display: flex;
   }
+}
+
+/* --------------------------------------------------
+   CUSTOM POPOVER (REPLACES BROWSER DIALOG)
+-------------------------------------------------- */
+#fc-custom-popover {
+  position: absolute;
+  z-index: 9999;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  width: 260px;
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+  transform: translate(-50%, -10px);
+}
+
+.fc-popover-hidden {
+  display: none;
+}
+
+.fc-popover-header {
+  background: #4A6FA5;
+  color: white;
+  padding: 10px 12px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#fc-popover-close {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#fc-popover-body {
+  padding: 12px;
+  white-space: pre-line;
+  font-size: 14px;
+  color: #333;
 }
