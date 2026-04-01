@@ -7,14 +7,15 @@ let SEASON_END = "2026-06-30";
 const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
-// Canonical normalization map
 const CANONICAL_MAP = {
   SUMNER: "SUMNER/SEAN JOYCE",
   "SEAN JOYCE": "SUMNER/SEAN JOYCE",
   "SUMNER/SEAN JOYCE": "SUMNER/SEAN JOYCE",
 
-  // ⭐ Add this
+  // ⭐ Normalize all Butler variants
   "AVON BUTLER": "BUTLER",
+  "AVON BUTLER ELEMENTARY SCHOOL": "BUTLER",
+  "BUTLER": "BUTLER",
 };
 
 // ===== STATE =====
