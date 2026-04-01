@@ -26,6 +26,9 @@ let lastUpdateText = "";
 let lastCheckedTime = null;
 let previousIcsTimestamp = "";
 
+// Popover state
+let popoverInitialized = false;
+
 // ===== TIME HELPERS =====
 
 function timeAgo(ts) {
@@ -230,15 +233,77 @@ function canonicalToLabel(canonical) {
   }
 }
 
-// ===== CALENDAR =====
+// ===== DEVICE DETECTION =====
 
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
+// ===== CUSTOM POPOVER HELPERS =====
+
+function ensurePopoverInitialized() {
+  if (popoverInitialized) return;
+
+  const pop = document.createElement("div");
+  pop.id = "fc-custom-popover";
+  pop.className = "fc-popover-hidden";
+
+  const header = document.createElement("div");
+  header.className = "fc-popover-header";
+
+  const titleSpan = document.createElement("span");
+  titleSpan.id = "fc-popover-title";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.id = "fc-popover-close";
+  closeBtn.textContent = "×";
+
+  header.appendChild(titleSpan);
+  header.appendChild(closeBtn);
+
+  const body = document.createElement("div");
+  body.id = "fc-popover-body";
+
+  pop.appendChild(header);
+  pop.appendChild(body);
+
+  document.body.appendChild(pop);
+
+  // Close button behavior
+  closeBtn.addEventListener("click", () => {
+    pop.classList.add("fc-popover-hidden");
+  });
+
+  // Click outside to close
+  document.addEventListener("click", (e) => {
+    if (!pop.contains(e.target) && !e.target.classList.contains("fc-event")) {
+      pop.classList.add("fc-popover-hidden");
+    }
+  });
+
+  popoverInitialized = true;
+}
+
+function getPopoverHeaderColor(ext) {
+  const type = (ext.type || "").toLowerCase();
+  const reasonType = (ext.reasonType || "").toLowerCase();
+
+  if (type === "game") return "#4A6FA5"; // blue
+  if (type === "practice") return "#9E9E9E"; // gray
+  if (type === "availability") return "#6FCF97"; // green
+  if (reasonType === "closure") return "#C0392B"; // red
+  if (reasonType === "admin_block" || type === "block") return "#F7D154"; // amber
+
+  return "#4A6FA5"; // default blue
+}
+
+// ===== CALENDAR =====
+
 function initCalendar() {
   const calendarEl = document.getElementById("calendar");
   if (!calendarEl) return;
+
+  ensurePopoverInitialized();
 
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "timeGridWeek",
@@ -280,11 +345,37 @@ function initCalendar() {
       const tooltip = info.event.extendedProps?.tooltip;
       if (!tooltip) return;
 
-      // Mobile popover
-      if (isMobile()) {
-        info.jsEvent.preventDefault();
-        alert(tooltip);
-      }
+      // Desktop: rely on hover tooltip only
+      if (!isMobile()) return;
+
+      // Mobile: custom popover
+      info.jsEvent.preventDefault();
+      info.jsEvent.stopPropagation();
+
+      ensurePopoverInitialized();
+
+      const pop = document.getElementById("fc-custom-popover");
+      const titleEl = document.getElementById("fc-popover-title");
+      const bodyEl = document.getElementById("fc-popover-body");
+      const headerEl = pop.querySelector(".fc-popover-header");
+
+      const ext = info.event.extendedProps || {};
+
+      // Set content
+      titleEl.textContent = info.event.title || "";
+      bodyEl.textContent = tooltip;
+
+      // Color-code header by type
+      const headerColor = getPopoverHeaderColor(ext);
+      headerEl.style.backgroundColor = headerColor;
+      headerEl.style.color = "#ffffff";
+
+      // Position popover under the tapped event
+      const rect = info.el.getBoundingClientRect();
+      pop.style.left = rect.left + rect.width / 2 + "px";
+      pop.style.top = rect.top + window.scrollY + rect.height + 8 + "px";
+
+      pop.classList.remove("fc-popover-hidden");
     },
   });
 
@@ -367,12 +458,22 @@ function isGameOnlyAvailability(ev) {
 
 function decorateEventClasses(ev) {
   const classes = [];
+  const ext = ev.extendedProps || {};
+
   if (isAvailabilityEvent(ev)) {
     if (isPracticeAllowed(ev)) classes.push("avail-practice");
     else if (isGameOnlyAvailability(ev)) classes.push("avail-game-only");
   }
-  if (ev.extendedProps?.type === "game") classes.push("game-event");
-  if (ev.extendedProps?.reasonType === "closure") classes.push("block-event");
+
+  if (ext.type === "game") classes.push("game-event");
+  if (ext.type === "practice") classes.push("practice-event");
+
+  if (ext.reasonType === "closure") {
+    classes.push("closure-event");
+  } else if (ext.reasonType === "admin_block" || ext.type === "block") {
+    classes.push("block-event");
+  }
+
   return classes;
 }
 
