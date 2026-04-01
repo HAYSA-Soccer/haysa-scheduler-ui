@@ -4,15 +4,11 @@
   <meta charset="UTF-8" />
   <title>HAYSA Field Availability</title>
 
-  <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
-
-  <!-- Our styles -->
   <link rel="stylesheet" href="style_v2.css" />
 </head>
 <body>
 
-  <!-- Loading Overlay -->
   <div id="loadingOverlay" class="loading-overlay">
     <div class="spinner"></div>
     <div>Loading data…</div>
@@ -21,7 +17,6 @@
   <div class="app-container">
     <header class="app-header">
 
-      <!-- Row 1: Title + Last Update + Refresh Button + Desktop Practice Button -->
       <div class="header-top">
         <h1>HAYSA Field Calendar</h1>
 
@@ -29,14 +24,12 @@
           <span id="lastUpdate" class="last-update"></span>
           <button id="refreshButton" class="refresh-button">Refresh Now</button>
 
-          <!-- Desktop Practice Change Button -->
           <button id="practiceActionFab" class="desktop-practice-btn">
             Practice Change
           </button>
         </div>
       </div>
 
-      <!-- Row 2: Practice Only -->
       <div class="controls-row">
         <label class="toggle-label">
           <input type="checkbox" id="practiceOnlyToggle" />
@@ -44,21 +37,16 @@
         </label>
       </div>
 
-      <!-- Row 3: Field Layers -->
       <div class="controls-row">
         <div class="field-layers">
           <div class="field-layers-label">Field Layers:</div>
-          <div id="fieldLayersContainer" class="field-layers-container">
-            <!-- JS injects checkboxes here -->
-          </div>
+          <div id="fieldLayersContainer" class="field-layers-container"></div>
         </div>
       </div>
 
-      <!-- Row 4: Legend -->
       <div class="controls-row">
         <div class="legend">
           <span class="legend-label">Legend:</span>
-
           <span class="legend-item legend-practice">Practice Available</span>
           <span class="legend-item legend-realpractice">Practice</span>
           <span class="legend-item legend-gameonly">Game-Only Availability</span>
@@ -74,12 +62,11 @@
     </main>
   </div>
 
-  <!-- Mobile-only sticky practice change bar -->
   <div id="practiceActionFabMobile" class="mobile-practice-bar">
     Practice Change
   </div>
 
-  <!-- Slide-up Panel -->
+  <!-- Slide-up Panel (now fully hidden until opened) -->
   <div id="practiceActionPanel">
     <h3>Practice Add / Change / Cancel</h3>
 
@@ -93,9 +80,7 @@
       📧 <a href="mailto:CoachCoordinator.haysa@gmail.com">CoachCoordinator.haysa@gmail.com</a>
     </p>
 
-    <p class="practice-note">
-      Please include ALL of the following:
-    </p>
+    <p class="practice-note">Please include ALL of the following:</p>
 
     <ul class="practice-details">
       <li>Team Name (e.g., 5/6 Girls, 3/4 Boys, 7/8 Coed)</li>
@@ -109,25 +94,21 @@
     </ul>
 
     <a id="practiceEmailLink"
-       href="mailto:webmaster@haysa.org,CoachCoordinator.haysa@gmail.com?subject=Practice%20Add%20Change%20or%20Cancellation&body=Team%20Name:%0AComplex%20(Butler%20/%20Turf%20/%20Sumner/Sean%20Joyce%20/%20Brookville):%0AFull%20Field%20Needed%20(Yes/No):%0ADate:%0AStart%20Time:%0AEnd%20Time:%0ARequest%20Type%20(Add%20/%20Change%20/%20Cancel):%0ANotes:"
-       class="practice-action-btn">
+       class="practice-action-btn"
+       href="mailto:webmaster@haysa.org,CoachCoordinator.haysa@gmail.com?subject=Practice%20Add%20Change%20or%20Cancellation&body=Team%20Name:%0AComplex%20(Butler%20/%20Turf%20/%20Sumner/Sean%20Joyce%20/%20Brookville):%0AFull%20Field%20Needed%20(Yes/No):%0ADate:%0AStart%20Time:%0AEnd%20Time:%0ARequest%20Type%20(Add%20/%20Change%20/%20Cancel):%0ANotes:">
       📧 Email Webmaster & Coach Coordinator
     </a>
 
     <button id="closePracticePanel" class="practice-close-btn">Close</button>
   </div>
 
-  <!-- Mobile-only floating week navigation -->
   <div class="mobile-week-nav">
     <button id="mobilePrevWeek" class="week-nav-button">← Prev</button>
     <button id="mobileToday" class="week-nav-button">Today</button>
     <button id="mobileNextWeek" class="week-nav-button">Next →</button>
   </div>
 
-  <!-- FullCalendar JS -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-
-  <!-- Our logic -->
   <script src="main_v2.js"></script>
 </body>
 </html>
