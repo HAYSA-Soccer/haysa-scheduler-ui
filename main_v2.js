@@ -12,6 +12,9 @@ const CANONICAL_MAP = {
   SUMNER: "SUMNER/SEAN JOYCE",
   "SEAN JOYCE": "SUMNER/SEAN JOYCE",
   "SUMNER/SEAN JOYCE": "SUMNER/SEAN JOYCE",
+
+  // ⭐ Add this
+  "AVON BUTLER": "BUTLER",
 };
 
 // ===== STATE =====
