@@ -16,7 +16,6 @@
   background: #005fa3;
 }
 
-/* Hide desktop button on mobile */
 @media (max-width: 768px) {
   .desktop-practice-btn {
     display: none;
@@ -50,13 +49,13 @@
 }
 
 /* --------------------------------------------------
-   SLIDE-UP PANEL
+   SLIDE-UP PANEL (now fully hidden)
 -------------------------------------------------- */
 
 #practiceActionPanel {
   position: fixed;
   right: 20px;
-  bottom: -350px;
+  bottom: calc(-100% - 40px); /* fully hidden */
   width: 300px;
   background: white;
   border-radius: 12px;
@@ -112,13 +111,12 @@
   margin-bottom: 6px;
 }
 
-/* Mobile: full-width panel */
 @media (max-width: 600px) {
   #practiceActionPanel {
     left: 0;
     right: 0;
     width: 100%;
-    bottom: -380px;
+    bottom: calc(-100% - 40px);
     border-radius: 12px 12px 0 0;
   }
 }
