@@ -410,9 +410,20 @@ function filterByDateRange(events, start, end) {
 }
 
 // ===== DECORATE EVENTS (rewrites game titles) =====
+function stripBackendColors(ev) {
+  const clone = { ...ev };
+  delete clone.backgroundColor;
+  delete clone.borderColor;
+  delete clone.textColor;
+  delete clone.color;
+  return clone;
+}
+
 
 function decorateEvents(events) {
   return events.map((ev) => {
+    ev = stripBackendColors(ev); // remove backend inline colors
+    
     const ext = ev.extendedProps || {};
 
     // ⭐ Rewrite game titles using backend-provided homeTeam/awayTeam
