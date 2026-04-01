@@ -165,28 +165,3 @@ async function loadSeasonData() {
     calendar.refetchEvents();
   }
 }
-
-// ===== FIELD LAYERS UI =====
-
-function createFieldCheckbox(canonical, labelText) {
-  const container = document.getElementById("fieldLayersContainer");
-
-  const wrapper = document.createElement("label");
-  wrapper.className = "field-layer-item";
-
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = true;
-  checkbox.dataset.canonical = canonical;
-
-  checkbox.addEventListener("change", () => {
-    if (checkbox.checked) {
-      selectedFields.add(canonical);
-    } else {
-      selectedFields.delete(canonical);
-    }
-    if (calendar) calendar.refetchEvents();
-  });
-
-  const span = document.createElement("span");
-  span.textContent =
