@@ -1,19 +1,22 @@
 /* --------------------------------------------------
-   DESKTOP PRACTICE BUTTON
+   DESKTOP PRACTICE BUTTON (HAYSA THEME)
 -------------------------------------------------- */
 
 .desktop-practice-btn {
   padding: 6px 12px;
-  background: #0078d4;
+  background: #1E3A8A; /* HAYSA Royal Blue */
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .desktop-practice-btn:hover {
-  background: #005fa3;
+  background: #162C6A; /* Darker Royal Blue */
+  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {
@@ -23,7 +26,7 @@
 }
 
 /* --------------------------------------------------
-   MOBILE STICKY PRACTICE BAR
+   MOBILE STICKY PRACTICE BAR (HAYSA THEME)
 -------------------------------------------------- */
 
 .mobile-practice-bar {
@@ -32,14 +35,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #0078d4;
+  background: #1E3A8A; /* Royal Blue */
   color: white;
   text-align: center;
   padding: 14px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   z-index: 9999;
+  border-top: 4px solid #F97316; /* HAYSA Orange Accent */
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
 }
 
 @media (max-width: 768px) {
@@ -49,13 +54,13 @@
 }
 
 /* --------------------------------------------------
-   SLIDE-UP PANEL (FULLY HIDDEN UNTIL OPENED)
+   SLIDE-UP PANEL (HAYSA THEME)
 -------------------------------------------------- */
 
 #practiceActionPanel {
   position: fixed;
   right: 20px;
-  bottom: calc(-100% - 40px); /* fully hidden */
+  bottom: calc(-100% - 40px);
   width: 300px;
   background: white;
   border-radius: 12px;
@@ -63,11 +68,23 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   transition: bottom 0.3s ease;
   z-index: 99999;
+  border-top: 4px solid #F97316; /* Orange accent */
 }
 
+#practiceActionPanel h3 {
+  margin-top: 0;
+  background: #1E3A8A; /* Royal Blue */
+  color: white;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Email button */
 .practice-action-btn {
   display: block;
-  background: #0078d4;
+  background: #F97316; /* HAYSA Orange */
   color: white;
   padding: 10px;
   text-align: center;
@@ -75,23 +92,37 @@
   text-decoration: none;
   margin-top: 14px;
   font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.2s ease;
 }
 
+.practice-action-btn:hover {
+  background: #d86212; /* Darker orange */
+}
+
+/* Close button */
 .practice-close-btn {
   margin-top: 14px;
   width: 100%;
   padding: 10px;
-  background: #ccc;
+  background: #1E3A8A; /* Royal Blue */
+  color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.practice-close-btn:hover {
+  background: #162C6A;
 }
 
 .practice-note {
   margin-top: 12px;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #444;
+  color: #333;
 }
 
 .practice-emails {
@@ -119,334 +150,4 @@
     bottom: calc(-100% - 40px);
     border-radius: 12px 12px 0 0;
   }
-}
-
-/* --------------------------------------------------
-   GLOBAL LAYOUT
--------------------------------------------------- */
-
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #f5f5f5;
-  color: #333;
-}
-
-.app-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px;
-}
-
-.app-header {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #ddd;
-}
-
-.header-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.app-header h1 {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 700;
-}
-
-.update-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Refresh Button */
-.refresh-button {
-  padding: 6px 12px;
-  background: #4A90E2;
-  color: white;
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
-.refresh-button:hover {
-  background: #357ABD;
-}
-
-/* Controls rows */
-.controls-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
-}
-
-/* Practice toggle */
-.toggle-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.toggle-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-}
-
-/* Field layers */
-.field-layers {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.field-layers-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.field-layers-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.field-layer-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.field-layer-item input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-}
-
-/* --------------------------------------------------
-   LEGEND
--------------------------------------------------- */
-
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.85rem;
-}
-
-.legend-label {
-  font-weight: 600;
-}
-
-.legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 8px 3px 4px;
-  border-radius: 4px;
-  background: #eee;
-}
-
-.legend-practice { border-left: 10px solid #6FCF97; }
-.legend-gameonly { border-left: 10px solid #A8D5BA; }
-.legend-game { border-left: 10px solid #6FA8DC; }
-.legend-block { border-left: 10px solid #F4C542; }
-.legend-realpractice { border-left: 10px solid #BDBDBD; }
-
-.last-update {
-  font-size: 0.85rem;
-  color: #666;
-}
-
-/* --------------------------------------------------
-   LOADING OVERLAY
--------------------------------------------------- */
-
-.loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(255,255,255,0.9);
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  color: #444;
-  z-index: 9999;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 4px solid #ccc;
-  border-top-color: #4A90E2;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 12px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* --------------------------------------------------
-   FULLCALENDAR BASE
--------------------------------------------------- */
-
-.fc {
-  background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  padding: 8px;
-}
-
-.fc-event {
-  border-radius: 6px !important;
-  padding: 0px 2px !important;
-  margin: 0 !important;
-}
-
-.fc-event-title,
-.fc-event-time {
-  font-size: 0.65rem !important;
-  line-height: 1.05 !important;
-  font-weight: 500 !important;
-  color: #1a1a1a !important;
-}
-
-.fc-event-time {
-  color: #444 !important;
-  font-weight: 400 !important;
-}
-
-.fc-event-main {
-  padding: 0 !important;
-}
-
-/* --------------------------------------------------
-   EVENT COLORS
--------------------------------------------------- */
-
-.fc-event.avail-practice {
-  background-color: #6FCF97 !important;
-  border-color: #4CAF50 !important;
-}
-
-.fc-event.avail-game-only {
-  background-color: #A8D5BA !important;
-  border-color: #7FBF99 !important;
-}
-
-.fc-event.game-event {
-  background-color: #6FA8DC !important;
-  border-color: #3D7FB1 !important;
-}
-
-.fc-event.practice-event {
-  background-color: #BDBDBD !important;
-  border-color: #9E9E9E !important;
-}
-
-.fc-event.block-event {
-  background-color: #F4C542 !important;
-  border-color: #C89F2A !important;
-  border-left: 4px solid #A67F1F !important;
-}
-
-.fc-event.closure-event {
-  background-color: #D64541 !important;
-  border-color: #B03A2E !important;
-}
-
-/* --------------------------------------------------
-   MOBILE WEEK NAV
--------------------------------------------------- */
-
-.mobile-week-nav {
-  position: fixed;
-  left: 50%;
-  bottom: 60px;
-  transform: translateX(-50%);
-  display: none;
-  gap: 8px;
-  padding: 6px 10px;
-  background: rgba(255,255,255,0.95);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  border-radius: 999px;
-  z-index: 9998;
-}
-
-.week-nav-button {
-  border: none;
-  background: #4A90E2;
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.week-nav-button:hover {
-  background: #357ABD;
-}
-
-@media (max-width: 768px) {
-  .mobile-week-nav {
-    display: flex;
-  }
-}
-
-/* --------------------------------------------------
-   CUSTOM POPOVER
--------------------------------------------------- */
-
-#fc-custom-popover {
-  position: absolute;
-  z-index: 9999;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  width: 260px;
-  overflow: hidden;
-  font-family: system-ui, sans-serif;
-  transform: translate(-50%, -10px);
-}
-
-.fc-popover-hidden {
-  display: none;
-}
-
-.fc-popover-header {
-  color: white;
-  padding: 10px 12px;
-  font-weight: 600;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#fc-popover-close {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-#fc-popover-body {
-  padding: 12px;
-  white-space: pre-line;
-  font-size: 14px;
-  color: #333;
 }
