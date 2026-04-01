@@ -143,15 +143,15 @@ body {
 }
 
 .legend-game {
-  border-left: 10px solid #4A6FA5; /* games */
+  border-left: 10px solid #6FA8DC; /* games (lighter blue) */
 }
 
 .legend-block {
-  border-left: 10px solid #F7D154; /* amber blocks */
+  border-left: 10px solid #F4C542; /* richer amber blocks */
 }
 
 .legend-realpractice {
-  border-left: 10px solid #9E9E9E; /* scheduled practices */
+  border-left: 10px solid #BDBDBD; /* scheduled practices */
 }
 
 .last-update {
@@ -213,7 +213,7 @@ body {
 }
 
 /* --------------------------------------------------
-   EVENT COLORS
+   EVENT COLORS (NEW PALETTE)
 -------------------------------------------------- */
 
 /* Availability (practice allowed) */
@@ -228,29 +228,29 @@ body {
   border-color: #7FBF99 !important;
 }
 
-/* Games */
+/* Games — lighter, more readable blue */
 .fc-event.game-event {
-  background-color: #4A6FA5 !important;
-  border-color: #3A5A85 !important;
+  background-color: #6FA8DC !important;
+  border-color: #3D7FB1 !important;
 }
 
-/* Scheduled Practices */
+/* Scheduled Practices — neutral gray */
 .fc-event.practice-event {
-  background-color: #9E9E9E !important;
-  border-color: #7A7A7A !important;
+  background-color: #BDBDBD !important;
+  border-color: #9E9E9E !important;
 }
 
-/* Blocks (amber) */
+/* Blocks — richer amber with accent stripe */
 .fc-event.block-event {
-  background-color: #F7D154 !important;
-  border-color: #D6A738 !important;
-  border-left: 4px solid #D6A738 !important; /* accent stripe */
+  background-color: #F4C542 !important;
+  border-color: #C89F2A !important;
+  border-left: 4px solid #A67F1F !important; /* accent stripe */
 }
 
-/* Closures */
+/* Closures — strong red */
 .fc-event.closure-event {
-  background-color: #C0392B !important;
-  border-color: #922B21 !important;
+  background-color: #D64541 !important;
+  border-color: #B03A2E !important;
 }
 
 /* --------------------------------------------------
@@ -310,7 +310,7 @@ body {
 }
 
 .fc-popover-header {
-  background: #4A6FA5;
+  /* background is set dynamically from JS via getPopoverHeaderColor */
   color: white;
   padding: 10px 12px;
   font-weight: 600;
