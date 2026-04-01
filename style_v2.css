@@ -1,4 +1,78 @@
 /* --------------------------------------------------
+   FLOATING PRACTICE ACTION BUTTON + PANEL
+-------------------------------------------------- */
+
+/* Floating Action Button */
+#practiceActionFab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  background: #0078d4;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 30px;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  z-index: 9999;
+}
+
+/* Slide-up Panel */
+#practiceActionPanel {
+  position: fixed;
+  right: 20px;
+  bottom: -300px; /* hidden by default */
+  width: 280px;
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  transition: bottom 0.3s ease;
+  z-index: 99999;
+}
+
+.practice-action-btn {
+  display: block;
+  background: #0078d4;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-top: 10px;
+}
+
+.practice-close-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 8px;
+  background: #ccc;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Mobile: full-width bottom bar */
+@media (max-width: 600px) {
+  #practiceActionFab {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  #practiceActionPanel {
+    left: 0;
+    right: 0;
+    width: 100%;
+    bottom: -350px;
+    border-radius: 12px 12px 0 0;
+  }
+}
+
+/* --------------------------------------------------
    GLOBAL LAYOUT
 -------------------------------------------------- */
 body {
