@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Default tab
   showTab("field-hours");
 });
 
@@ -67,7 +68,15 @@ async function addFieldRule() {
     body: JSON.stringify(payload)
   });
 
+  // reload table
   loadFieldRules();
+
+  // optional: clear form
+  document.getElementById("fr-field").value = "";
+  document.getElementById("fr-start").value = "";
+  document.getElementById("fr-end").value = "";
+  document.getElementById("fr-practice").value = "Yes";
+  document.getElementById("fr-grades").value = "";
 }
 
 async function deleteFieldRule(index) {
