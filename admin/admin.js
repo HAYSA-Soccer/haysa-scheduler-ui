@@ -15,7 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
       panel.classList.toggle("active", panel.id === tabName);
     });
 
-    if (tabName === "blocks") loadBlocks();
+    if (tabName === "blocks") {
+      loadBlockFields();
+      loadBlocks();
+    }
     if (tabName === "extra") loadExtraRequests();
     if (tabName === "field-hours") loadFieldRules();
     if (tabName === "mapping") loadFieldMapping();
@@ -170,6 +173,23 @@ async function saveEditedFieldRuleRow(row) {
 // BLOCKS / CLOSURES
 // --------------------------------------
 
+// Load canonical fields into the Blocks field dropdown
+async function loadBlockFields() {
+  const res = await fetch(`${WEBAPP}?action=getFieldMapping`);
+  const fields = await res.json();
+
+  const select = document.getElementById("bl-field");
+  if (!select) return;
+  select.innerHTML = "";
+
+  fields.forEach(f => {
+    const opt = document.createElement("option");
+    opt.value = f.canonical_field;
+    opt.textContent = f.canonical_field;
+    select.appendChild(opt);
+  });
+}
+
 async function loadBlocks() {
   const res = await fetch(`${WEBAPP}?action=getBlocks`);
   const blocks = await res.json();
@@ -220,7 +240,7 @@ async function addBlock() {
   document.getElementById("bl-date").value = "";
   document.getElementById("bl-start").value = "";
   document.getElementById("bl-end").value = "";
-  document.getElementById("bl-type").value = "Block";
+  document.getElementById("bl-type").value = "practice";
   document.getElementById("bl-reason").value = "";
 }
 
@@ -245,10 +265,9 @@ function startEditingBlockRow(row) {
 
   cells[4].innerHTML = `
     <select>
-      <option>Block</option>
-      <option>Closure</option>
-      <option>Weather</option>
-      <option>Maintenance</option>
+      <option value="practice">Practice Block</option>
+      <option value="game">Game Block</option>
+      <option value="admin_block">Admin Block</option>
     </select>`;
   cells[4].querySelector("select").value = type;
 
