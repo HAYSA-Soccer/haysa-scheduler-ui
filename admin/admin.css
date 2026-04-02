@@ -139,6 +139,20 @@ table button:hover {
   background: #b91c1c;
 }
 
+/* CLOSED FIELD ROW HIGHLIGHT */
+.fh-closed {
+  background: #ffe5e5 !important;
+  color: #7a0000 !important;
+}
+
+.fh-closed td button {
+  background: #7a0000 !important;
+}
+
+.fh-closed td button:hover {
+  background: #5c0000 !important;
+}
+
 /* --------------------------------------
    SEASON SETTINGS STYLING
 -------------------------------------- */
