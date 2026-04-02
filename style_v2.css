@@ -7,26 +7,31 @@
   --haysa-orange: #F97316;
   --haysa-gray: #6B7280;
   --haysa-bg: #F3F4F6;
+
+  /* New mild yellow for Block/Closure */
+  --haysa-yellow: #F7E7A3;
+  --haysa-yellow-border: #D6C46A;
 }
 
 /* --------------------------------------------------
-   DESKTOP PRACTICE BUTTON
+   DESKTOP PRACTICE BUTTON (PRIMARY ACTION)
 -------------------------------------------------- */
 
 .desktop-practice-btn {
-  padding: 6px 12px;
-  background: var(--haysa-blue);
+  padding: 8px 16px;
+  background: var(--haysa-orange); /* Primary action */
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .desktop-practice-btn:hover {
-  background: var(--haysa-blue-dark);
+  background: #d86212;
   transform: translateY(-1px);
 }
 
@@ -46,7 +51,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--haysa-blue);
+  background: var(--haysa-orange); /* Match primary action */
   color: white;
   text-align: center;
   padding: 14px;
@@ -54,7 +59,7 @@
   font-weight: 700;
   cursor: pointer;
   z-index: 9999;
-  border-top: 4px solid var(--haysa-orange);
+  border-top: 4px solid var(--haysa-blue);
   box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
 }
 
@@ -209,7 +214,7 @@ body {
   gap: 12px;
 }
 
-/* Refresh Button */
+/* Refresh Button (SECONDARY ACTION) */
 .refresh-button {
   padding: 6px 12px;
   background: var(--haysa-blue);
@@ -288,7 +293,7 @@ body {
 }
 
 /* --------------------------------------------------
-   LEGEND (BRANDED)
+   LEGEND (UPDATED WITH SOFT YELLOW)
 -------------------------------------------------- */
 
 .legend {
@@ -314,7 +319,12 @@ body {
 .legend-realpractice { background: var(--haysa-gray); }
 .legend-gameonly { background: #A8D5BA; color: black; }
 .legend-game { background: var(--haysa-blue); }
-.legend-block { background: var(--haysa-orange); }
+
+/* NEW mild yellow for Block/Closure */
+.legend-block {
+  background: var(--haysa-yellow);
+  color: #333;
+}
 
 .last-update {
   font-size: 0.85rem;
@@ -381,7 +391,7 @@ body {
 }
 
 /* --------------------------------------------------
-   EVENT COLORS
+   EVENT COLORS (UPDATED BLOCK/CLOSURE)
 -------------------------------------------------- */
 
 .fc-event.avail-practice {
@@ -404,14 +414,12 @@ body {
   border-color: #9E9E9E !important;
 }
 
-.fc-event.block-event {
-  background-color: var(--haysa-orange) !important;
-  border-color: #d86212 !important;
-}
-
+/* NEW mild yellow for Block/Closure */
+.fc-event.block-event,
 .fc-event.closure-event {
-  background-color: #D64541 !important;
-  border-color: #B03A2E !important;
+  background-color: var(--haysa-yellow) !important;
+  border-color: var(--haysa-yellow-border) !important;
+  color: #333 !important;
 }
 
 /* --------------------------------------------------
