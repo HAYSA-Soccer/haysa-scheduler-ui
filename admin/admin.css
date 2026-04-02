@@ -138,3 +138,30 @@ table button:hover {
 #fr-table button:hover {
   background: #b91c1c;
 }
+
+/* --------------------------------------
+   SEASON SETTINGS STYLING
+-------------------------------------- */
+
+#season h1 {
+  margin-bottom: 20px;
+}
+
+#season .form-row {
+  max-width: 300px;
+}
+
+#ss-save-btn {
+  margin-top: 15px;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+#ss-save-btn:hover {
+  background: #1d4ed8;
+}
