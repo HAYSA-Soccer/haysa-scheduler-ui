@@ -15,11 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
       panel.classList.toggle("active", panel.id === tabName);
     });
 
-    if (tabName === "field-hours") loadFieldRules();
     if (tabName === "blocks") loadBlocks();
+    if (tabName === "extra") loadExtraRequests();
+    if (tabName === "field-hours") loadFieldRules();
     if (tabName === "mapping") loadFieldMapping();
     if (tabName === "season") loadSeasonSettings();
-    if (tabName === "extra") loadExtraRequests();
     if (tabName === "tools") initDataTools();
   }
 
