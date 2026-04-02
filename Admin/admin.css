@@ -1,0 +1,58 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fa;
+}
+
+#admin-container {
+  display: flex;
+  height: 100vh;
+}
+
+#sidebar {
+  width: 240px;
+  background: #1e3a8a;
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+#sidebar h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+#sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tab-btn {
+  background: #3b82f6;
+  border: none;
+  padding: 12px;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.tab-btn:hover {
+  background: #2563eb;
+}
+
+#content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
