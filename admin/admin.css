@@ -1,3 +1,7 @@
+/* --------------------------------------
+   GLOBAL LAYOUT
+-------------------------------------- */
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -49,14 +53,9 @@ body {
   overflow-y: auto;
 }
 
-.tab-panel {
-  display: none;
-}
-
-.tab-panel.active {
-  display: block;
-}
-
+/* --------------------------------------
+   TAB PANELS
+-------------------------------------- */
 
 .tab-panel {
   display: none;
@@ -66,7 +65,9 @@ body {
   display: block;
 }
 
-/* FIELD RULES STYLING */
+/* --------------------------------------
+   FORM ELEMENTS
+-------------------------------------- */
 
 .form-row {
   margin-bottom: 12px;
@@ -75,51 +76,13 @@ body {
   max-width: 300px;
 }
 
-#fr-add-btn {
-  margin-top: 10px;
-  padding: 10px 16px;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 6px;
+button {
   cursor: pointer;
 }
 
-#fr-add-btn:hover {
-  background: #1d4ed8;
-}
-
-#fr-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-#fr-table th,
-#fr-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-#fr-table th {
-  background: #e5e7eb;
-}
-
-#fr-table button {
-  padding: 6px 10px;
-  background: #dc2626;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-#fr-table button:hover {
-  background: #b91c1c;
-}
-
-
-
+/* --------------------------------------
+   TABLES — UNIVERSAL STYLING
+-------------------------------------- */
 
 table {
   width: 100%;
@@ -144,9 +107,34 @@ table button {
   color: white;
   border: none;
   border-radius: 4px;
-  cursor: pointer;
 }
 
 table button:hover {
   background: #1d4ed8;
+}
+
+/* --------------------------------------
+   FIELD HOURS — SPECIAL BUTTON COLOR
+-------------------------------------- */
+
+#fr-add-btn {
+  margin-top: 10px;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
+
+#fr-add-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Field Hours table uses red delete buttons */
+#fr-table button {
+  background: #dc2626;
+}
+
+#fr-table button:hover {
+  background: #b91c1c;
 }
