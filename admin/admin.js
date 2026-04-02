@@ -1,8 +1,11 @@
 // --------------------------------------
-// TAB HANDLING
+// CONFIG
 // --------------------------------------
 const WEBAPP = "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
+// --------------------------------------
+// TAB HANDLING
+// --------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   const buttons = document.querySelectorAll(".tab-btn");
   const panels = document.querySelectorAll(".tab-panel");
@@ -105,28 +108,6 @@ async function deleteFieldRule(index) {
   await loadFieldRules();
 }
 
-async function saveEditedFieldRuleRow(row) {
-  const index = Number(row.dataset.index);
-  const cells = row.querySelectorAll("td");
-
-  const payload = {
-    index,
-    field: cells[0].querySelector("input").value,
-    day_of_week: cells[1].querySelector("select").value,
-    start_time: cells[2].querySelector("input").value,
-    end_time: cells[3].querySelector("input").value,
-    practice_allowed: cells[4].querySelector("select").value,
-    travel_game_grades: cells[5].querySelector("input").value
-  };
-
-  await fetch(`${WEBAPP}?action=updateFieldRule`, {
-    method: "POST",
-    body: JSON.stringify(payload)
-  });
-
-  await loadFieldRules();
-}
-
 function startEditingFieldRuleRow(row) {
   const cells = row.querySelectorAll("td");
   const field = cells[0].innerText;
@@ -161,6 +142,28 @@ function startEditingFieldRuleRow(row) {
     <button class="fr-save-btn">Save</button>
     <button class="fr-cancel-btn">Cancel</button>
   `;
+}
+
+async function saveEditedFieldRuleRow(row) {
+  const index = Number(row.dataset.index);
+  const cells = row.querySelectorAll("td");
+
+  const payload = {
+    index,
+    field: cells[0].querySelector("input").value,
+    day_of_week: cells[1].querySelector("select").value,
+    start_time: cells[2].querySelector("input").value,
+    end_time: cells[3].querySelector("input").value,
+    practice_allowed: cells[4].querySelector("select").value,
+    travel_game_grades: cells[5].querySelector("input").value
+  };
+
+  await fetch(`${WEBAPP}?action=updateFieldRule`, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+
+  await loadFieldRules();
 }
 
 // --------------------------------------
@@ -280,7 +283,7 @@ async function saveEditedBlockRow(row) {
 }
 
 // --------------------------------------
-// FIELD MAPPING (partial edit: practiceAllowed, gameAllowed, enabled)
+// FIELD MAPPING (partial edit)
 // --------------------------------------
 
 async function loadFieldMapping() {
@@ -369,7 +372,7 @@ async function saveEditedFieldMappingRow(row) {
 }
 
 // --------------------------------------
-// SEASON SETTINGS (single row, full edit)
+// SEASON SETTINGS
 // --------------------------------------
 
 async function loadSeasonSettings() {
@@ -545,14 +548,12 @@ function initDataTools() {
         method: "POST",
         body: JSON.stringify({ tool })
       });
-
-      // Optionally reload something or show a toast
     });
   });
 }
 
 // --------------------------------------
-// GLOBAL CLICK HANDLER FOR EDIT/SAVE/DELETE
+// GLOBAL CLICK HANDLER
 // --------------------------------------
 
 document.addEventListener("click", (e) => {
