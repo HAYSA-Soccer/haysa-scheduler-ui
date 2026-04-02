@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     panels.forEach(panel => {
       panel.classList.toggle("active", panel.id === tabName);
     });
+
+    if (tabName === "rules") loadFieldRules();
   }
 
   buttons.forEach(btn => {
@@ -15,6 +17,62 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Default tab
   showTab("field-hours");
 });
+
+// -----------------------------
+// FIELD RULES TAB LOGIC
+// -----------------------------
+
+const WEBAPP = "YOUR_WEBAPP_URL_HERE";
+
+async function loadFieldRules() {
+  const res = await fetch(`${WEBAPP}?action=getFieldRules`);
+  const rules = await res.json();
+
+  const tbody = document.querySelector("#fr-table tbody");
+  tbody.innerHTML = "";
+
+  rules.forEach((rule, index) => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${rule.field}</td>
+      <td>${rule.day_of_week}</td>
+      <td>${rule.start_time}</td>
+      <td>${rule.end_time}</td>
+      <td>${rule.practice_allowed}</td>
+      <td>${rule.travel_game_grades}</td>
+      <td>
+        <button onclick="deleteFieldRule(${index})">Delete</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+async function addFieldRule() {
+  const payload = {
+    field: document.getElementById("fr-field").value,
+    day_of_week: document.getElementById("fr-day").value,
+    start_time: document.getElementById("fr-start").value,
+    end_time: document.getElementById("fr-end").value,
+    practice_allowed: document.getElementById("fr-practice").value,
+    travel_game_grades: document.getElementById("fr-grades").value
+  };
+
+  await fetch(`${WEBAPP}?action=addFieldRule`, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+
+  loadFieldRules();
+}
+
+async function deleteFieldRule(index) {
+  await fetch(`${WEBAPP}?action=deleteFieldRule&index=${index}`);
+  loadFieldRules();
+}
+
+document.getElementById("fr-add-btn").addEventListener("click", addFieldRule);
