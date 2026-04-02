@@ -283,7 +283,7 @@ async function saveEditedBlockRow(row) {
 }
 
 // --------------------------------------
-// FIELD MAPPING (partial edit)
+// FIELD MAPPING
 // --------------------------------------
 
 async function loadFieldMapping() {
@@ -377,7 +377,7 @@ async function saveEditedFieldMappingRow(row) {
 
 async function loadSeasonSettings() {
   const res = await fetch(`${WEBAPP}?action=getSeasonSettings`);
-  const settings = await res.json(); // { season_start, season_end }
+  const settings = await res.json();
 
   const startInput = document.getElementById("ss-start");
   const endInput = document.getElementById("ss-end");
@@ -541,83 +541,9 @@ function initDataTools() {
   const buttons = document.querySelectorAll(".data-tool-btn");
   buttons.forEach(btn => {
     btn.addEventListener("click", async () => {
-      const tool = btn.dataset.tool;
-      if (!tool) return;
+     David, I’ve got you — but before I paste the **full updated script**, I need one thing from you so I don’t break your admin console:
 
-      await fetch(`${WEBAPP}?action=runDataTool`, {
-        method: "POST",
-        body: JSON.stringify({ tool })
-      });
-    });
-  });
-}
+# ⭐ I need to know **which version of the Field Hours HTML you are using.**
 
-// --------------------------------------
-// GLOBAL CLICK HANDLER
-// --------------------------------------
+Your admin.js expects these exact IDs in your HTML:
 
-document.addEventListener("click", (e) => {
-  const target = e.target;
-
-  // Field Hours
-  if (target.classList.contains("fr-edit-btn")) {
-    startEditingFieldRuleRow(target.closest("tr"));
-  }
-  if (target.classList.contains("fr-save-btn")) {
-    saveEditedFieldRuleRow(target.closest("tr"));
-  }
-  if (target.classList.contains("fr-cancel-btn")) {
-    loadFieldRules();
-  }
-  if (target.classList.contains("fr-delete-btn")) {
-    const index = Number(target.dataset.index);
-    deleteFieldRule(index);
-  }
-
-  // Blocks
-  if (target.classList.contains("bl-edit-btn")) {
-    startEditingBlockRow(target.closest("tr"));
-  }
-  if (target.classList.contains("bl-save-btn")) {
-    saveEditedBlockRow(target.closest("tr"));
-  }
-  if (target.classList.contains("bl-cancel-btn")) {
-    loadBlocks();
-  }
-  if (target.classList.contains("bl-delete-btn")) {
-    const index = Number(target.dataset.index);
-    deleteBlock(index);
-  }
-
-  // Field Mapping
-  if (target.classList.contains("fm-edit-btn")) {
-    startEditingFieldMappingRow(target.closest("tr"));
-  }
-  if (target.classList.contains("fm-save-btn")) {
-    saveEditedFieldMappingRow(target.closest("tr"));
-  }
-  if (target.classList.contains("fm-cancel-btn")) {
-    loadFieldMapping();
-  }
-
-  // Extra Practice Requests
-  if (target.classList.contains("ep-edit-btn")) {
-    startEditingExtraRequestRow(target.closest("tr"));
-  }
-  if (target.classList.contains("ep-save-btn")) {
-    saveEditedExtraRequestRow(target.closest("tr"));
-  }
-  if (target.classList.contains("ep-cancel-btn")) {
-    loadExtraRequests();
-  }
-  if (target.classList.contains("ep-delete-btn")) {
-    const index = Number(target.dataset.index);
-    deleteExtraRequest(index);
-  }
-  if (target.classList.contains("ep-approve-btn")) {
-    approveExtraRequest(target.closest("tr"));
-  }
-  if (target.classList.contains("ep-deny-btn")) {
-    denyExtraRequest(target.closest("tr"));
-  }
-});
