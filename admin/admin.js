@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // FIELD RULES TAB LOGIC
 // -----------------------------
 
-const WEBAPP = "YOUR_WEBAPP_URL_HERE";
+const WEBAPP = "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
 async function loadFieldRules() {
   const res = await fetch(`${WEBAPP}?action=getFieldRules`);
