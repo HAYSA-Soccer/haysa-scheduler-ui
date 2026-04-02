@@ -26,7 +26,7 @@
     <!-- Main Content -->
     <main id="content">
 
-      <!-- Field Hours (formerly Field Rules) -->
+      <!-- Field Hours -->
       <section id="field-hours" class="tab-panel">
         <h1>Field Hours</h1>
 
@@ -93,31 +93,133 @@
       <!-- Blocks / Closures -->
       <section id="blocks" class="tab-panel">
         <h1>Blocks & Closures</h1>
-        <p>Add or remove field blocks and closures.</p>
+
+        <div class="form-row">
+          <label>Field</label>
+          <input id="bl-field" type="text" placeholder="e.g., Butler">
+        </div>
+
+        <div class="form-row">
+          <label>Date</label>
+          <input id="bl-date" type="date">
+        </div>
+
+        <div class="form-row">
+          <label>Start Time</label>
+          <input id="bl-start" type="time">
+        </div>
+
+        <div class="form-row">
+          <label>End Time</label>
+          <input id="bl-end" type="time">
+        </div>
+
+        <div class="form-row">
+          <label>Type</label>
+          <select id="bl-type">
+            <option>Block</option>
+            <option>Closure</option>
+            <option>Weather</option>
+            <option>Maintenance</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Reason</label>
+          <input id="bl-reason" type="text" placeholder="Optional">
+        </div>
+
+        <button id="bl-add-btn">Add Block</button>
+
+        <h2>Existing Blocks</h2>
+        <table id="bl-table">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Date</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Type</th>
+              <th>Reason</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </section>
 
       <!-- Field Mapping -->
       <section id="mapping" class="tab-panel">
         <h1>Field Mapping</h1>
-        <p>Assign fields to complexes and manage field metadata.</p>
+        <p>Core mapping between abbreviations, canonical fields, and ICS aliases.</p>
+
+        <table id="fm-table">
+          <thead>
+            <tr>
+              <th>Abbreviation</th>
+              <th>Canonical Field</th>
+              <th>Surface</th>
+              <th>ICS Match</th>
+              <th>Practice Allowed</th>
+              <th>Game Allowed</th>
+              <th>Enabled</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </section>
 
       <!-- Season Settings -->
       <section id="season" class="tab-panel">
         <h1>Season Settings</h1>
-        <p>Configure season dates and defaults.</p>
+
+        <div class="form-row">
+          <label>Season Start</label>
+          <input id="ss-start" type="date">
+        </div>
+
+        <div class="form-row">
+          <label>Season End</label>
+          <input id="ss-end" type="date">
+        </div>
+
+        <button id="ss-save-btn">Save Season Settings</button>
       </section>
 
       <!-- Extra Practice Requests -->
       <section id="extra" class="tab-panel">
         <h1>Extra Practice Requests</h1>
-        <p>Approve or deny pending requests.</p>
+
+        <table id="ep-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Coach</th>
+              <th>Team</th>
+              <th>Field</th>
+              <th>Date</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Status</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </section>
 
       <!-- Data Tools -->
       <section id="tools" class="tab-panel">
         <h1>Data Tools</h1>
         <p>Run maintenance and recalculation tools.</p>
+
+        <div class="data-tools-list">
+          <button class="data-tool-btn" data-tool="rebuildCalendar">Rebuild Calendar Cache</button>
+          <button class="data-tool-btn" data-tool="recalcMappings">Recalculate Field Mappings</button>
+          <button class="data-tool-btn" data-tool="cleanupOldBlocks">Clean Up Old Blocks</button>
+        </div>
       </section>
 
     </main>
