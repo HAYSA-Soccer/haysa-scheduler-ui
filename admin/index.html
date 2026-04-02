@@ -31,49 +31,100 @@
       <section id="field-hours" class="tab-panel">
         <h1>Field Hours</h1>
         <p>Manage weekly field hours here.</p>
-        <div id="field-hours-content"></div>
       </section>
 
       <!-- Blocks / Closures -->
       <section id="blocks" class="tab-panel">
         <h1>Blocks & Closures</h1>
         <p>Add or remove field blocks and closures.</p>
-        <div id="blocks-content"></div>
       </section>
 
       <!-- Field Rules -->
       <section id="rules" class="tab-panel">
         <h1>Field Rules</h1>
-        <p>Set practice/game permissions and age restrictions.</p>
-        <div id="rules-content"></div>
+
+        <div class="form-row">
+          <label>Field</label>
+          <input id="fr-field" type="text" placeholder="e.g., Butler 1">
+        </div>
+
+        <div class="form-row">
+          <label>Day of Week</label>
+          <select id="fr-day">
+            <option>Monday</option>
+            <option>Tuesday</option>
+            <option>Wednesday</option>
+            <option>Thursday</option>
+            <option>Friday</option>
+            <option>Saturday</option>
+            <option>Sunday</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Start Time</label>
+          <input id="fr-start" type="time">
+        </div>
+
+        <div class="form-row">
+          <label>End Time</label>
+          <input id="fr-end" type="time">
+        </div>
+
+        <div class="form-row">
+          <label>Practice Allowed</label>
+          <select id="fr-practice">
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Travel Game Grades</label>
+          <input id="fr-grades" type="text" placeholder="e.g., 5/6, 7/8">
+        </div>
+
+        <button id="fr-add-btn">Add Rule</button>
+
+        <h2>Existing Rules</h2>
+        <table id="fr-table">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Day</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Practice Allowed</th>
+              <th>Travel Grades</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </section>
 
       <!-- Field Mapping -->
       <section id="mapping" class="tab-panel">
         <h1>Field Mapping</h1>
         <p>Assign fields to complexes and manage field metadata.</p>
-        <div id="mapping-content"></div>
       </section>
 
       <!-- Season Settings -->
       <section id="season" class="tab-panel">
         <h1>Season Settings</h1>
         <p>Configure season dates and defaults.</p>
-        <div id="season-content"></div>
       </section>
 
       <!-- Extra Practice Requests -->
       <section id="extra" class="tab-panel">
         <h1>Extra Practice Requests</h1>
         <p>Approve or deny pending requests.</p>
-        <div id="extra-content"></div>
       </section>
 
       <!-- Data Tools -->
       <section id="tools" class="tab-panel">
         <h1>Data Tools</h1>
         <p>Run maintenance and recalculation tools.</p>
-        <div id="tools-content"></div>
       </section>
 
     </main>
