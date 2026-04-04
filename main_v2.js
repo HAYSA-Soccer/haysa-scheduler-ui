@@ -1,5 +1,6 @@
 // ===== CONFIG =====
 
+// Hard-coded season dates (kept unless backend provides them)
 let SEASON_START = "2026-03-15";
 let SEASON_END = "2026-06-30";
 
@@ -10,6 +11,7 @@ const CANONICAL_MAP = {
   SUMNER: "SUMNER/SEAN JOYCE",
   "SEAN JOYCE": "SUMNER/SEAN JOYCE",
   "SUMNER/SEAN JOYCE": "SUMNER/SEAN JOYCE",
+
   "AVON BUTLER": "BUTLER",
   "AVON BUTLER ELEMENTARY SCHOOL": "BUTLER",
   BUTLER: "BUTLER",
@@ -25,11 +27,16 @@ let allFieldKeys = new Set();
 
 let lastUpdateText = "";
 let lastCheckedTime = null;
+let previousIcsTimestamp = "";
+
+// Popover state
+let popoverInitialized = false;
 
 // ===== TIME HELPERS =====
 
 function timeAgo(ts) {
   if (!ts) return "";
+
   const now = Date.now();
   const then = new Date(ts).getTime();
   const diffMs = now - then;
@@ -57,10 +64,15 @@ async function fetchSeasonEvents() {
   params.append("start", SEASON_START);
   params.append("end", SEASON_END);
 
-  const url = API_URL + "?" + params.toString();
-  const res = await fetch(url);
+  const url =
+    API_URL + (API_URL.includes("?") ? "&" : "?") + params.toString();
 
-  if (!res.ok) return { lastUpdate: "", events: [] };
+  const res = await fetch(url);
+  if (!res.ok) {
+    console.error("Failed to fetch season events", res.status, res.statusText);
+    return { lastUpdate: "", events: [] };
+  }
+
   return await res.json();
 }
 
@@ -75,6 +87,7 @@ async function loadSeasonData() {
 
   const rawEvents = data.events || [];
 
+  previousIcsTimestamp = lastUpdateText;
   lastUpdateText = data.lastUpdate || "";
   lastCheckedTime = Date.now();
 
@@ -95,7 +108,9 @@ async function loadSeasonData() {
   allFieldKeys = new Set();
   seasonEvents.forEach((ev) => {
     const ext = ev.extendedProps || {};
-    if (ext.canonical) allFieldKeys.add(ext.canonical);
+    if (ext.canonical) {
+      allFieldKeys.add(ext.canonical);
+    }
   });
 
   selectedFields = new Set(allFieldKeys);
@@ -103,7 +118,10 @@ async function loadSeasonData() {
   initFieldLayersUI();
 
   if (overlay) overlay.style.display = "none";
-  if (calendar) calendar.refetchEvents();
+
+  if (calendar) {
+    calendar.refetchEvents();
+  }
 }
 
 // ===== FIELD LAYERS UI =====
@@ -120,8 +138,11 @@ function createFieldCheckbox(canonical, labelText) {
   checkbox.dataset.canonical = canonical;
 
   checkbox.addEventListener("change", () => {
-    if (checkbox.checked) selectedFields.add(canonical);
-    else selectedFields.delete(canonical);
+    if (checkbox.checked) {
+      selectedFields.add(canonical);
+    } else {
+      selectedFields.delete(canonical);
+    }
     if (calendar) calendar.refetchEvents();
   });
 
@@ -148,15 +169,33 @@ function initFieldLayersUI() {
   });
 }
 
+// ===== PRACTICE CHANGE PANEL =====
+
+document.addEventListener("DOMContentLoaded", () => {
+  const panel = document.getElementById("practiceActionPanel");
+  const closeBtn = document.getElementById("closePracticePanel");
+  const desktopBtn = document.getElementById("practiceActionFab");
+  const mobileBtn = document.getElementById("practiceActionFabMobile");
+
+  function openPanel() {
+    panel.style.bottom = "20px";
+  }
+
+  if (desktopBtn) desktopBtn.addEventListener("click", openPanel);
+  if (mobileBtn) mobileBtn.addEventListener("click", openPanel);
+
+  closeBtn.addEventListener("click", () => {
+    panel.style.bottom = "calc(-100% - 40px)";
+  });
+});
+
 // ===== DEVICE DETECTION =====
 
 function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-// ===== POPOVER =====
-
-let popoverInitialized = false;
+// ===== CUSTOM POPOVER =====
 
 function ensurePopoverInitialized() {
   if (popoverInitialized) return;
@@ -183,6 +222,7 @@ function ensurePopoverInitialized() {
 
   pop.appendChild(header);
   pop.appendChild(body);
+
   document.body.appendChild(pop);
 
   closeBtn.addEventListener("click", () => {
@@ -204,8 +244,7 @@ function getPopoverHeaderColor(ext) {
 
   if (type === "game") return "#3D7FB1";
   if (type === "practice") return "#757575";
-  if (type === "availability-practice") return "#4CAF50";
-  if (type === "availability-game-only") return "#7FBF99";
+  if (type.startsWith("availability")) return "#4CAF50";
   if (reason === "closure") return "#B03A2E";
   if (reason === "admin_block" || type === "block") return "#C89F2A";
 
@@ -242,18 +281,23 @@ function initCalendar() {
         filtered = decorateEvents(filtered);
         success(filtered);
       } catch (err) {
+        console.error(err);
         fail(err);
       }
     },
 
     eventDidMount(info) {
       const tooltip = info.event.extendedProps?.tooltip;
-      if (!isMobile() && tooltip) info.el.title = tooltip;
+      if (!isMobile() && tooltip) {
+        info.el.title = tooltip;
+      }
     },
 
     eventClick(info) {
       const tooltip = info.event.extendedProps?.tooltip;
-      if (!tooltip || !isMobile()) return;
+      if (!tooltip) return;
+
+      if (!isMobile()) return;
 
       info.jsEvent.preventDefault();
       info.jsEvent.stopPropagation();
@@ -290,9 +334,7 @@ function initCalendar() {
 function filterByPractice(events) {
   if (!practiceOnly) return events;
   return events.filter(
-    (ev) =>
-      ev.extendedProps?.type !== "availability-game-only" ||
-      ev.extendedProps?.practiceSurfaces?.length > 0
+    (ev) => !isAvailabilityEvent(ev) || isPracticeAllowed(ev)
   );
 }
 
@@ -313,17 +355,30 @@ function filterByDateRange(events, start, end) {
   });
 }
 
-// ===== DECORATION =====
+// ===== DECORATE EVENTS =====
+
+function stripBackendColors(ev) {
+  const clone = { ...ev };
+  delete clone.backgroundColor;
+  delete clone.borderColor;
+  delete clone.textColor;
+  delete clone.color;
+  return clone;
+}
 
 function decorateEvents(events) {
   return events.map((ev) => {
+    ev = stripBackendColors(ev);
+
     const ext = ev.extendedProps || {};
 
     let newTitle = ev.title;
     if (ext.type === "game") {
       const home = ext.homeTeam || "";
       const away = ext.awayTeam || "";
-      if (home || away) newTitle = `${home} vs ${away}`.trim();
+      if (home || away) {
+        newTitle = `${home} vs ${away}`.trim();
+      }
     }
 
     return {
@@ -342,41 +397,68 @@ function decorateEvents(events) {
   });
 }
 
+// ===== EVENT CLASS HELPERS =====
+
+function isAvailabilityEvent(ev) {
+  const t = (ev.extendedProps?.type || "").toLowerCase();
+  return t === "availability" || t.startsWith("availability-");
+}
+
+function isPracticeAllowed(ev) {
+  return (ev.extendedProps?.practiceSurfaces || []).length > 0;
+}
+
+function isGameOnlyAvailability(ev) {
+  const ps = ev.extendedProps?.practiceSurfaces || [];
+  const gs = ev.extendedProps?.gameOnlySurfaces || [];
+  return ps.length === 0 && gs.length > 0;
+}
+
 function decorateEventClasses(ev) {
   const classes = [];
   const ext = ev.extendedProps || {};
 
-  if (ext.type === "availability-practice") classes.push("avail-practice");
-  if (ext.type === "availability-game-only") classes.push("avail-game-only");
+  if (isAvailabilityEvent(ev)) {
+    if (isPracticeAllowed(ev)) classes.push("avail-practice");
+    else if (isGameOnlyAvailability(ev)) classes.push("avail-game-only");
+  }
+
   if (ext.type === "game") classes.push("game-event");
   if (ext.type === "practice") classes.push("practice-event");
-  if (ext.reasonType === "closure") classes.push("closure-event");
-  if (ext.reasonType === "admin_block" || ext.type === "block")
+
+  if (ext.reasonType === "closure") {
+    classes.push("closure-event");
+  } else if (ext.reasonType === "admin_block" || ext.type === "block") {
     classes.push("block-event");
+  }
 
   return classes;
 }
 
-// ===== TOOLTIP =====
+// ===== TOOLTIP BUILDER =====
 
 function buildTooltip(ev) {
   const ext = ev.extendedProps || {};
 
-  if (ext.type === "availability-practice") {
+  if (isAvailabilityEvent(ev)) {
     const ps = ext.practiceSurfaces || [];
-    return `Practice Available\nPractice Surfaces: ${ps.join(", ")}`;
-  }
-
-  if (ext.type === "availability-game-only") {
     const gs = ext.gameOnlySurfaces || [];
+    if (ps.length > 0) {
+      return `Practice Available\nPractice Surfaces: ${ps.join(", ")}`;
+    }
     return `Available for Games Only\nGame Surfaces: ${gs.join(", ")}`;
   }
 
   if (ext.type === "game") {
     const parts = [];
+
     if (ev.title) parts.push(ev.title);
+    if (ext.division) parts.push(`Division: ${ext.division}`);
+    if (ext.ageGroup) parts.push(`Age Group: ${ext.ageGroup}`);
     if (ext.surface) parts.push(`Surface: ${ext.surface}`);
     if (ext.canonical) parts.push(`Field: ${ext.canonical}`);
+    if (ext.gameId) parts.push(`Game ID: ${ext.gameId}`);
+
     return parts.join("\n");
   }
 
@@ -421,9 +503,23 @@ function initMobileWeekNav() {
   const nextBtn = document.getElementById("mobileNextWeek");
   const todayBtn = document.getElementById("mobileToday");
 
-  if (prevBtn) prevBtn.addEventListener("click", () => calendar.prev());
-  if (nextBtn) nextBtn.addEventListener("click", () => calendar.next());
-  if (todayBtn) todayBtn.addEventListener("click", () => calendar.today());
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      if (calendar) calendar.prev();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      if (calendar) calendar.next();
+    });
+  }
+
+  if (todayBtn) {
+    todayBtn.addEventListener("click", () => {
+      if (calendar) calendar.today();
+    });
+  }
 }
 
 // ===== BOOTSTRAP =====
