@@ -1,198 +1,22 @@
-/* --------------------------------------------------
-   HAYSA BRAND COLORS
--------------------------------------------------- */
-:root {
-  --haysa-blue: #1E3A8A;
-  --haysa-blue-dark: #162C6A;
-  --haysa-orange: #F97316;
-  --haysa-gray: #6B7280;
-  --haysa-bg: #F3F4F6;
-
-  /* New mild yellow for Block/Closure */
-  --haysa-yellow: #F7E7A3;
-  --haysa-yellow-border: #D6C46A;
-}
-
-/* --------------------------------------------------
-   DESKTOP PRACTICE BUTTON (PRIMARY ACTION)
--------------------------------------------------- */
-
-.desktop-practice-btn {
-  padding: 8px 16px;
-  background: var(--haysa-orange); /* Primary action */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 700;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.desktop-practice-btn:hover {
-  background: #d86212;
-  transform: translateY(-1px);
-}
-
-@media (max-width: 768px) {
-  .desktop-practice-btn {
-    display: none;
-  }
-}
-
-/* --------------------------------------------------
-   MOBILE STICKY PRACTICE BAR
--------------------------------------------------- */
-
-.mobile-practice-bar {
-  display: none;
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--haysa-orange); /* Match primary action */
-  color: white;
-  text-align: center;
-  padding: 14px;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  z-index: 9999;
-  border-top: 4px solid var(--haysa-blue);
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
-}
-
-@media (max-width: 768px) {
-  .mobile-practice-bar {
-    display: block;
-  }
-}
-
-/* --------------------------------------------------
-   SLIDE-UP PANEL
--------------------------------------------------- */
-
-#practiceActionPanel {
-  position: fixed;
-  right: 20px;
-  bottom: calc(-100% - 40px);
-  width: 300px;
-  background: white;
-  border-radius: 12px;
-  padding: 18px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-  transition: bottom 0.3s ease;
-  z-index: 99999;
-  border-top: 4px solid var(--haysa-orange);
-}
-
-#practiceActionPanel h3 {
-  margin-top: 0;
-  background: var(--haysa-blue);
-  color: white;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.practice-action-btn {
-  display: block;
-  background: var(--haysa-orange);
-  color: white;
-  padding: 10px;
-  text-align: center;
-  border-radius: 6px;
-  text-decoration: none;
-  margin-top: 14px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: background 0.2s ease;
-}
-
-.practice-action-btn:hover {
-  background: #d86212;
-}
-
-.practice-close-btn {
-  margin-top: 14px;
-  width: 100%;
-  padding: 10px;
-  background: var(--haysa-blue);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.2s ease;
-}
-
-.practice-close-btn:hover {
-  background: var(--haysa-blue-dark);
-}
-
-.practice-note {
-  margin-top: 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #333;
-}
-
-.practice-emails {
-  margin: 10px 0;
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.practice-details {
-  margin: 8px 0 0 20px;
-  padding: 0;
-  font-size: 0.9rem;
-  color: #444;
-}
-
-.practice-details li {
-  margin-bottom: 6px;
-}
-
-@media (max-width: 600px) {
-  #practiceActionPanel {
-    left: 0;
-    right: 0;
-    width: 100%;
-    bottom: calc(-100% - 40px);
-    border-radius: 12px 12px 0 0;
-  }
-}
-
-/* --------------------------------------------------
-   GLOBAL LAYOUT
--------------------------------------------------- */
+/* ===== GENERAL ===== */
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: Arial, sans-serif;
   background: #f5f5f5;
-  color: #333;
 }
 
 .app-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 16px;
 }
 
-/* --------------------------------------------------
-   HEADER (SOFT BLUE → SOFT ORANGE GRADIENT)
--------------------------------------------------- */
+/* ===== HEADER ===== */
 
 .app-header {
-  background: linear-gradient(to right, #E8EEF9, #FFF4E8);
-  border-bottom: 4px solid var(--haysa-orange);
-  padding: 16px;
-  margin-bottom: 16px;
-  color: var(--haysa-blue);
+  background: #ffffff;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
 }
 
 .header-top {
@@ -201,307 +25,81 @@ body {
   align-items: center;
 }
 
-.app-header h1 {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--haysa-blue);
-}
-
-.update-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Refresh Button (SECONDARY ACTION) */
-.refresh-button {
-  padding: 6px 12px;
-  background: var(--haysa-blue);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: background 0.2s ease;
-}
-
-.refresh-button:hover {
-  background: var(--haysa-blue-dark);
-}
-
-/* Controls rows */
 .controls-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
+  margin-top: 10px;
 }
 
-/* Practice toggle */
-.toggle-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.toggle-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-}
-
-/* Field layers */
-.field-layers {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.field-layers-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.field-layers-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.field-layer-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 4px;
-  transition: background 0.15s ease;
-}
-
-.field-layer-item:hover {
-  background: var(--haysa-bg);
-}
-
-.field-layer-item input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--haysa-blue);
-}
-
-/* --------------------------------------------------
-   LEGEND (UPDATED WITH SOFT YELLOW)
--------------------------------------------------- */
+/* ===== LEGEND ===== */
 
 .legend {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  font-size: 0.85rem;
 }
 
 .legend-label {
-  font-weight: 600;
+  font-weight: bold;
 }
 
 .legend-item {
   padding: 4px 10px;
-  border-radius: 6px;
-  font-weight: 600;
-  color: white;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #fff;
 }
 
-.legend-practice { background: #6FCF97; }
-.legend-realpractice { background: var(--haysa-gray); }
-.legend-gameonly { background: #A8D5BA; color: black; }
-.legend-game { background: var(--haysa-blue); }
+.legend-practice {
+  background-color: #6FCF97;
+}
 
-/* NEW mild yellow for Block/Closure */
+.legend-realpractice {
+  background-color: #9E9E9E;
+}
+
+.legend-gameonly {
+  background-color: #A8D5BA;
+  color: #000;
+}
+
+.legend-game {
+  background-color: #4A6FA5;
+}
+
 .legend-block {
-  background: var(--haysa-yellow);
-  color: #333;
+  background-color: #F7D154;
+  color: #000;
 }
 
-.last-update {
-  font-size: 0.85rem;
-  color: #666;
-}
+/* ===== AVAILABILITY COLORS ===== */
 
-/* --------------------------------------------------
-   LOADING OVERLAY
--------------------------------------------------- */
-
-.loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(255,255,255,0.9);
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  color: #444;
-  z-index: 9999;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 4px solid #ccc;
-  border-top-color: var(--haysa-blue);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 12px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* --------------------------------------------------
-   FULLCALENDAR BASE + TOOLBAR BRANDING
--------------------------------------------------- */
-
-.fc {
-  background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  padding: 8px;
-}
-
-.fc .fc-button {
-  background: var(--haysa-blue) !important;
-  border: none !important;
-  color: white !important;
-  font-weight: 600 !important;
-  border-radius: 6px !important;
-}
-
-.fc .fc-button:hover {
-  background: var(--haysa-blue-dark) !important;
-}
-
-.fc .fc-toolbar-title {
-  color: var(--haysa-blue);
-  font-weight: 700;
-}
-
-/* --------------------------------------------------
-   EVENT COLORS (UPDATED BLOCK/CLOSURE)
--------------------------------------------------- */
-
-.fc-event.avail-practice {
+.avail-practice {
   background-color: #6FCF97 !important;
   border-color: #4CAF50 !important;
 }
 
-.fc-event.avail-game-only {
+.avail-game-only {
   background-color: #A8D5BA !important;
   border-color: #7FBF99 !important;
 }
 
-.fc-event.game-event {
-  background-color: var(--haysa-blue) !important;
-  border-color: var(--haysa-blue-dark) !important;
+/* ===== EVENTS ===== */
+
+.practice-event {
+  background-color: #9E9E9E !important;
+  border-color: #7A7A7A !important;
 }
 
-.fc-event.practice-event {
-  background-color: var(--haysa-gray) !important;
-  border-color: #9E9E9E !important;
+.game-event {
+  background-color: #4A6FA5 !important;
+  border-color: #3A5A85 !important;
 }
 
-/* NEW mild yellow for Block/Closure */
-.fc-event.block-event,
-.fc-event.closure-event {
-  background-color: var(--haysa-yellow) !important;
-  border-color: var(--haysa-yellow-border) !important;
-  color: #333 !important;
+.block-event {
+  background-color: #F7D154 !important;
+  border-color: #D6A738 !important;
 }
 
-/* --------------------------------------------------
-   MOBILE WEEK NAV
--------------------------------------------------- */
-
-.mobile-week-nav {
-  position: fixed;
-  left: 50%;
-  bottom: 60px;
-  transform: translateX(-50%);
-  display: none;
-  gap: 8px;
-  padding: 6px 10px;
-  background: rgba(255,255,255,0.95);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  border-radius: 999px;
-  z-index: 9998;
-}
-
-.week-nav-button {
-  border: none;
-  background: var(--haysa-blue);
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.week-nav-button:hover {
-  background: var(--haysa-blue-dark);
-}
-
-@media (max-width: 768px) {
-  .mobile-week-nav {
-    display: flex;
-  }
-}
-
-/* --------------------------------------------------
-   CUSTOM POPOVER
--------------------------------------------------- */
-
-#fc-custom-popover {
-  position: absolute;
-  z-index: 9999;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  width: 260px;
-  overflow: hidden;
-  font-family: system-ui, sans-serif;
-  transform: translate(-50%, -10px);
-}
-
-.fc-popover-hidden {
-  display: none;
-}
-
-.fc-popover-header {
-  background: var(--haysa-blue);
-  color: white;
-  padding: 10px 12px;
-  font-weight: 600;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#fc-popover-close {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-#fc-popover-body {
-  padding: 12px;
-  white-space: pre-line;
-  font-size: 14px;
-  color: #333;
+.closure-event {
+  background-color: #C0392B !important;
+  border-color: #922B21 !important;
 }
