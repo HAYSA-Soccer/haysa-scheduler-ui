@@ -381,21 +381,26 @@ function decorateEvents(events) {
       }
     }
 
+    const backendTooltip = ext.tooltip;
+    const computedTooltip = buildTooltip({
+      ...ev,
+      title: newTitle,
+      extendedProps: ext,
+    });
+
     return {
       ...ev,
       title: newTitle,
       classNames: (ev.classNames || []).concat(decorateEventClasses(ev)),
       extendedProps: {
         ...ext,
-        tooltip: buildTooltip({
-          ...ev,
-          title: newTitle,
-          extendedProps: ext,
-        }),
+        // ⭐ Prefer backend tooltip if it exists
+        tooltip: backendTooltip || computedTooltip,
       },
     };
   });
 }
+
 
 // ===== EVENT CLASS HELPERS =====
 
