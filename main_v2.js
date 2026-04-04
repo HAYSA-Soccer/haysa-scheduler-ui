@@ -57,7 +57,6 @@ function timeAgo(ts) {
   });
 }
 
-
 // ===== DATA LOAD =====
 
 async function fetchSeasonEvents() {
@@ -125,7 +124,6 @@ async function loadSeasonData() {
   }
 }
 
-
 // ===== FIELD LAYERS UI =====
 
 function createFieldCheckbox(canonical, labelText) {
@@ -186,7 +184,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (desktopBtn) desktopBtn.addEventListener("click", openPanel);
   if (mobileBtn) mobileBtn.addEventListener("click", openPanel);
 
-  // ⭐ FULL CLOSE — hides panel completely
   closeBtn.addEventListener("click", () => {
     panel.style.bottom = "calc(-100% - 40px)";
   });
@@ -247,7 +244,8 @@ function getPopoverHeaderColor(ext) {
 
   if (type === "game") return "#3D7FB1";
   if (type === "practice") return "#757575";
-  if (type === "availability") return "#4CAF50";
+  if (type === "availability-practice") return "#4CAF50";
+  if (type === "availability-game-only") return "#7FBF99";
   if (reason === "closure") return "#B03A2E";
   if (reason === "admin_block" || type === "block") return "#C89F2A";
 
@@ -371,7 +369,13 @@ function stripBackendColors(ev) {
 
 function decorateEvents(events) {
   return events.map((ev) => {
-    ev = stripBackendColors(ev);
+    // DO NOT strip colors for availability
+    if (
+      ev.extendedProps?.type !== "availability-practice" &&
+      ev.extendedProps?.type !== "availability-game-only"
+    ) {
+      ev = stripBackendColors(ev);
+    }
 
     const ext = ev.extendedProps || {};
 
@@ -403,7 +407,8 @@ function decorateEvents(events) {
 // ===== EVENT CLASS HELPERS =====
 
 function isAvailabilityEvent(ev) {
-  return ev.extendedProps?.type === "availability";
+  const t = ev.extendedProps?.type;
+  return t === "availability-practice" || t === "availability-game-only";
 }
 
 function isPracticeAllowed(ev) {
@@ -442,12 +447,17 @@ function decorateEventClasses(ev) {
 function buildTooltip(ev) {
   const ext = ev.extendedProps || {};
 
-  if (ext.type === "availability") {
+  if (
+    ext.type === "availability-practice" ||
+    ext.type === "availability-game-only"
+  ) {
     const ps = ext.practiceSurfaces || [];
     const gs = ext.gameOnlySurfaces || [];
+
     if (ps.length > 0) {
       return `Practice Available\nPractice Surfaces: ${ps.join(", ")}`;
     }
+
     return `Available for Games Only\nGame Surfaces: ${gs.join(", ")}`;
   }
 
