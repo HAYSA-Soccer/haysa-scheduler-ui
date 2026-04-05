@@ -169,7 +169,7 @@ function initFieldLayersUI() {
   });
 }
 
-// ===== PRACTICE CHANGE PANEL =====
+// ===== PRACTICE CHANGE PANEL (TOGGLE + POLISHED UI) =====
 
 document.addEventListener("DOMContentLoaded", () => {
   const panel = document.getElementById("practiceActionPanel");
@@ -177,15 +177,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const desktopBtn = document.getElementById("practiceActionFab");
   const mobileBtn = document.getElementById("practiceActionFabMobile");
 
-  function openPanel() {
-    panel.style.bottom = "20px";
+  function togglePanel() {
+    panel.classList.toggle("open");
   }
 
-  if (desktopBtn) desktopBtn.addEventListener("click", openPanel);
-  if (mobileBtn) mobileBtn.addEventListener("click", openPanel);
+  if (desktopBtn) desktopBtn.addEventListener("click", togglePanel);
+  if (mobileBtn) mobileBtn.addEventListener("click", togglePanel);
 
   closeBtn.addEventListener("click", () => {
-    panel.style.bottom = "calc(-100% - 40px)";
+    panel.classList.remove("open");
   });
 });
 
