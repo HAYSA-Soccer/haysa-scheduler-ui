@@ -104,20 +104,9 @@ body {
   border-color: #922B21 !important;
 }
 
-#practiceActionPanel {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(-100% - 40px); /* hidden by default */
-  transition: bottom 0.3s ease;
-  background: #ffffff;
-  z-index: 9999;
-  padding: 20px;
-  border-top: 2px solid #ccc;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
-}
-
-/* ===== PRACTICE REQUEST SLIDE-UP PANEL ===== */
+/* ========================================================= */
+/* ===== PRACTICE REQUEST SLIDE-UP PANEL (FINAL VERSION) ==== */
+/* ========================================================= */
 
 #practiceActionPanel {
   position: fixed;
@@ -167,5 +156,3 @@ body {
 .practice-close-btn:hover {
   background: #222;
 }
-
-
