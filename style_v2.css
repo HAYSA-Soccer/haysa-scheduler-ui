@@ -117,3 +117,55 @@ body {
   box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
 }
 
+/* ===== PRACTICE REQUEST SLIDE-UP PANEL ===== */
+
+#practiceActionPanel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -100%; /* hidden by default */
+  background: #ffffff;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+  padding: 24px;
+  z-index: 9999;
+  transition: bottom 0.35s ease;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Slide-up when open */
+#practiceActionPanel.open {
+  bottom: 0;
+}
+
+/* Handle bar for modern UI */
+#practiceActionPanel::before {
+  content: "";
+  width: 40px;
+  height: 5px;
+  background: #ccc;
+  border-radius: 3px;
+  display: block;
+  margin: 0 auto 12px;
+}
+
+/* Close button */
+.practice-close-btn {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.practice-close-btn:hover {
+  background: #222;
+}
+
+
