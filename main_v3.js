@@ -246,7 +246,7 @@ function getPopoverHeaderColor(ext) {
   if (type === "practice") return "#757575";
   if (type.startsWith("availability")) return "#4CAF50";
   if (reason === "closure") return "#B03A2E";
-  if (reason === "admin_block" || type === "block") return "#C89F2A";
+  if (reason === "admin_block" || type === "block" || type === "admin_block")
 
   return "#3D7FB1";
 }
@@ -439,6 +439,7 @@ function decorateEventClasses(ev) {
       break;
 
     case "block":
+    case "admin_block":
       classes.push("block-event");
       break;
 
