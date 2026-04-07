@@ -10,7 +10,6 @@ const CANONICAL_MAP = {
   SUMNER: "SUMNER/SEAN JOYCE",
   "SEAN JOYCE": "SUMNER/SEAN JOYCE",
   "SUMNER/SEAN JOYCE": "SUMNER/SEAN JOYCE",
-
   "AVON BUTLER": "AVON BUTLER",
   "AVON BUTLER ELEMENTARY SCHOOL": "AVON BUTLER",
   BUTLER: "AVON BUTLER",
@@ -28,6 +27,9 @@ let lastCheckedTime = null;
 let previousIcsTimestamp = "";
 
 let popoverInitialized = false;
+
+// snapshot of full season
+let SNAPSHOT = null;
 
 // ===== TIME HELPERS =====
 
@@ -53,59 +55,41 @@ function timeAgo(ts) {
   });
 }
 
-// ===== RANGE-AWARE FETCH =====
+// ===== SNAPSHOT LOADER =====
 
-async function fetchEventsForRange(start, end) {
-  const params = new URLSearchParams();
-  params.append("start", start.toISOString());
-  params.append("end", end.toISOString());
-
-  const url =
-    API_URL + (API_URL.includes("?") ? "&" : "?") + params.toString();
-
+async function loadSnapshot(force = false) {
+  const url = `${API_URL}?action=getSnapshot${force ? "&force=true" : ""}`;
   const res = await fetch(url);
   if (!res.ok) {
-    console.error("Failed to fetch events", res.status, res.statusText);
-    return { lastUpdate: "", events: [] };
+    console.error("Failed to load snapshot", res.status, res.statusText);
+    return SNAPSHOT;
   }
-
-  return await res.json();
+  SNAPSHOT = await res.json();
+  return SNAPSHOT;
 }
 
-// ===== INITIAL FIELD LIST (today → season end) =====
+// ===== INITIAL FIELD LIST (from snapshot) =====
 
 async function loadSeasonMeta() {
   const overlay = document.getElementById("loadingOverlay");
   if (overlay) overlay.style.display = "flex";
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  await loadSnapshot();
 
-  const params = new URLSearchParams();
-  params.append("start", today.toISOString());
-  params.append("end", SEASON_END);
-
-  const url =
-    API_URL + (API_URL.includes("?") ? "&" : "?") + params.toString();
-
-  const res = await fetch(url);
-  if (!res.ok) {
-    console.error("Failed to fetch season meta", res.status, res.statusText);
+  if (!SNAPSHOT) {
     if (overlay) overlay.style.display = "none";
     return;
   }
 
-  const data = await res.json();
-
-  if (data.seasonStart) SEASON_START = data.seasonStart;
-  if (data.seasonEnd)   SEASON_END   = data.seasonEnd;
+  if (SNAPSHOT.seasonStart) SEASON_START = SNAPSHOT.seasonStart;
+  if (SNAPSHOT.seasonEnd)   SEASON_END   = SNAPSHOT.seasonEnd;
 
   previousIcsTimestamp = lastUpdateText;
-  lastUpdateText = data.lastUpdate || "";
+  lastUpdateText = SNAPSHOT.lastUpdate || "";
   lastCheckedTime = Date.now();
 
   allFieldKeys = new Set();
-  (data.events || []).forEach((ev) => {
+  (SNAPSHOT.events || []).forEach((ev) => {
     const ext = ev.extendedProps || {};
     if (ext.canonical) {
       allFieldKeys.add(ext.canonical);
@@ -123,6 +107,7 @@ async function loadSeasonMeta() {
 
 function createFieldCheckbox(canonical, labelText) {
   const container = document.getElementById("fieldLayersContainer");
+  if (!container) return;
 
   const wrapper = document.createElement("label");
   wrapper.className = "field-layer-item";
@@ -170,6 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const mobileBtn = document.getElementById("practiceActionFabMobile");
 
   function togglePanel() {
+    if (!panel) return;
     panel.classList.toggle("open");
   }
 
@@ -387,24 +373,22 @@ function initCalendar() {
       right: "timeGridWeek,dayGridMonth",
     },
 
-    events: async (info, success, fail) => {
-      try {
-        const data = await fetchEventsForRange(info.start, info.end);
-
-        previousIcsTimestamp = lastUpdateText;
-        lastUpdateText = data.lastUpdate || "";
-        lastCheckedTime = Date.now();
-
-        let events = data.events || [];
-        events = filterByPractice(events);
-        events = filterByFields(events);
-        events = decorateEvents(events);
-
-        success(events);
-      } catch (err) {
-        console.error(err);
-        fail(err);
+    events: (info, success) => {
+      if (!SNAPSHOT) {
+        success([]);
+        return;
       }
+
+      let events = (SNAPSHOT.events || []).filter(ev => {
+        const evStart = new Date(ev.start);
+        return evStart >= info.start && evStart <= info.end;
+      });
+
+      events = filterByPractice(events);
+      events = filterByFields(events);
+      events = decorateEvents(events);
+
+      success(events);
     },
 
     eventDidMount(info) {
@@ -465,7 +449,8 @@ function initRefreshButton() {
   const btn = document.getElementById("refreshButton");
   if (!btn) return;
 
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", async () => {
+    await loadSnapshot(true);
     if (calendar) calendar.refetchEvents();
   });
 }
@@ -477,9 +462,22 @@ function initMobileWeekNav() {
   const nextBtn = document.getElementById("mobileNextWeek");
   const todayBtn = document.getElementById("mobileToday");
 
-  if (prevBtn) prevBtn.addEventListener("click", () => calendar.prev());
-  if (nextBtn) nextBtn.addEventListener("click", () => calendar.next());
-  if (todayBtn) todayBtn.addEventListener("click", () => calendar.today());
+  if (prevBtn) prevBtn.addEventListener("click", () => calendar && calendar.prev());
+  if (nextBtn) nextBtn.addEventListener("click", () => calendar && calendar.next());
+  if (todayBtn) todayBtn.addEventListener("click", () => calendar && calendar.today());
+}
+
+// ===== AUTO-REFRESH SNAPSHOT (optional) =====
+
+function initAutoRefresh() {
+  setInterval(async () => {
+    const newSnap = await loadSnapshot();
+    if (!newSnap || !SNAPSHOT) return;
+    if (newSnap.lastUpdate !== SNAPSHOT.lastUpdate) {
+      SNAPSHOT = newSnap;
+      if (calendar) calendar.refetchEvents();
+    }
+  }, 5 * 60 * 1000);
 }
 
 // ===== BOOTSTRAP =====
@@ -490,4 +488,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   initRefreshButton();
   initCalendar();
   initMobileWeekNav();
+  initAutoRefresh();
 });
