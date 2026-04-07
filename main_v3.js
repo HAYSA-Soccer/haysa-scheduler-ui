@@ -366,41 +366,6 @@ function stripBackendColors(ev) {
   return clone;
 }
 
-function decorateEventClasses(ev) {
-  const classes = [];
-  const ext = ev.extendedProps || {};
-  const type = (ext.type || "").toLowerCase();
-
-  switch (type) {
-    case "availability-practice":
-      classes.push("avail-practice");
-      break;
-
-    case "availability-game-only":
-      classes.push("avail-game-only");
-      break;
-
-    case "practice":
-      classes.push("practice-event");
-      break;
-
-    case "game":
-      classes.push("game-event");
-      break;
-
-    case "block":
-      classes.push("block-event");
-      break;
-
-    case "closure":
-      classes.push("closure-event");
-      break;
-  }
-
-  return classes;
-}
-
-
 
 // ===== EVENT CLASS HELPERS =====
 
