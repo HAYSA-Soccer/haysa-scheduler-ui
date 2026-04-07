@@ -366,6 +366,39 @@ function stripBackendColors(ev) {
   return clone;
 }
 
+function decorateEvents(events) {
+  return events.map((ev) => {
+    ev = stripBackendColors(ev);
+
+    const ext = ev.extendedProps || {};
+
+    let newTitle = ev.title;
+    if (ext.type === "game") {
+      const home = ext.homeTeam || "";
+      const away = ext.awayTeam || "";
+      if (home || away) {
+        newTitle = `${home} vs ${away}`.trim();
+      }
+    }
+
+    const backendTooltip = ext.tooltip;
+    const computedTooltip = buildTooltip({
+      ...ev,
+      title: newTitle,
+      extendedProps: ext,
+    });
+
+    return {
+      ...ev,
+      title: newTitle,
+      classNames: (ev.classNames || []).concat(decorateEventClasses(ev)),
+      extendedProps: {
+        ...ext,
+        tooltip: backendTooltip || computedTooltip,
+      },
+    };
+  });
+}
 
 // ===== EVENT CLASS HELPERS =====
 
