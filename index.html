@@ -1,177 +1,104 @@
-/* ===== GENERAL ===== */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HAYSA Field Availability</title>
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-}
+  <!-- FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet" />
 
-.app-container {
-  max-width: 1400px;
-  margin: 0 auto;
-}
+  <!-- App CSS -->
+  <link rel="stylesheet" href="Frontend_v2_css.css" />
+</head>
+<body>
+  <div id="loadingOverlay" style="
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+    ">
+    <div>Loading season data…</div>
+  </div>
 
-/* ===== HEADER ===== */
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-top">
+        <h1>HAYSA Field Availability</h1>
+        <button id="refreshButton">Refresh</button>
+      </div>
 
-.app-header {
-  background: #ffffff;
-  padding: 20px;
-  border-bottom: 1px solid #ddd;
-}
+      <div class="controls-row">
+        <label>
+          <input type="checkbox" id="practiceOnlyToggle" />
+          Show practice-eligible availability only
+        </label>
+      </div>
 
-.header-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+      <div class="controls-row">
+        <div id="fieldLayersContainer"></div>
+      </div>
 
-.controls-row {
-  margin-top: 10px;
-}
+      <div class="controls-row">
+        <div class="legend">
+          <span class="legend-label">Legend:</span>
+          <span class="legend-item legend-availability-practice">Practice Available</span>
+          <span class="legend-item legend-availability-game-only">Game-Only Availability</span>
+          <span class="legend-item legend-practice">Scheduled Practice</span>
+          <span class="legend-item legend-game">Scheduled Game</span>
+          <span class="legend-item legend-block">Admin Block</span>
+          <span class="legend-item legend-closure">Closure</span>
+        </div>
+      </div>
+    </header>
 
-/* ===== LEGEND ===== */
+    <main>
+      <!-- Desktop calendar -->
+      <div id="calendar"></div>
 
-.legend {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+      <!-- Mobile week nav -->
+      <div class="controls-row" style="margin-top: 10px;">
+        <button id="mobilePrevWeek">Prev</button>
+        <button id="mobileToday">Today</button>
+        <button id="mobileNextWeek">Next</button>
+      </div>
+    </main>
+  </div>
 
-.legend-label {
-  font-weight: bold;
-}
+  <!-- Practice action panel -->
+  <div id="practiceActionPanel">
+    <div>
+      <h2>Practice Actions</h2>
+      <p>Use this area for future practice request tools or guidance.</p>
+    </div>
+    <button id="closePracticePanel" class="practice-close-btn">Close</button>
+  </div>
 
-.legend-item {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 13px;
-  color: #fff;
-  border-left: 10px solid transparent;
-}
+  <!-- Floating buttons (desktop + mobile) -->
+  <button id="practiceActionFab" style="
+      position: fixed;
+      right: 20px;
+      bottom: 80px;
+      z-index: 9999;
+    ">
+    Practice Options
+  </button>
 
-/* Practice Available (bright green) */
-.legend-availability-practice {
-  background-color: #6FCF97;
-  border-left-color: #4CAF50;
-}
+  <button id="practiceActionFabMobile" style="
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 9999;
+    ">
+    Practice
+  </button>
 
-/* Game-Only Availability (muted green) */
-.legend-availability-game-only {
-  background-color: #A8D5BA;
-  border-left-color: #7FBF99;
-  color: #000;
-}
+  <!-- FullCalendar JS -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
-/* Actual scheduled practices (gray) */
-.legend-practice {
-  background-color: #9E9E9E;
-  border-left-color: #7A7A7A;
-}
-
-/* Actual scheduled games (blue) */
-.legend-game {
-  background-color: #4A6FA5;
-  border-left-color: #3A5A85;
-}
-
-/* Block (amber) */
-.legend-block {
-  background-color: #F7D154;
-  border-left-color: #D6A738;
-  color: #000;
-}
-
-/* Closure (red) */
-.legend-closure {
-  background-color: #C0392B;
-  border-left-color: #922B21;
-}
-
-/* ===== AVAILABILITY COLORS (calendar events) ===== */
-
-.avail-practice {
-  background-color: #6FCF97 !important;
-  border-color: #4CAF50 !important;
-}
-
-.avail-game-only {
-  background-color: #A8D5BA !important;
-  border-color: #7FBF99 !important;
-}
-
-/* ===== EVENTS ===== */
-
-.practice-event {
-  background-color: #9E9E9E !important;
-  border-color: #7A7A7A !important;
-}
-
-.game-event {
-  background-color: #4A6FA5 !important;
-  border-color: #3A5A85 !important;
-}
-
-.block-event {
-  background-color: #F7D154 !important;
-  border-color: #D6A738 !important;
-}
-
-.closure-event {
-  background-color: #C0392B !important;
-  border-color: #922B21 !important;
-}
-
-/* ========================================================= */
-/* ===== PRACTICE REQUEST SLIDE-UP PANEL (FINAL VERSION) ==== */
-/* ========================================================= */
-
-#practiceActionPanel {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: -100%; /* hidden by default */
-  background: #ffffff;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-  padding: 24px;
-  z-index: 9999;
-  transition: bottom 0.35s ease;
-  max-height: 70vh;
-  overflow-y: auto;
-}
-
-/* Slide-up when open */
-#practiceActionPanel.open {
-  bottom: 0;
-}
-
-/* Handle bar for modern UI */
-#practiceActionPanel::before {
-  content: "";
-  width: 40px;
-  height: 5px;
-  background: #ccc;
-  border-radius: 3px;
-  display: block;
-  margin: 0 auto 12px;
-}
-
-/* Close button */
-.practice-close-btn {
-  display: block;
-  margin: 20px auto 0;
-  padding: 10px 20px;
-  background: #444;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.practice-close-btn:hover {
-  background: #222;
-}
+  <!-- App JS -->
+  <script src="Frontend_main_v3_js.js"></script>
+</body>
+</html>
