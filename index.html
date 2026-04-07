@@ -8,9 +8,10 @@
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet" />
 
   <!-- App CSS -->
-  <link rel="stylesheet" href="Frontend_v2_css.css" />
+  <link rel="stylesheet" href="style_v2.css" />
 </head>
 <body>
+  <!-- Loading overlay -->
   <div id="loadingOverlay" style="
       position: fixed;
       inset: 0;
@@ -55,10 +56,8 @@
     </header>
 
     <main>
-      <!-- Desktop calendar -->
       <div id="calendar"></div>
 
-      <!-- Mobile week nav -->
       <div class="controls-row" style="margin-top: 10px;">
         <button id="mobilePrevWeek">Prev</button>
         <button id="mobileToday">Today</button>
@@ -76,7 +75,7 @@
     <button id="closePracticePanel" class="practice-close-btn">Close</button>
   </div>
 
-  <!-- Floating buttons (desktop + mobile) -->
+  <!-- Floating buttons -->
   <button id="practiceActionFab" style="
       position: fixed;
       right: 20px;
@@ -99,6 +98,6 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
   <!-- App JS -->
-  <script src="Frontend_main_v3_js.js"></script>
+  <script src="main_v3.js"></script>
 </body>
 </html>
