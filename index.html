@@ -1,140 +1,177 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>HAYSA Field Availability</title>
+/* ===== GENERAL ===== */
 
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="style_v2.css" />
-</head>
-<body>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
 
-  <div id="loadingOverlay" class="loading-overlay">
-    <div class="spinner"></div>
-    <div>Loading data…</div>
-  </div>
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
 
-  <div class="app-container">
-    <header class="app-header">
+/* ===== HEADER ===== */
 
-      <div class="header-top">
-        <h1>HAYSA Field Calendar</h1>
+.app-header {
+  background: #ffffff;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+}
 
-        <div class="update-group">
-          <span id="lastUpdate" class="last-update"></span>
-          <button id="refreshButton" class="refresh-button">Refresh Now</button>
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-          <button id="practiceActionFab" class="desktop-practice-btn">
-            Practice Change
-          </button>
-        </div>
-      </div>
+.controls-row {
+  margin-top: 10px;
+}
 
-      <div class="controls-row">
-        <label class="toggle-label">
-          <input type="checkbox" id="practiceOnlyToggle" />
-          <span>Practice Only</span>
-        </label>
-      </div>
+/* ===== LEGEND ===== */
 
-      <div class="controls-row">
-        <div class="field-layers">
-          <div class="field-layers-label">Field Layers:</div>
-          <div id="fieldLayersContainer" class="field-layers-container"></div>
-        </div>
-      </div>
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-      <!-- ⭐ UPDATED LEGEND -->
-      <div class="controls-row">
-        <div class="legend">
-          <span class="legend-label">Legend:</span>
+.legend-label {
+  font-weight: bold;
+}
 
-          <!-- Practice availability -->
-          <span class="legend-item legend-availability-practice">
-            Practice Available
-          </span>
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #fff;
+  border-left: 10px solid transparent;
+}
 
-          <!-- Game-only availability -->
-          <span class="legend-item legend-availability-game-only">
-            Game-Only Availability
-          </span>
+/* Practice Available (bright green) */
+.legend-availability-practice {
+  background-color: #6FCF97;
+  border-left-color: #4CAF50;
+}
 
-          <!-- Actual scheduled practices -->
-          <span class="legend-item legend-practice">
-            Practice
-          </span>
+/* Game-Only Availability (muted green) */
+.legend-availability-game-only {
+  background-color: #A8D5BA;
+  border-left-color: #7FBF99;
+  color: #000;
+}
 
-          <!-- Actual scheduled games -->
-          <span class="legend-item legend-game">
-            Game
-          </span>
+/* Actual scheduled practices (gray) */
+.legend-practice {
+  background-color: #9E9E9E;
+  border-left-color: #7A7A7A;
+}
 
-          <!-- Blocks -->
-          <span class="legend-item legend-block">
-            Block / Unavailable
-          </span>
+/* Actual scheduled games (blue) */
+.legend-game {
+  background-color: #4A6FA5;
+  border-left-color: #3A5A85;
+}
 
-          <!-- Closures -->
-          <span class="legend-item legend-closure">
-            Field Closed
-          </span>
-        </div>
-      </div>
+/* Block (amber) */
+.legend-block {
+  background-color: #F7D154;
+  border-left-color: #D6A738;
+  color: #000;
+}
 
-    </header>
+/* Closure (red) */
+.legend-closure {
+  background-color: #C0392B;
+  border-left-color: #922B21;
+}
 
-    <main>
-      <div id="calendar"></div>
-    </main>
-  </div>
+/* ===== AVAILABILITY COLORS (calendar events) ===== */
 
-  <div id="practiceActionFabMobile" class="mobile-practice-bar">
-    Practice Change
-  </div>
+.avail-practice {
+  background-color: #6FCF97 !important;
+  border-color: #4CAF50 !important;
+}
 
-  <!-- Slide-up Panel -->
-  <div id="practiceActionPanel">
-    <h3>Practice Add / Change / Cancel</h3>
+.avail-game-only {
+  background-color: #A8D5BA !important;
+  border-color: #7FBF99 !important;
+}
 
-    <p>
-      To request an <strong>addition</strong>, <strong>change</strong>, or <strong>cancellation</strong> of a practice,
-      please email:
-    </p>
+/* ===== EVENTS ===== */
 
-    <p class="practice-emails">
-      📧 <a href="mailto:webmaster@haysa.org">webmaster@haysa.org</a><br>
-      📧 <a href="mailto:CoachCoordinator.haysa@gmail.com">CoachCoordinator.haysa@gmail.com</a>
-    </p>
+.practice-event {
+  background-color: #9E9E9E !important;
+  border-color: #7A7A7A !important;
+}
 
-    <p class="practice-note">Please include ALL of the following:</p>
+.game-event {
+  background-color: #4A6FA5 !important;
+  border-color: #3A5A85 !important;
+}
 
-    <ul class="practice-details">
-      <li>Team Name (e.g., 5/6 Girls, 3/4 Boys, 7/8 Coed)</li>
-      <li>Complex (Butler / Turf / Sumner/Sean Joyce / Brookville)</li>
-      <li>Full Field Needed (Yes/No)</li>
-      <li>Date</li>
-      <li>Start Time</li>
-      <li>End Time</li>
-      <li>Request Type (Add / Change / Cancel)</li>
-      <li>Notes</li>
-    </ul>
+.block-event {
+  background-color: #F7D154 !important;
+  border-color: #D6A738 !important;
+}
 
-    <a id="practiceEmailLink"
-       class="practice-action-btn"
-       href="mailto:webmaster@haysa.org,CoachCoordinator.haysa@gmail.com?subject=Practice%20Add%20Change%20or%20Cancellation&body=Team%20Name:%0AComplex%20(Butler%20/%20Turf%20/%20Sumner/Sean%20Joyce%20/%20Brookville):%0AFull%20Field%20Needed%20(Yes/No):%0ADate:%0AStart%20Time:%0AEnd%20Time:%0ARequest%20Type%20(Add%20/%20Change%20/%20Cancel):%0ANotes:">
-      📧 Email Webmaster & Coach Coordinator
-    </a>
+.closure-event {
+  background-color: #C0392B !important;
+  border-color: #922B21 !important;
+}
 
-    <button id="closePracticePanel" class="practice-close-btn">Close</button>
-  </div>
+/* ========================================================= */
+/* ===== PRACTICE REQUEST SLIDE-UP PANEL (FINAL VERSION) ==== */
+/* ========================================================= */
 
-  <div class="mobile-week-nav">
-    <button id="mobilePrevWeek" class="week-nav-button">← Prev</button>
-    <button id="mobileToday" class="week-nav-button">Today</button>
-    <button id="mobileNextWeek" class="week-nav-button">Next →</button>
-  </div>
+#practiceActionPanel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -100%; /* hidden by default */
+  background: #ffffff;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+  padding: 24px;
+  z-index: 9999;
+  transition: bottom 0.35s ease;
+  max-height: 70vh;
+  overflow-y: auto;
+}
 
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-  <script src="main_v3.js?v=3001"></script>
-</body>
-</html>
+/* Slide-up when open */
+#practiceActionPanel.open {
+  bottom: 0;
+}
+
+/* Handle bar for modern UI */
+#practiceActionPanel::before {
+  content: "";
+  width: 40px;
+  height: 5px;
+  background: #ccc;
+  border-radius: 3px;
+  display: block;
+  margin: 0 auto 12px;
+}
+
+/* Close button */
+.practice-close-btn {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.practice-close-btn:hover {
+  background: #222;
+}
