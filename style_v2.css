@@ -175,3 +175,55 @@ body {
 .practice-close-btn:hover {
   background: #222;
 }
+
+/* ===== CUSTOM POPOVER (MOBILE TOOLTIP) ===== */
+
+#fc-custom-popover {
+  position: absolute;
+  z-index: 9999;
+  min-width: 220px;
+  max-width: 280px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+#fc-custom-popover.fc-popover-hidden {
+  display: none;
+}
+
+.fc-popover-header {
+  padding: 8px 12px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#fc-popover-body {
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  font-size: 13px;
+}
+
+#fc-popover-close {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ===== FIELD LAYERS ===== */
+
+.field-layer-item {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.field-layer-item input {
+  margin-right: 4px;
+}
