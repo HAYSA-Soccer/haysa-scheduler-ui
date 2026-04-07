@@ -42,35 +42,54 @@ body {
 }
 
 .legend-item {
+  display: inline-flex;
+  align-items: center;
   padding: 4px 10px;
   border-radius: 4px;
   font-size: 13px;
   color: #fff;
+  border-left: 10px solid transparent;
 }
 
-.legend-practice {
+/* Practice Available (bright green) */
+.legend-availability-practice {
   background-color: #6FCF97;
+  border-left-color: #4CAF50;
 }
 
-.legend-realpractice {
-  background-color: #9E9E9E;
-}
-
-.legend-gameonly {
+/* Game-Only Availability (muted green) */
+.legend-availability-game-only {
   background-color: #A8D5BA;
+  border-left-color: #7FBF99;
   color: #000;
 }
 
+/* Actual scheduled practices (gray) */
+.legend-practice {
+  background-color: #9E9E9E;
+  border-left-color: #7A7A7A;
+}
+
+/* Actual scheduled games (blue) */
 .legend-game {
   background-color: #4A6FA5;
+  border-left-color: #3A5A85;
 }
 
+/* Block (amber) */
 .legend-block {
   background-color: #F7D154;
+  border-left-color: #D6A738;
   color: #000;
 }
 
-/* ===== AVAILABILITY COLORS ===== */
+/* Closure (red) */
+.legend-closure {
+  background-color: #C0392B;
+  border-left-color: #922B21;
+}
+
+/* ===== AVAILABILITY COLORS (calendar events) ===== */
 
 .avail-practice {
   background-color: #6FCF97 !important;
