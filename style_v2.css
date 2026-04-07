@@ -51,45 +51,45 @@ body {
   border-left: 10px solid transparent;
 }
 
-/* Practice Available (bright green) */
+/* Practice Available */
 .legend-availability-practice {
   background-color: #6FCF97;
   border-left-color: #4CAF50;
 }
 
-/* Game-Only Availability (muted green) */
+/* Game-Only Availability */
 .legend-availability-game-only {
   background-color: #A8D5BA;
   border-left-color: #7FBF99;
   color: #000;
 }
 
-/* Actual scheduled practices (gray) */
+/* Scheduled Practice */
 .legend-practice {
   background-color: #9E9E9E;
   border-left-color: #7A7A7A;
 }
 
-/* Actual scheduled games (blue) */
+/* Scheduled Game */
 .legend-game {
   background-color: #4A6FA5;
   border-left-color: #3A5A85;
 }
 
-/* Block (amber) */
+/* Block */
 .legend-block {
   background-color: #F7D154;
   border-left-color: #D6A738;
   color: #000;
 }
 
-/* Closure (red) */
+/* Closure */
 .legend-closure {
   background-color: #C0392B;
   border-left-color: #922B21;
 }
 
-/* ===== AVAILABILITY COLORS (calendar events) ===== */
+/* ===== AVAILABILITY COLORS ===== */
 
 .avail-practice {
   background-color: #6FCF97 !important;
@@ -123,15 +123,13 @@ body {
   border-color: #922B21 !important;
 }
 
-/* ========================================================= */
-/* ===== PRACTICE REQUEST SLIDE-UP PANEL (FINAL VERSION) ==== */
-/* ========================================================= */
+/* ===== PRACTICE PANEL ===== */
 
 #practiceActionPanel {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: -100%; /* hidden by default */
+  bottom: -100%;
   background: #ffffff;
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
@@ -143,12 +141,10 @@ body {
   overflow-y: auto;
 }
 
-/* Slide-up when open */
 #practiceActionPanel.open {
   bottom: 0;
 }
 
-/* Handle bar for modern UI */
 #practiceActionPanel::before {
   content: "";
   width: 40px;
@@ -159,7 +155,6 @@ body {
   margin: 0 auto 12px;
 }
 
-/* Close button */
 .practice-close-btn {
   display: block;
   margin: 20px auto 0;
@@ -176,7 +171,7 @@ body {
   background: #222;
 }
 
-/* ===== CUSTOM POPOVER (MOBILE TOOLTIP) ===== */
+/* ===== MOBILE POPOVER ===== */
 
 #fc-custom-popover {
   position: absolute;
