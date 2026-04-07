@@ -6,15 +6,6 @@ let SEASON_END   = "2026-06-30";
 const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
-const CANONICAL_MAP = {
-  SUMNER: "SUMNER/SEAN JOYCE",
-  "SEAN JOYCE": "SUMNER/SEAN JOYCE",
-  "SUMNER/SEAN JOYCE": "SUMNER/SEAN JOYCE",
-  "AVON BUTLER": "AVON BUTLER",
-  "AVON BUTLER ELEMENTARY SCHOOL": "AVON BUTLER",
-  BUTLER: "AVON BUTLER",
-};
-
 // ===== STATE =====
 
 let calendar = null;
@@ -28,47 +19,25 @@ let previousIcsTimestamp = "";
 
 let popoverInitialized = false;
 
-// snapshot of full season
+// Full-season snapshot
 let SNAPSHOT = null;
-
-// ===== TIME HELPERS =====
-
-function timeAgo(ts) {
-  if (!ts) return "";
-  const now = Date.now();
-  const then = new Date(ts).getTime();
-  const diffMs = now - then;
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHr = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHr / 24);
-
-  if (diffMin < 1) return "just now";
-  if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? "" : "s"} ago`;
-  if (diffHr < 24) return `${diffHr} hour${diffHr === 1 ? "" : "s"} ago`;
-  if (diffDay === 1) return "yesterday";
-
-  return new Date(ts).toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
 
 // ===== SNAPSHOT LOADER =====
 
 async function loadSnapshot(force = false) {
   const url = `${API_URL}?action=getSnapshot${force ? "&force=true" : ""}`;
   const res = await fetch(url);
+
   if (!res.ok) {
-    console.error("Failed to load snapshot", res.status, res.statusText);
+    console.error("Snapshot load failed", res.status, res.statusText);
     return SNAPSHOT;
   }
+
   SNAPSHOT = await res.json();
   return SNAPSHOT;
 }
 
-// ===== INITIAL FIELD LIST (from snapshot) =====
+// ===== INITIAL FIELD LIST =====
 
 async function loadSeasonMeta() {
   const overlay = document.getElementById("loadingOverlay");
@@ -81,19 +50,17 @@ async function loadSeasonMeta() {
     return;
   }
 
-  if (SNAPSHOT.seasonStart) SEASON_START = SNAPSHOT.seasonStart;
-  if (SNAPSHOT.seasonEnd)   SEASON_END   = SNAPSHOT.seasonEnd;
+  SEASON_START = SNAPSHOT.seasonStart;
+  SEASON_END   = SNAPSHOT.seasonEnd;
 
   previousIcsTimestamp = lastUpdateText;
   lastUpdateText = SNAPSHOT.lastUpdate || "";
   lastCheckedTime = Date.now();
 
   allFieldKeys = new Set();
-  (SNAPSHOT.events || []).forEach((ev) => {
+  (SNAPSHOT.events || []).forEach(ev => {
     const ext = ev.extendedProps || {};
-    if (ext.canonical) {
-      allFieldKeys.add(ext.canonical);
-    }
+    if (ext.canonical) allFieldKeys.add(ext.canonical);
   });
 
   selectedFields = new Set(allFieldKeys);
@@ -137,7 +104,7 @@ function initFieldLayersUI() {
 
   container.innerHTML = "";
 
-  allFieldKeys.forEach((canonical) => {
+  allFieldKeys.forEach(canonical => {
     let label = canonical;
     if (canonical === "SUMNER/SEAN JOYCE") label = "Sumner / Sean Joyce";
     else label = canonical.charAt(0) + canonical.slice(1).toLowerCase();
@@ -204,7 +171,7 @@ function ensurePopoverInitialized() {
     pop.classList.add("fc-popover-hidden");
   });
 
-  document.addEventListener("click", (e) => {
+  document.addEventListener("click", e => {
     if (!pop.contains(e.target) && !e.target.classList.contains("fc-event")) {
       pop.classList.add("fc-popover-hidden");
     }
@@ -304,7 +271,7 @@ function buildTooltip(ev) {
 }
 
 function decorateEvents(events) {
-  return events.map((ev) => {
+  return events.map(ev => {
     ev = stripBackendColors(ev);
 
     const ext = ev.extendedProps || {};
@@ -339,14 +306,12 @@ function decorateEvents(events) {
 
 function filterByPractice(events) {
   if (!practiceOnly) return events;
-  return events.filter(
-    (ev) => !isAvailabilityEvent(ev) || isPracticeAllowed(ev)
-  );
+  return events.filter(ev => !isAvailabilityEvent(ev) || isPracticeAllowed(ev));
 }
 
 function filterByFields(events) {
   if (!selectedFields.size) return [];
-  return events.filter((ev) =>
+  return events.filter(ev =>
     selectedFields.has(ev.extendedProps?.canonical)
   );
 }
@@ -467,12 +432,13 @@ function initMobileWeekNav() {
   if (todayBtn) todayBtn.addEventListener("click", () => calendar && calendar.today());
 }
 
-// ===== AUTO-REFRESH SNAPSHOT (optional) =====
+// ===== AUTO-REFRESH SNAPSHOT =====
 
 function initAutoRefresh() {
   setInterval(async () => {
     const newSnap = await loadSnapshot();
     if (!newSnap || !SNAPSHOT) return;
+
     if (newSnap.lastUpdate !== SNAPSHOT.lastUpdate) {
       SNAPSHOT = newSnap;
       if (calendar) calendar.refetchEvents();
