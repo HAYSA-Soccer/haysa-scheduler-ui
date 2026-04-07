@@ -1,114 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>HAYSA Field Availability</title>
+<div class="controls-row">
+  <div class="legend">
+    <span class="legend-label">Legend:</span>
 
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="style_v2.css" />
-</head>
-<body>
+    <!-- Practice availability (bright green) -->
+    <span class="legend-item legend-availability-practice">
+      Practice Available
+    </span>
 
-  <div id="loadingOverlay" class="loading-overlay">
-    <div class="spinner"></div>
-    <div>Loading data…</div>
+    <!-- Game-only availability (muted green) -->
+    <span class="legend-item legend-availability-game-only">
+      Game-Only Availability
+    </span>
+
+    <!-- Actual scheduled practices (gray) -->
+    <span class="legend-item legend-practice">
+      Practice
+    </span>
+
+    <!-- Actual scheduled games (blue) -->
+    <span class="legend-item legend-game">
+      Game
+    </span>
+
+    <!-- Blocks (amber) -->
+    <span class="legend-item legend-block">
+      Block / Unavailable
+    </span>
+
+    <!-- Closures (red) -->
+    <span class="legend-item legend-closure">
+      Field Closed
+    </span>
   </div>
-
-  <div class="app-container">
-    <header class="app-header">
-
-      <div class="header-top">
-        <h1>HAYSA Field Calendar</h1>
-
-        <div class="update-group">
-          <span id="lastUpdate" class="last-update"></span>
-          <button id="refreshButton" class="refresh-button">Refresh Now</button>
-
-          <button id="practiceActionFab" class="desktop-practice-btn">
-            Practice Change
-          </button>
-        </div>
-      </div>
-
-      <div class="controls-row">
-        <label class="toggle-label">
-          <input type="checkbox" id="practiceOnlyToggle" />
-          <span>Practice Only</span>
-        </label>
-      </div>
-
-      <div class="controls-row">
-        <div class="field-layers">
-          <div class="field-layers-label">Field Layers:</div>
-          <div id="fieldLayersContainer" class="field-layers-container"></div>
-        </div>
-      </div>
-
-      <div class="controls-row">
-        <div class="legend">
-          <span class="legend-label">Legend:</span>
-          <span class="legend-item legend-practice">Practice Available</span>
-          <span class="legend-item legend-realpractice">Practice</span>
-          <span class="legend-item legend-gameonly">Game-Only Availability</span>
-          <span class="legend-item legend-game">Game</span>
-          <span class="legend-item legend-block">Block / Closure</span>
-        </div>
-      </div>
-
-    </header>
-
-    <main>
-      <div id="calendar"></div>
-    </main>
-  </div>
-
-  <div id="practiceActionFabMobile" class="mobile-practice-bar">
-    Practice Change
-  </div>
-
-  <!-- Slide-up Panel (now fully hidden until opened) -->
-  <div id="practiceActionPanel">
-    <h3>Practice Add / Change / Cancel</h3>
-
-    <p>
-      To request an <strong>addition</strong>, <strong>change</strong>, or <strong>cancellation</strong> of a practice,
-      please email:
-    </p>
-
-    <p class="practice-emails">
-      📧 <a href="mailto:webmaster@haysa.org">webmaster@haysa.org</a><br>
-      📧 <a href="mailto:CoachCoordinator.haysa@gmail.com">CoachCoordinator.haysa@gmail.com</a>
-    </p>
-
-    <p class="practice-note">Please include ALL of the following:</p>
-
-    <ul class="practice-details">
-      <li>Team Name (e.g., 5/6 Girls, 3/4 Boys, 7/8 Coed)</li>
-      <li>Complex (Butler / Turf / Sumner/Sean Joyce / Brookville)</li>
-      <li>Full Field Needed (Yes/No)</li>
-      <li>Date</li>
-      <li>Start Time</li>
-      <li>End Time</li>
-      <li>Request Type (Add / Change / Cancel)</li>
-      <li>Notes</li>
-    </ul>
-
-    <a id="practiceEmailLink"
-       class="practice-action-btn"
-       href="mailto:webmaster@haysa.org,CoachCoordinator.haysa@gmail.com?subject=Practice%20Add%20Change%20or%20Cancellation&body=Team%20Name:%0AComplex%20(Butler%20/%20Turf%20/%20Sumner/Sean%20Joyce%20/%20Brookville):%0AFull%20Field%20Needed%20(Yes/No):%0ADate:%0AStart%20Time:%0AEnd%20Time:%0ARequest%20Type%20(Add%20/%20Change%20/%20Cancel):%0ANotes:">
-      📧 Email Webmaster & Coach Coordinator
-    </a>
-
-    <button id="closePracticePanel" class="practice-close-btn">Close</button>
-  </div>
-
-  <div class="mobile-week-nav">
-    <button id="mobilePrevWeek" class="week-nav-button">← Prev</button>
-    <button id="mobileToday" class="week-nav-button">Today</button>
-    <button id="mobileNextWeek" class="week-nav-button">Next →</button>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-  <script src="main_v3.js?v=3001"></script>
-</body>
-</html>
+</div>
