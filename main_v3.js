@@ -366,79 +366,92 @@ function stripBackendColors(ev) {
   return clone;
 }
 
-function decorateEvents(events) {
-  return events.map((ev) => {
-    ev = stripBackendColors(ev);
+function decorateEventClasses(ev) {
+  const classes = [];
+  const ext = ev.extendedProps || {};
+  const type = (ext.type || "").toLowerCase();
 
-    const ext = ev.extendedProps || {};
+  switch (type) {
+    case "availability-practice":
+      classes.push("avail-practice");
+      break;
 
-    let newTitle = ev.title;
-    if (ext.type === "game") {
-      const home = ext.homeTeam || "";
-      const away = ext.awayTeam || "";
-      if (home || away) {
-        newTitle = `${home} vs ${away}`.trim();
-      }
-    }
+    case "availability-game-only":
+      classes.push("avail-game-only");
+      break;
 
-    const backendTooltip = ext.tooltip;
-    const computedTooltip = buildTooltip({
-      ...ev,
-      title: newTitle,
-      extendedProps: ext,
-    });
+    case "practice":
+      classes.push("practice-event");
+      break;
 
-    return {
-      ...ev,
-      title: newTitle,
-      classNames: (ev.classNames || []).concat(decorateEventClasses(ev)),
-      extendedProps: {
-        ...ext,
-        // ⭐ Prefer backend tooltip if it exists
-        tooltip: backendTooltip || computedTooltip,
-      },
-    };
-  });
+    case "game":
+      classes.push("game-event");
+      break;
+
+    case "block":
+      classes.push("block-event");
+      break;
+
+    case "closure":
+      classes.push("closure-event");
+      break;
+  }
+
+  return classes;
 }
+
 
 
 // ===== EVENT CLASS HELPERS =====
 
 function isAvailabilityEvent(ev) {
   const t = (ev.extendedProps?.type || "").toLowerCase();
-  return t === "availability" || t.startsWith("availability-");
+  return t === "availability-practice" || t === "availability-game-only";
 }
 
 function isPracticeAllowed(ev) {
-  return (ev.extendedProps?.practiceSurfaces || []).length > 0;
+  return (ev.extendedProps?.type || "").toLowerCase() === "availability-practice";
 }
 
 function isGameOnlyAvailability(ev) {
-  const ps = ev.extendedProps?.practiceSurfaces || [];
-  const gs = ev.extendedProps?.gameOnlySurfaces || [];
-  return ps.length === 0 && gs.length > 0;
+  return (ev.extendedProps?.type || "").toLowerCase() === "availability-game-only";
 }
+
 
 function decorateEventClasses(ev) {
   const classes = [];
   const ext = ev.extendedProps || {};
+  const type = (ext.type || "").toLowerCase();
 
-  if (isAvailabilityEvent(ev)) {
-    if (isPracticeAllowed(ev)) classes.push("avail-practice");
-    else if (isGameOnlyAvailability(ev)) classes.push("avail-game-only");
-  }
+  switch (type) {
+    case "availability-practice":
+      classes.push("avail-practice");
+      break;
 
-  if (ext.type === "game") classes.push("game-event");
-  if (ext.type === "practice") classes.push("practice-event");
+    case "availability-game-only":
+      classes.push("avail-game-only");
+      break;
 
-  if (ext.reasonType === "closure") {
-    classes.push("closure-event");
-  } else if (ext.reasonType === "admin_block" || ext.type === "block") {
-    classes.push("block-event");
+    case "practice":
+      classes.push("practice-event");
+      break;
+
+    case "game":
+      classes.push("game-event");
+      break;
+
+    case "block":
+      classes.push("block-event");
+      break;
+
+    case "closure":
+      classes.push("closure-event");
+      break;
   }
 
   return classes;
 }
+
 
 // ===== TOOLTIP BUILDER =====
 
@@ -446,13 +459,12 @@ function buildTooltip(ev) {
   const ext = ev.extendedProps || {};
 
   if (isAvailabilityEvent(ev)) {
-    const ps = ext.practiceSurfaces || [];
-    const gs = ext.gameOnlySurfaces || [];
-    if (ps.length > 0) {
-      return `Practice Available\nPractice Surfaces: ${ps.join(", ")}`;
+    if (isPracticeAllowed(ev)) {
+      return ext.tooltip || "Practice Available";
     }
-    return `Available for Games Only\nGame Surfaces: ${gs.join(", ")}`;
+    return ext.tooltip || "Available for Games Only";
   }
+
 
   if (ext.type === "game") {
     const parts = [];
