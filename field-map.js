@@ -51,7 +51,7 @@ const COMPLEX_MAPS = {
     },
     "6": {
       left: 55.8,
-      top: 68.4,
+      top: 70.0,
       width: 10.3,
       height: 10.6
     }
