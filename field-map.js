@@ -15,48 +15,49 @@ const LABELS = {
 // =========================
 const COMPLEX_MAPS = {
   "AVON BUTLER": {
-    label: "Butler",
-    image: "assets/butler-layout.jpg",
+  label: "Butler",
+  image: "assets/butler-layout.jpg",
 
-    // Percent-based overlay positions
-    fields: {
-
-
-
-      fields: {
-  "3": {
-    left: 55.8,
-    top: 27.0,
-    width: 10.3,
-    height: 10.6
-  },
-  "4": {
-    left: 71.3,
-    top: 27.0,
-    width: 10.3,
-    height: 10.6
-  },
-  "1": {
-    left: 55.8,
-    top: 39.1,
-    width: 10.3,
-    height: 10.6
-  },
-  "2": {
-    left: 69.8,
-    top: 40.1,
-    width: 10.3,
-    height: 10.6
-  },
-  "5": {left: 55.8,top: 57.7, width: 10.3, height: 10.6}, 
-  "6": {left: 55.8, top: 68.4,width: 10.3, height: 10.6
-  }
-}
-
-      "BU1": { left: 20, top: 40, width: 18, height: 14 },
-      "SOFTBALL": { left: 10, top: 70, width: 20, height: 14 }
+  fields: {
+    "3": {
+      left: 55.8,
+      top: 27.0,
+      width: 10.3,
+      height: 10.6
+    },
+    "4": {
+      left: 71.3,
+      top: 27.0,
+      width: 10.3,
+      height: 10.6
+    },
+    "1": {
+      left: 55.8,
+      top: 39.1,
+      width: 10.3,
+      height: 10.6
+    },
+    "2": {
+      left: 69.8,
+      top: 40.1,
+      width: 10.3,
+      height: 10.6
+    },
+    "5": {
+      left: 55.8,
+      top: 57.7,
+      width: 10.3,
+      height: 10.6
+    },
+    "6": {
+      left: 55.8,
+      top: 68.4,
+      width: 10.3,
+      height: 10.6
     }
-  },
+  }
+},
+
 
   "TURF": {
     label: "Turf",
