@@ -22,8 +22,8 @@ const COMPLEX_MAPS = {
     "3": {
       left: 55.8,
       top: 27.0,
-      width: 10.4,
-      height: 10.5
+      width: 10.5,
+      height: 10.4
     },
     "4": {
       left: 71.3,
