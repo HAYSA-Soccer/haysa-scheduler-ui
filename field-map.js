@@ -16,7 +16,7 @@ const LABELS = {
 const COMPLEX_MAPS = {
   "AVON BUTLER": {
     label: "Butler",
-    image: "assets/butler.jpg",
+    image: "assets/butler-layout.jpg",
 
     // Percent-based overlay positions
     fields: {
