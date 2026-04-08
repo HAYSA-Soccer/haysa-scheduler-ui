@@ -66,7 +66,7 @@ const COMPLEX_MAPS = {
       "FULL": { left: 10, top: 10, width: 80, height: 80 }
     }
   }
-};
+}
 
 // =========================
 // FETCH BACKEND DATA
