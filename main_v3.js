@@ -44,17 +44,22 @@ let SNAPSHOT = null;
 // ===== SNAPSHOT LOADER =====
 
 async function loadSnapshot(force = false) {
-  const url = `${API_URL}?action=getSnapshot${force ? "&force=true" : ""}`;
-  const res = await fetch(url);
-
-  if (!res.ok) {
-    console.error("Snapshot load failed", res.status, res.statusText);
+  if (SNAPSHOT && !force) {
     return SNAPSHOT;
   }
 
-  SNAPSHOT = await res.json();
+  const url = `${API_URL}?action=getSnapshot${force ? "&force=true" : ""}`;
+  const res = await fetch(url);
+  const newSnap = await res.json();
+
+  if (SNAPSHOT && newSnap.lastUpdate === SNAPSHOT.lastUpdate && !force) {
+    return SNAPSHOT;
+  }
+
+  SNAPSHOT = newSnap;
   return SNAPSHOT;
 }
+
 
 // ===== INITIAL FIELD LIST =====
 
