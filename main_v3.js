@@ -1,4 +1,14 @@
-// ===== ADMIN WHITELIST =====
+document.addEventListener("DOMContentLoaded", async () => {
+
+  // === ADMIN MODE VIA URL FLAG ===
+  const params = new URLSearchParams(window.location.search);
+  const isAdmin = params.get("admin") === "1";
+
+  if (isAdmin) {
+    document.getElementById("refreshButton").style.display = "inline-block";
+  }
+
+  // ===== ADMIN WHITELIST =====
 const ADMIN_EMAILS = [
   "haysa.manager@gmail.com",
   "president@haysa.org",
@@ -435,10 +445,37 @@ function initRefreshButton() {
   if (!btn) return;
 
   btn.addEventListener("click", async () => {
+
+    // If admin mode is active, call backend refresh
+    const params = new URLSearchParams(window.location.search);
+    const isAdmin = params.get("admin") === "1";
+
+    if (isAdmin) {
+      try {
+        const url = `${API_URL}?action=refreshSnapshot&key=HAYSA_REFRESH`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.success) {
+          alert("Backend refreshed successfully!");
+          await loadSnapshot(true);
+          if (calendar) calendar.refetchEvents();
+          return;
+        } else {
+          alert("Backend refresh failed or unauthorized.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error contacting backend.");
+      }
+    }
+
+    // Non-admin fallback: local refresh only
     await loadSnapshot(true);
     if (calendar) calendar.refetchEvents();
   });
 }
+
 
 // ===== MOBILE WEEK NAV =====
 
