@@ -22,7 +22,7 @@ const ADMIN_EMAILS = [
 let SEASON_START = "2026-03-15";
 let SEASON_END   = "2026-06-30";
 
-const API_URL = "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
+const API_URL = `https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMXqzOc9cbZuQqc74xc5BVXmYYdzlQRASORdBWj7cPYc_-xobV-65-QUTP7-flrgzCj5jUe5mnTFC14BV1YtWXGLA3Qm8dhvOx5-OR0XZHNqY8IOjQ-ZdN1rKr8KPsws-ezF_htqyDw5XGyD-JobxrC1nl4mhclvS1Olduc4hLFxH1w-H0Iq1VpvPe-wrlM_tgxrgQYZTDgGZv6TuJRDgF7KVq2ryh0XvU_zYCYaCPEiQk2HNx6CYFo5HiNal6zNSdFiN9OWphcEVgPmYLiH63XTpLKymg&lib=Miy5ijuaTEUTYQQmplJaX4U46Et3bKFCz`;
 
 
 // ===== STATE =====
@@ -48,8 +48,15 @@ async function loadSnapshot(force = false) {
     return SNAPSHOT;
   }
 
-  const url = `${API_URL}?action=getSnapshot${force ? "&force=true" : ""}`;
-  const res = await fetch(url);
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "getSnapshot",
+      force: force ? true : false
+    })
+  });
+  
   const newSnap = await res.json();
 
   if (SNAPSHOT && newSnap.lastUpdate === SNAPSHOT.lastUpdate && !force) {
@@ -446,9 +453,17 @@ function initRefreshButton() {
 
     if (isAdmin) {
       try {
-        const url = `${API_URL}?action=refreshSnapshot&key=HAYSA_REFRESH`;
-        const res = await fetch(url);
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "refreshSnapshot",
+            key: "HAYSA_REFRESH"
+          })
+        });
+        
         const data = await res.json();
+
 
         if (data.success) {
           alert("Backend refreshed successfully!");
