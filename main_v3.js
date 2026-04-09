@@ -1,3 +1,23 @@
+// ===== ADMIN WHITELIST =====
+const ADMIN_EMAILS = [
+  "haysa.manager@gmail.com",
+  "president@haysa.org",
+  "treasurer@haysa.org",
+  "secretary@haysa.org",
+  "riskmanager@haysa.org",
+  "registrar@haysa.org",
+  "webmaster@haysa.org",
+  "volunteercoordinator.haysa@gmail.com",
+  "assistanttreasurer.haysa@gmail.com",
+  "coachcoordinator.haysa@gmail.com",
+  "refereecoordinator.haysa@gmail.com",
+  "minikickerdirector.haysa@gmail.com",
+  "recdirector.haysa@gmail.com",
+  "traveldirector.haysa@gmail.com",
+  "brian.green88@yahoo.com"
+];
+
+
 // ===== CONFIG =====
 
 let SEASON_START = "2026-03-15";
