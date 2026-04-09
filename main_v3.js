@@ -1,14 +1,4 @@
-document.addEventListener("DOMContentLoaded", async () => {
-
-  // === ADMIN MODE VIA URL FLAG ===
-  const params = new URLSearchParams(window.location.search);
-  const isAdmin = params.get("admin") === "1";
-
-  if (isAdmin) {
-    document.getElementById("refreshButton").style.display = "inline-block";
-  }
-
-  // ===== ADMIN WHITELIST =====
+// ===== ADMIN WHITELIST =====
 const ADMIN_EMAILS = [
   "haysa.manager@gmail.com",
   "president@haysa.org",
@@ -26,6 +16,15 @@ const ADMIN_EMAILS = [
   "traveldirector.haysa@gmail.com",
   "brian.green88@yahoo.com"
 ];
+
+// ===== CONFIG =====
+
+let SEASON_START = "2026-03-15";
+let SEASON_END   = "2026-06-30";
+
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
+
 
 
 // ===== CONFIG =====
@@ -504,8 +503,16 @@ function initAutoRefresh() {
 }
 
 // ===== BOOTSTRAP =====
-
 document.addEventListener("DOMContentLoaded", async () => {
+
+  // === ADMIN MODE VIA URL FLAG ===
+  const params = new URLSearchParams(window.location.search);
+  const isAdmin = params.get("admin") === "1";
+
+  if (isAdmin) {
+    document.getElementById("refreshButton").style.display = "inline-block";
+  }
+
   await loadSeasonMeta();
   initPracticeToggle();
   initRefreshButton();
