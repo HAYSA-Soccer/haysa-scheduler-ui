@@ -31,6 +31,15 @@
         <button id="refreshButton" style="display:none;">Refresh</button>
       </div>
 
+      <!-- NEW subtle request link -->
+      <div id="requestHelpLink">
+        <em>
+          <a href="#" id="practiceRequestEmailLink">
+            Need to request an add, change, or cancellation?
+          </a>
+        </em>
+      </div>
+
       <div class="controls-row">
         <label>
           <input type="checkbox" id="practiceOnlyToggle" />
@@ -66,29 +75,10 @@
     </main>
   </div>
 
-  <!-- Practice action panel -->
-  <div id="practiceActionPanel">
-    <div>
-      <h2>Practice Actions</h2>
-      <p>Use this area for future practice request tools or guidance.</p>
-    </div>
-    <button id="closePracticePanel" class="practice-close-btn">Close</button>
-  </div>
-
-  <!-- Floating buttons -->
-  <button id="practiceActionFab" style="
-      position: fixed;
-      right: 20px;
-      bottom: 80px;
-      z-index: 9999;
-    ">
-    Practice Options
-  </button>
-
   <!-- FullCalendar JS -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
   <!-- App JS -->
-<script src="main_v6.js?v=1"></script>
+  <script src="main_v6.js?v=1"></script>
 </body>
 </html>
