@@ -252,28 +252,63 @@ function decorateEventClasses(ev) {
   const classes = [];
   const ext = ev.extendedProps || {};
   const type = (ext.type || "").toLowerCase();
+  const reason = (ext.reasonType || "").toLowerCase();
+  const title = (ev.title || "").toLowerCase();
 
-  switch (type) {
-    case "availability-practice":
-      classes.push("avail-practice");
-      break;
-    case "availability-game-only":
-      classes.push("avail-game-only");
-      break;
-    case "practice":
-      classes.push("practice-event");
-      break;
-    case "game":
-      classes.push("game-event");
-      break;
-    case "block":
-    case "admin_block":
-      classes.push("block-event");
-      break;
-    case "closure":
-      classes.push("closure-event");
-      break;
+  // 1. Availability always wins
+  if (type === "availability-practice") {
+    classes.push("avail-practice");
+    return classes;
   }
+
+  if (type === "availability-game-only") {
+    classes.push("avail-game-only");
+    return classes;
+  }
+
+  // 2. Closures (backend OR inferred)
+  if (
+    reason === "closure" ||
+    type === "closure" ||
+    title.includes("closed") ||
+    title.includes("unavailable")
+  ) {
+    classes.push("closure-event");
+    return classes;
+  }
+
+  // 3. Admin blocks / field unavailable
+  if (
+    reason === "admin_block" ||
+    type === "admin_block" ||
+    type === "block"
+  ) {
+    classes.push("block-event");
+
+    // If the block contains a practice or game, classify it too
+    if (title.includes("practice")) classes.push("practice-event");
+    if (title.includes(" vs ")) classes.push("game-event");
+
+    return classes;
+  }
+
+  // 4. Real games (ICS or inferred)
+  if (type === "game" || title.includes(" vs ")) {
+    classes.push("game-event");
+    return classes;
+  }
+
+  // 5. Real practices (ICS or inferred)
+  if (type === "practice" || title.includes("practice")) {
+    classes.push("practice-event");
+    return classes;
+  }
+
+  // 6. Fallback
+  classes.push("other-event");
+  return classes;
+}
+
 
   // Front-end inference without touching backend:
   // - Anything with "practice" in the title counts as a practice, even if it's a block
