@@ -90,6 +90,49 @@ async function loadSeasonMeta() {
   if (overlay) overlay.style.display = "none";
 }
 
+function createFieldCheckbox(canonical, labelText) {
+  const container = document.getElementById("fieldLayersContainer");
+  if (!container) return;
+
+  const wrapper = document.createElement("label");
+  wrapper.className = "field-layer-item";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = true;
+  checkbox.dataset.canonical = canonical;
+
+  checkbox.addEventListener("change", () => {
+    if (checkbox.checked) selectedFields.add(canonical);
+    else selectedFields.delete(canonical);
+    if (calendar) calendar.refetchEvents();
+  });
+
+  const span = document.createElement("span");
+  span.textContent = labelText;
+
+  wrapper.appendChild(checkbox);
+  wrapper.appendChild(span);
+  container.appendChild(wrapper);
+}
+
+
+function initFieldLayersUI() {
+  const container = document.getElementById("fieldLayersContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  allFieldKeys.forEach(canonical => {
+    let label = canonical;
+    if (canonical === "SUMNER/SEAN JOYCE") label = "Sumner / Sean Joyce";
+    else label = canonical.charAt(0) + canonical.slice(1).toLowerCase();
+
+    createFieldCheckbox(canonical, label);
+  });
+}
+
+
 // ===== FIELD LAYERS UI =====
 // (unchanged)
 // ... (your UI code stays exactly the same)
