@@ -1,14 +1,19 @@
 /* ===== GENERAL ===== */
 
-body {
+html, body {
   margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
-  background: #f5f5f5;
+  background: #ffffff !important;   /* REMOVE gray/pink background */
+  height: auto !important;          /* Prevent extra vertical space */
+  min-height: 0 !important;
 }
 
 .app-container {
   max-width: 1400px;
   margin: 0 auto;
+  background: #ffffff;              /* Ensure white behind calendar */
+  padding-bottom: 0;
 }
 
 /* ===== HEADER ===== */
@@ -123,8 +128,7 @@ body {
   border-color: #922B21 !important;
 }
 
-/* ===== FULLCALENDAR OVERRIDES (CRITICAL) ===== */
-/* These ensure your colors beat FullCalendar's defaults */
+/* ===== FULLCALENDAR OVERRIDES ===== */
 
 .fc-event.avail-practice {
   background-color: #6FCF97 !important;
@@ -162,12 +166,11 @@ body {
   color: #fff !important;
 }
 
-/* Slight hover clarity */
 .fc-event:hover {
   filter: brightness(1.05);
 }
 
-/* ===== PRACTICE PANEL ===== */
+/* ===== PRACTICE PANEL (unused but kept for safety) ===== */
 
 #practiceActionPanel {
   position: fixed;
@@ -266,6 +269,8 @@ body {
 .field-layer-item input {
   margin-right: 4px;
 }
+
+/* ===== REQUEST HELP LINK ===== */
 
 #requestHelpLink {
   font-size: 0.85rem;
