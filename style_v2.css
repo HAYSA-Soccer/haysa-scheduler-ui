@@ -266,3 +266,20 @@ body {
 .field-layer-item input {
   margin-right: 4px;
 }
+
+#requestHelpLink {
+  font-size: 0.85rem;
+  font-style: italic;
+  margin: 8px 0 12px 4px;
+  opacity: 0.75;
+}
+
+#requestHelpLink a {
+  color: #333;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#requestHelpLink a:hover {
+  opacity: 1;
+}
