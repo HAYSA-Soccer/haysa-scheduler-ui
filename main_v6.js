@@ -131,20 +131,36 @@ function initFieldLayersUI() {
   });
 }
 
-// ===== PRACTICE PANEL (ONE BUTTON VERSION) =====
+// ===== PRACTICE REQUEST BUTTON (ONE BUTTON VERSION) =====
 
 document.addEventListener("DOMContentLoaded", () => {
-  const panel = document.getElementById("practiceActionPanel");
-  const closeBtn = document.getElementById("closePracticePanel");
   const fab = document.getElementById("practiceActionFab");
 
-  function togglePanel() {
-    if (!panel) return;
-    panel.classList.toggle("open");
-  }
+  if (fab) {
+    fab.addEventListener("click", () => {
+      const to = "webmaster@haysa.org, coachcoordinator.haysa@gmail.com";
 
-  if (fab) fab.addEventListener("click", togglePanel);
-  if (closeBtn) closeBtn.addEventListener("click", () => panel.classList.remove("open"));
+      const subject = encodeURIComponent("Practice / Game Add, Change, or Cancellation Request");
+
+      const body = encodeURIComponent(
+`Please complete the details below:
+
+Team Name:
+Coach Name:
+Coach Email:
+Requested Action: (Add / Change / Cancel)
+Field:
+Date:
+Start Time:
+End Time:
+Reason / Notes:
+
+(Please confirm you checked the field calendar before sending.)`
+      );
+
+      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+    });
+  }
 });
 
 // ===== DEVICE DETECTION =====
@@ -238,7 +254,7 @@ function decorateEventClasses(ev) {
     return classes;
   }
 
-  // 2. Closures (backend OR inferred)
+  // 2. Closures
   if (
     reason === "closure" ||
     type === "closure" ||
@@ -249,7 +265,7 @@ function decorateEventClasses(ev) {
     return classes;
   }
 
-  // 3. Admin blocks / field unavailable
+  // 3. Admin blocks
   if (
     reason === "admin_block" ||
     type === "admin_block" ||
@@ -263,13 +279,13 @@ function decorateEventClasses(ev) {
     return classes;
   }
 
-  // 4. Real games
+  // 4. Games
   if (type === "game" || title.includes(" vs ")) {
     classes.push("game-event");
     return classes;
   }
 
-  // 5. Real practices
+  // 5. Practices
   if (type === "practice" || title.includes("practice")) {
     classes.push("practice-event");
     return classes;
