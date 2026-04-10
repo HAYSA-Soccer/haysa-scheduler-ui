@@ -131,21 +131,19 @@ function initFieldLayersUI() {
   });
 }
 
-// ===== PRACTICE PANEL =====
+// ===== PRACTICE PANEL (ONE BUTTON VERSION) =====
 
 document.addEventListener("DOMContentLoaded", () => {
   const panel = document.getElementById("practiceActionPanel");
   const closeBtn = document.getElementById("closePracticePanel");
-  const desktopBtn = document.getElementById("practiceActionFab");
-  const mobileBtn = document.getElementById("practiceActionFabMobile");
+  const fab = document.getElementById("practiceActionFab");
 
   function togglePanel() {
     if (!panel) return;
     panel.classList.toggle("open");
   }
 
-  if (desktopBtn) desktopBtn.addEventListener("click", togglePanel);
-  if (mobileBtn) mobileBtn.addEventListener("click", togglePanel);
+  if (fab) fab.addEventListener("click", togglePanel);
   if (closeBtn) closeBtn.addEventListener("click", () => panel.classList.remove("open"));
 });
 
@@ -259,26 +257,24 @@ function decorateEventClasses(ev) {
   ) {
     classes.push("block-event");
 
-    // If the block contains a practice or game, classify it too
     if (title.includes("practice")) classes.push("practice-event");
     if (title.includes(" vs ")) classes.push("game-event");
 
     return classes;
   }
 
-  // 4. Real games (ICS or inferred)
+  // 4. Real games
   if (type === "game" || title.includes(" vs ")) {
     classes.push("game-event");
     return classes;
   }
 
-  // 5. Real practices (ICS or inferred)
+  // 5. Real practices
   if (type === "practice" || title.includes("practice")) {
     classes.push("practice-event");
     return classes;
   }
 
-  // 6. Fallback
   classes.push("other-event");
   return classes;
 }
