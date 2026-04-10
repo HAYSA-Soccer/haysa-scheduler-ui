@@ -131,13 +131,15 @@ function initFieldLayersUI() {
   });
 }
 
-// ===== PRACTICE REQUEST BUTTON (ONE BUTTON VERSION) =====
+// ===== EMAIL REQUEST LINK =====
 
 document.addEventListener("DOMContentLoaded", () => {
-  const fab = document.getElementById("practiceActionFab");
+  const link = document.getElementById("practiceRequestEmailLink");
 
-  if (fab) {
-    fab.addEventListener("click", () => {
+  if (link) {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+
       const to = "webmaster@haysa.org, coachcoordinator.haysa@gmail.com";
 
       const subject = encodeURIComponent("Practice / Game Add, Change, or Cancellation Request");
@@ -243,7 +245,6 @@ function decorateEventClasses(ev) {
   const reason = (ext.reasonType || "").toLowerCase();
   const title = (ev.title || "").toLowerCase();
 
-  // 1. Availability always wins
   if (type === "availability-practice") {
     classes.push("avail-practice");
     return classes;
@@ -254,7 +255,6 @@ function decorateEventClasses(ev) {
     return classes;
   }
 
-  // 2. Closures
   if (
     reason === "closure" ||
     type === "closure" ||
@@ -265,7 +265,6 @@ function decorateEventClasses(ev) {
     return classes;
   }
 
-  // 3. Admin blocks
   if (
     reason === "admin_block" ||
     type === "admin_block" ||
@@ -279,13 +278,11 @@ function decorateEventClasses(ev) {
     return classes;
   }
 
-  // 4. Games
   if (type === "game" || title.includes(" vs ")) {
     classes.push("game-event");
     return classes;
   }
 
-  // 5. Practices
   if (type === "practice" || title.includes("practice")) {
     classes.push("practice-event");
     return classes;
@@ -502,52 +499,4 @@ function initRefreshButton() {
       }
     }
 
-    await loadSnapshot(true);
-    if (calendar) calendar.refetchEvents();
-  });
-}
-
-// ===== MOBILE WEEK NAV =====
-
-function initMobileWeekNav() {
-  const prevBtn = document.getElementById("mobilePrevWeek");
-  const nextBtn = document.getElementById("mobileNextWeek");
-  const todayBtn = document.getElementById("mobileToday");
-
-  if (prevBtn) prevBtn.addEventListener("click", () => calendar && calendar.prev());
-  if (nextBtn) nextBtn.addEventListener("click", () => calendar && calendar.next());
-  if (todayBtn) todayBtn.addEventListener("click", () => calendar && calendar.today());
-}
-
-// ===== AUTO-REFRESH SNAPSHOT =====
-
-function initAutoRefresh() {
-  setInterval(async () => {
-    const newSnap = await loadSnapshot();
-    if (!newSnap || !SNAPSHOT) return;
-
-    if (newSnap.lastUpdate !== SNAPSHOT.lastUpdate) {
-      SNAPSHOT = newSnap;
-      if (calendar) calendar.refetchEvents();
-    }
-  }, 5 * 60 * 1000);
-}
-
-// ===== BOOTSTRAP =====
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const params = new URLSearchParams(window.location.search);
-  const isAdmin = params.get("admin") === "1";
-
-  if (isAdmin) {
-    const btn = document.getElementById("refreshButton");
-    if (btn) btn.style.display = "inline-block";
-  }
-
-  await loadSeasonMeta();
-  initPracticeToggle();
-  initRefreshButton();
-  initCalendar();
-  initMobileWeekNav();
-  initAutoRefresh();
-});
+    await loadSnapshot(true
