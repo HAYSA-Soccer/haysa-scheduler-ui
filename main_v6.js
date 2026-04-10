@@ -22,7 +22,6 @@ const ADMIN_EMAILS = [
 let SEASON_START = "2026-03-15";
 let SEASON_END   = "2026-06-30";
 
-// MUST use script.google.com — NOT googleusercontent.com
 const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
@@ -39,11 +38,10 @@ let previousIcsTimestamp = "";
 
 let popoverInitialized = false;
 
-// Full-season snapshot
 let SNAPSHOT = null;
 
 // ===== SNAPSHOT LOADER =====
-// GET ONLY — no POST, no JSON, no CORS issues
+
 async function loadSnapshot(force = false) {
   const url = `${API_URL}?action=getSnapshot${force ? "&force=true" : ""}`;
   const res = await fetch(url);
@@ -224,30 +222,6 @@ function isPracticeAllowed(ev) {
   return (ev.extendedProps?.type || "").toLowerCase() === "availability-practice";
 }
 
-// Anything that looks like a practice (including blocks)
-function hasPracticeKeyword(ev) {
-  const title = (ev.title || "").toLowerCase();
-  return title.includes("practice");
-}
-
-// Anything that looks like a game (has a vs, including blocks)
-function hasVsKeyword(ev) {
-  const title = (ev.title || "").toLowerCase();
-  return title.includes(" vs ") || title.includes(" vs.");
-}
-
-// Field unavailable (closures or clearly marked)
-function isFieldUnavailable(ev) {
-  const ext = ev.extendedProps || {};
-  const reason = (ext.reasonType || "").toLowerCase();
-  const type = (ext.type || "").toLowerCase();
-  const title = (ev.title || "").toLowerCase();
-
-  if (reason === "closure" || type === "closure") return true;
-  if (title.includes("unavailable") || title.includes("closed")) return true;
-  return false;
-}
-
 function decorateEventClasses(ev) {
   const classes = [];
   const ext = ev.extendedProps || {};
@@ -309,26 +283,6 @@ function decorateEventClasses(ev) {
   return classes;
 }
 
-
-  // Front-end inference without touching backend:
-  // - Anything with "practice" in the title counts as a practice, even if it's a block
-  // - Anything with "vs" in the title counts as a game, even if it's a block
-  if (!classes.includes("practice-event") && hasPracticeKeyword(ev)) {
-    classes.push("practice-event");
-  }
-
-  if (!classes.includes("game-event") && hasVsKeyword(ev)) {
-    classes.push("game-event");
-  }
-
-  // Explicit field-unavailable tagging for styling/legend
-  if (isFieldUnavailable(ev)) {
-    classes.push("field-unavailable");
-  }
-
-  return classes;
-}
-
 function stripBackendColors(ev) {
   const clone = { ...ev };
   delete clone.backgroundColor;
@@ -362,7 +316,6 @@ function buildTooltip(ev) {
     return parts.join("\n");
   }
 
-  // For blocks/closures that still look like practices/games, keep the title visible
   return ev.title || "";
 }
 
@@ -389,7 +342,9 @@ function decorateEvents(events) {
     return {
       ...ev,
       title: newTitle,
-      classNames: (ev.classNames || []).concat(decorateEventClasses({ ...ev, title: newTitle, extendedProps: ext })),
+      classNames: (ev.classNames || []).concat(
+        decorateEventClasses({ ...ev, title: newTitle, extendedProps: ext })
+      ),
       extendedProps: {
         ...ext,
         tooltip: backendTooltip || computedTooltip,
@@ -505,7 +460,7 @@ function initPracticeToggle() {
 }
 
 // ===== REFRESH BUTTON =====
-// FIXED — now uses GET instead of POST
+
 function initRefreshButton() {
   const btn = document.getElementById("refreshButton");
   if (!btn) return;
@@ -535,7 +490,6 @@ function initRefreshButton() {
       }
     }
 
-    // Non-admin fallback: local refresh only
     await loadSnapshot(true);
     if (calendar) calendar.refetchEvents();
   });
