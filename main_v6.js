@@ -136,6 +136,15 @@ function initFieldLayersUI() {
 // ===== FIELD LAYERS UI =====
 // (unchanged)
 // ... (your UI code stays exactly the same)
+function initPracticeToggle() {
+  const toggle = document.getElementById("practiceOnlyToggle");
+  if (!toggle) return;
+
+  toggle.addEventListener("change", () => {
+    practiceOnly = toggle.checked;
+    if (calendar) calendar.refetchEvents();
+  });
+}
 
 // ===== REFRESH BUTTON =====
 // FIXED — now uses GET instead of POST
