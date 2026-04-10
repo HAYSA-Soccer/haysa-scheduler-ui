@@ -499,4 +499,53 @@ function initRefreshButton() {
       }
     }
 
-    await loadSnapshot(true
+        await loadSnapshot(true);
+    if (calendar) calendar.refetchEvents();
+  });
+}
+
+// ===== MOBILE WEEK NAV =====
+
+function initMobileWeekNav() {
+  const prevBtn = document.getElementById("mobilePrevWeek");
+  const nextBtn = document.getElementById("mobileNextWeek");
+  const todayBtn = document.getElementById("mobileToday");
+
+  if (prevBtn) prevBtn.addEventListener("click", () => calendar && calendar.prev());
+  if (nextBtn) nextBtn.addEventListener("click", () => calendar && calendar.next());
+  if (todayBtn) todayBtn.addEventListener("click", () => calendar && calendar.today());
+}
+
+// ===== AUTO-REFRESH SNAPSHOT =====
+
+function initAutoRefresh() {
+  setInterval(async () => {
+    const newSnap = await loadSnapshot();
+    if (!newSnap || !SNAPSHOT) return;
+
+    if (newSnap.lastUpdate !== SNAPSHOT.lastUpdate) {
+      SNAPSHOT = newSnap;
+      if (calendar) calendar.refetchEvents();
+    }
+  }, 5 * 60 * 1000);
+}
+
+// ===== BOOTSTRAP =====
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const params = new URLSearchParams(window.location.search);
+  const isAdmin = params.get("admin") === "1";
+
+  if (isAdmin) {
+    const btn = document.getElementById("refreshButton");
+    if (btn) btn.style.display = "inline-block";
+  }
+
+  await loadSeasonMeta();
+  initPracticeToggle();
+  initRefreshButton();
+  initCalendar();
+  initMobileWeekNav();
+  initAutoRefresh();
+});
+
