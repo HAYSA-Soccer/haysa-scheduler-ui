@@ -52,7 +52,11 @@ async function loadSnapshot(force = false) {
     return SNAPSHOT;
   }
 
+
   SNAPSHOT = await res.json();
+  console.log("DIAGNOSTIC OUTPUT:", SNAPSHOT);
+
+  //SNAPSHOT = await res.json();
   return SNAPSHOT;
 }
 
