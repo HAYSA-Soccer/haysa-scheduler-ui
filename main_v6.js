@@ -43,8 +43,8 @@ let SNAPSHOT = null;
 // ===== SNAPSHOT LOADER =====
 
 async function loadSnapshot(force = false) {
-//  const url = `${API_URL}?action=getSnapshot${force ? "&force=true" : ""}`;
-  const url = `${API_URL}?action=getCalendarEvents`;
+  const url = `${API_URL}?action=getSnapshot${force ? "&force=true" : ""}`;
+  // const url = `${API_URL}?action=getCalendarEvents`;
   const res = await fetch(url);
 
   if (!res.ok) {
@@ -53,10 +53,10 @@ async function loadSnapshot(force = false) {
   }
 
 
-  SNAPSHOT = await res.json();
-  console.log("DIAGNOSTIC OUTPUT:", SNAPSHOT);
-
   //SNAPSHOT = await res.json();
+  //console.log("DIAGNOSTIC OUTPUT:", SNAPSHOT);
+
+  SNAPSHOT = await res.json();
   return SNAPSHOT;
 }
 
