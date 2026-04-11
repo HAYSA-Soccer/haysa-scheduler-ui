@@ -509,8 +509,10 @@ function initRefreshButton() {
       }
     }
 
+    CACHE = {}; // ⭐ CLEAR ALL FRONTEND CACHES
     await loadSnapshot(true);
     if (calendar) calendar.refetchEvents();
+
   });
 }
 
