@@ -9,64 +9,70 @@
   <!-- App CSS -->
   <link rel="stylesheet" href="style_v2.css" />
 </head>
+
 <body>
-  <!-- Loading overlay -->
-  <div id="loadingOverlay" style="
-      position: fixed;
-      inset: 0;
-      background: rgba(255,255,255,0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9998;
-    ">
-    <div>Loading season data…</div>
-  </div>
+  <div class="app-container">
 
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" style="
+        position: fixed;
+        inset: 0;
+        background: rgba(255,255,255,0.85);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9998;
+      ">
+      <div>Loading season data…</div>
+    </div>
 
+    <!-- Request link (subtle, inline) -->
+    <div id="requestHelpLink">
+      <em>
+        <a href="#" id="practiceRequestEmailLink">
+          Need to request an add, change, or cancellation?
+        </a>
+      </em>
+    </div>
 
-      <!-- NEW subtle request link -->
-      <div id="requestHelpLink">
-        <em>
-          <a href="#" id="practiceRequestEmailLink">
-            Need to request an add, change, or cancellation?
-          </a>
-        </em>
+    <!-- Practice-only toggle -->
+    <div class="controls-row">
+      <label>
+        <input type="checkbox" id="practiceOnlyToggle" />
+        Show practice-eligible availability only
+      </label>
+    </div>
+
+    <!-- Field checkboxes -->
+    <div class="controls-row">
+      <div id="fieldLayersContainer"></div>
+    </div>
+
+    <!-- Legend -->
+    <div class="controls-row">
+      <div class="legend">
+        <span class="legend-label">Legend:</span>
+        <span class="legend-item legend-availability-practice">Practice Available</span>
+        <span class="legend-item legend-availability-game-only">Game-Only Availability</span>
+        <span class="legend-item legend-practice">Scheduled Practice</span>
+        <span class="legend-item legend-game">Scheduled Game</span>
+        <span class="legend-item legend-block">Admin Block</span>
+        <span class="legend-item legend-closure">Closure</span>
       </div>
+    </div>
 
-      <div class="controls-row">
-        <label>
-          <input type="checkbox" id="practiceOnlyToggle" />
-          Show practice-eligible availability only
-        </label>
-      </div>
-
-      <div class="controls-row">
-        <div id="fieldLayersContainer"></div>
-      </div>
-
-      <div class="controls-row">
-        <div class="legend">
-          <span class="legend-label">Legend:</span>
-          <span class="legend-item legend-availability-practice">Practice Available</span>
-          <span class="legend-item legend-availability-game-only">Game-Only Availability</span>
-          <span class="legend-item legend-practice">Scheduled Practice</span>
-          <span class="legend-item legend-game">Scheduled Game</span>
-          <span class="legend-item legend-block">Admin Block</span>
-          <span class="legend-item legend-closure">Closure</span>
-        </div>
-      </div>
-    </header>
-
+    <!-- Calendar -->
     <main>
       <div id="calendar"></div>
 
+      <!-- Mobile week navigation -->
       <div class="controls-row" style="margin-top: 10px;">
         <button id="mobilePrevWeek">Prev</button>
         <button id="mobileToday">Today</button>
         <button id="mobileNextWeek">Next</button>
       </div>
     </main>
+
   </div>
 
   <!-- FullCalendar JS -->
