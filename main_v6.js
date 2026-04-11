@@ -454,6 +454,16 @@ function initCalendar() {
   });
 
   calendar.render();
+
+  // ⭐ HEIGHT FIX — force FullCalendar to recompute size
+  setTimeout(() => {
+    if (calendar) calendar.updateSize();
+  }, 50);
+
+  // ⭐ Recompute on window resize (important for iframe)
+  window.addEventListener("resize", () => {
+    if (calendar) calendar.updateSize();
+  });
 }
 
 // ===== PRACTICE TOGGLE =====
@@ -499,7 +509,7 @@ function initRefreshButton() {
       }
     }
 
-        await loadSnapshot(true);
+    await loadSnapshot(true);
     if (calendar) calendar.refetchEvents();
   });
 }
@@ -548,4 +558,3 @@ document.addEventListener("DOMContentLoaded", async () => {
   initMobileWeekNav();
   initAutoRefresh();
 });
-
