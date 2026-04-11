@@ -61,7 +61,7 @@ async function loadSeasonMeta() {
   const overlay = document.getElementById("loadingOverlay");
   if (overlay) overlay.style.display = "flex";
 
-  await loadSnapshot();
+  await loadSnapshot(true); // ⭐ ALWAYS force fresh snapshot on load
 
   if (!SNAPSHOT) {
     if (overlay) overlay.style.display = "none";
@@ -490,6 +490,10 @@ function initRefreshButton() {
     const isAdmin = params.get("admin") === "1";
 
     if (isAdmin) {
+      CACHE = {}; // ⭐ CLEAR FRONTEND CACHE FOR ADMINS
+    }
+
+    if (isAdmin) {
       try {
         const url = `${API_URL}?action=refreshSnapshot&key=HAYSA_REFRESH`;
         const res = await fetch(url);
@@ -497,6 +501,7 @@ function initRefreshButton() {
 
         if (data.success) {
           alert("Backend refreshed successfully!");
+          CACHE = {}; // ⭐ CLEAR CACHE AGAIN AFTER BACKEND REFRESH
           await loadSnapshot(true);
           if (calendar) calendar.refetchEvents();
           return;
@@ -509,7 +514,7 @@ function initRefreshButton() {
       }
     }
 
-    CACHE = {}; // ⭐ CLEAR ALL FRONTEND CACHES
+    CACHE = {}; // ⭐ CLEAR CACHE FOR NON-ADMIN REFRESH
     await loadSnapshot(true);
     if (calendar) calendar.refetchEvents();
 
@@ -549,6 +554,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const isAdmin = params.get("admin") === "1";
 
   if (isAdmin) {
+    CACHE = {}; // ⭐ FORCE FRESH SNAPSHOT ON ADMIN PAGE LOAD
     const btn = document.getElementById("refreshButton");
     if (btn) btn.style.display = "inline-block";
   }
