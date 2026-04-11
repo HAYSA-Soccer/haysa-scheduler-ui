@@ -22,8 +22,10 @@ const ADMIN_EMAILS = [
 let SEASON_START = "2026-03-15";
 let SEASON_END   = "2026-06-30";
 
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
+//const API_URL =
+//  "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
+const url = `${API_URL}?action=getCalendarEvents`;
+
 
 // ===== STATE =====
 
