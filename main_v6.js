@@ -400,8 +400,9 @@ function initCalendar() {
     headerToolbar: {
       left: "prev,next today",
       center: "title",
-      right: "timeGridWeek,dayGridMonth",
+      right: "timeGridDay,timeGridWeek,dayGridMonth",
     },
+
 
     events: (info, success) => {
       if (!SNAPSHOT) {
