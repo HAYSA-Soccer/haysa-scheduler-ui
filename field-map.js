@@ -196,45 +196,30 @@ function normalizeSurface(s) {
 // =========================
 // UPDATE MAP OVERLAY
 // =========================
-function updateUsageOverlay(usage) {
-  document.querySelectorAll(".field-box").forEach(el => {
-    const [canonical, rawSurface] = el.dataset.label.split(" – ");
-    const surface = normalizeSurface(rawSurface);
+function getFieldUsageAtTime(dt, events) {
+  const ts = dt.getTime();
+  const usage = {};
 
-    const u = usage[canonical]?.[surface];
+  events.forEach(ev => {
+    const canonical = ev.extendedProps?.canonical;
+    const rawField = ev.extendedProps?.canonicalField;  // <-- THIS IS THE FIX
 
-    el.classList.remove("open", "booked", "partial", "full");
+    if (!canonical || !rawField) return;
 
-    if (!u) {
-      el.classList.add("open");
-    } else {
-      el.classList.add("booked");
+    const surface = rawField.trim();  // exact match to your field-box labels
+
+    const start = new Date(ev.start).getTime();
+    const end = new Date(ev.end).getTime();
+
+    if (ts >= start && ts < end) {
+      if (!usage[canonical]) usage[canonical] = {};
+      usage[canonical][surface] = { status: "booked", event: ev };
     }
   });
 
-  // FULL field logic
-  Object.keys(usage).forEach(canonical => {
-    const surfaces = usage[canonical];
-    if (!surfaces) return;
-
-    const fullEl = document.querySelector(
-      `.field-box[data-label="${canonical} – FULL"]`
-    );
-    if (!fullEl) return;
-
-    fullEl.classList.remove("open", "booked", "partial", "full");
-
-    const bookedSurfaces = Object.values(surfaces).filter(s => s.status === "booked");
-
-    if (bookedSurfaces.length === 0) {
-      fullEl.classList.add("open");
-    } else if (bookedSurfaces.length === Object.keys(surfaces).length) {
-      fullEl.classList.add("full");
-    } else {
-      fullEl.classList.add("partial");
-    }
-  });
+  return usage;
 }
+
 
 
 // =========================
