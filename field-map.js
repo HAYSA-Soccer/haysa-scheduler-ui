@@ -243,13 +243,13 @@ function renderAllComplexes(active) {
 async function init() {
   const snapshot = await loadSnapshot();
 
-  // ⭐ ADD THESE THREE LINES HERE ⭐
-  console.log("Snapshot:", snapshot);
-  console.log("Active complexes:", snapshot.activeComplexes);
-  console.log("COMPLEX_MAPS keys:", Object.keys(COMPLEX_MAPS));
-
+  // Build active complexes from events
   const events = snapshot.events || [];
-  const active = snapshot.activeComplexes || [];
+  const active = [...new Set(events.map(ev => ev.extendedProps?.canonical))];
+
+  console.log("Snapshot:", snapshot);
+  console.log("Active complexes:", active);
+  console.log("COMPLEX_MAPS keys:", Object.keys(COMPLEX_MAPS));
 
   renderAllComplexes(active);
 
@@ -274,3 +274,4 @@ async function init() {
 }
 
 init();
+
