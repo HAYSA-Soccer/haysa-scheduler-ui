@@ -181,7 +181,7 @@ function normalizeSurface(s) {
   // Numbered fields
   if (/^\d+$/.test(s)) return s;
 
-  // Butler fields → treat as FULL (backend does not send BU1/BU2)
+  // Butler fields → treat as FULL
   if (s.startsWith("BU")) return "FULL";
 
   // Softball → treat as FULL
