@@ -15,7 +15,30 @@ h1 {
   font-size: 22px;
 }
 
-/* Tabs */
+/* ============================
+   TIME SLIDER
+============================ */
+.time-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+}
+
+#timeSlider {
+  width: 300px;
+}
+
+#timeLabel {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+/* ============================
+   Tabs
+============================ */
 .tabs {
   display: flex;
   gap: 10px;
@@ -37,7 +60,9 @@ h1 {
   color: white;
 }
 
-/* Multi-complex grid */
+/* ============================
+   Multi-complex grid
+============================ */
 .complex-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -51,7 +76,9 @@ h1 {
   }
 }
 
-/* Map container */
+/* ============================
+   Map container
+============================ */
 .map-wrapper {
   position: relative;
   width: 100%;
@@ -64,21 +91,45 @@ h1 {
   display: block;
 }
 
-/* Field overlays */
+/* ============================
+   Field overlays (base)
+============================ */
 .field-box {
   position: absolute;
   border: 2px solid #333;
   border-radius: 4px;
-  background: rgba(0, 128, 0, 0.55); /* default: available */
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.25s ease;
+  box-sizing: border-box;
 }
 
+/* ============================
+   Radar Colors (new)
+============================ */
+.field-box.open {
+  background-color: rgba(0, 200, 0, 0.35); /* green */
+}
+
+.field-box.booked {
+  background-color: rgba(255, 0, 0, 0.45); /* red */
+}
+
+.field-box.partial {
+  background-color: rgba(255, 165, 0, 0.45); /* orange */
+}
+
+.field-box.full {
+  background-color: rgba(255, 0, 0, 0.65); /* darker red */
+}
+
+/* Legacy unavailable (still used for non-radar mode) */
 .field-box.unavailable {
   background: rgba(200, 150, 0, 0.55);
 }
 
-/* Tooltip */
+/* ============================
+   Tooltip
+============================ */
 .field-box:hover::after {
   content: attr(data-label);
   position: absolute;
@@ -92,7 +143,9 @@ h1 {
   white-space: nowrap;
 }
 
-/* Hidden */
+/* ============================
+   Hidden
+============================ */
 .hidden {
   display: none;
 }
