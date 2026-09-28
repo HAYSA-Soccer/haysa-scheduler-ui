@@ -4,114 +4,68 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
-// Canonical → Display label
-const LABELS = {
-  "AVON BUTLER": "Butler",
-  "TURF": "Turf"
-};
-
-// =========================
-// COMPLEX MAP DEFINITIONS
-// =========================
 // =========================
 // COMPLEX MAP DEFINITIONS
 // =========================
 const COMPLEX_MAPS = {
-
-  // ============================
-  // TURF
-  // ============================
   "TURF": {
+    canonical: "TURF",
     label: "Turf",
     image: "/haysa-scheduler-ui/assets/turf.jpg",
     fields: {
       "FULL": { left: 5, top: 5, width: 90, height: 90 },
-
-      "1":  { left: 5, top: 5, width: 40, height: 20 },
+      "1": { left: 5, top: 5, width: 40, height: 20 },
       "1B": { left: 50, top: 5, width: 40, height: 20 },
-
-      "2":  { left: 5, top: 30, width: 40, height: 20 },
+      "2": { left: 5, top: 30, width: 40, height: 20 },
       "2B": { left: 50, top: 30, width: 40, height: 20 },
-
-      "3":  { left: 5, top: 55, width: 40, height: 20 },
+      "3": { left: 5, top: 55, width: 40, height: 20 },
       "3B": { left: 50, top: 55, width: 40, height: 20 },
-
-      "4":  { left: 5, top: 80, width: 40, height: 20 },
+      "4": { left: 5, top: 80, width: 40, height: 20 },
       "4B": { left: 50, top: 80, width: 40, height: 20 }
     }
   },
 
-  // ============================
-  // SUMNER / SEAN JOYCE
-  // ============================
   "SUMNER/SEAN JOYCE": {
+    canonical: "SUMNER/SEAN JOYCE",
     label: "Sumner/Sean Joyce",
     image: "/haysa-scheduler-ui/assets/sumner.jpg",
     fields: {
-      "1":  { left: 5, top: 5, width: 90, height: 15 },
+      "1": { left: 5, top: 5, width: 90, height: 15 },
       "1A": { left: 5, top: 5, width: 40, height: 15 },
       "1B": { left: 50, top: 5, width: 40, height: 15 },
-
-      "2":  { left: 5, top: 25, width: 90, height: 15 },
+      "2": { left: 5, top: 25, width: 90, height: 15 },
       "2A": { left: 5, top: 25, width: 40, height: 15 },
       "2B": { left: 50, top: 25, width: 40, height: 15 },
-
-      "3":  { left: 5, top: 45, width: 90, height: 15 },
+      "3": { left: 5, top: 45, width: 90, height: 15 },
       "3A": { left: 5, top: 45, width: 40, height: 15 },
       "3B": { left: 50, top: 45, width: 40, height: 15 },
-
-      "4":  { left: 5, top: 65, width: 90, height: 15 },
+      "4": { left: 5, top: 65, width: 90, height: 15 },
       "4A": { left: 5, top: 65, width: 40, height: 15 },
       "4B": { left: 50, top: 65, width: 40, height: 15 }
     }
   },
 
-  // ============================
-  // BROOKVILLE
-  // ============================
-  "BROOKVILLE": {
-    label: "Brookville",
-    image: "/haysa-scheduler-ui/assets/brookville.jpg",
-    fields: {
-      "FULL": { left: 5, top: 5, width: 90, height: 90 },
-
-      "1A": { left: 5, top: 5, width: 40, height: 40 },
-      "1B": { left: 50, top: 5, width: 40, height: 40 },
-
-      "2A": { left: 5, top: 50, width: 40, height: 40 },
-      "2B": { left: 50, top: 50, width: 40, height: 40 }
-    }
-  },
-
-  // ============================
-  // AVON BUTLER
-  // ============================
   "AVON BUTLER": {
+    canonical: "AVON BUTLER",
     label: "Butler",
     image: "/haysa-scheduler-ui/assets/butler-layout.jpg",
     fields: {
       "FULL": { left: 5, top: 5, width: 90, height: 90 },
-
       "1": { left: 5, top: 5, width: 40, height: 20 },
       "2": { left: 50, top: 5, width: 40, height: 20 },
-
       "3": { left: 5, top: 30, width: 40, height: 20 },
       "4": { left: 50, top: 30, width: 40, height: 20 },
-
       "5": { left: 5, top: 55, width: 40, height: 20 },
       "6": { left: 50, top: 55, width: 40, height: 20 },
-
       "BU1": { left: 5, top: 80, width: 40, height: 15 },
       "BU2": { left: 50, top: 80, width: 40, height: 15 },
-
       "Softball Diamond": { left: 30, top: 80, width: 40, height: 15 }
     }
   }
 };
 
-
 // =========================
-// FETCH BACKEND SNAPSHOT
+// FETCH SNAPSHOT
 // =========================
 async function loadSnapshot() {
   const res = await fetch(`${API_URL}?action=getSnapshot`);
@@ -119,7 +73,7 @@ async function loadSnapshot() {
 }
 
 // =========================
-// TIME SLIDER → DATE
+// TIME SLIDER
 // =========================
 function sliderToDate(value) {
   const minutes = parseInt(value, 10);
@@ -131,8 +85,26 @@ function sliderToDate(value) {
 }
 
 function updateTimeLabel(dt) {
-  const label = document.getElementById("timeLabel");
-  label.textContent = dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  document.getElementById("timeLabel").textContent =
+    dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// =========================
+// NORMALIZE SURFACE
+// =========================
+function normalizeSurface(s) {
+  if (!s) return null;
+  s = s.trim();
+
+  if (s === "FULL") return "FULL";
+  if (/^\d[A-B]$/.test(s)) return s[0]; // 1A → 1
+  if (/^\d+$/.test(s)) return s;
+
+  if (s.startsWith("BU")) return "FULL";
+  if (s.toLowerCase().includes("softball")) return "FULL";
+  if (s.toLowerCase().includes("mini")) return "FULL";
+
+  return s;
 }
 
 // =========================
@@ -144,11 +116,11 @@ function getFieldUsageAtTime(dt, events) {
 
   events.forEach(ev => {
     const canonical = ev.extendedProps?.canonical;
-    const rawSurface = ev.extendedProps?.surface;  // <-- BACK TO SURFACE
+    const rawSurface = ev.extendedProps?.surface;
 
     if (!canonical || !rawSurface) return;
 
-    const surface = normalizeSurface(rawSurface);  // <-- USE NORMALIZER
+    const surface = normalizeSurface(rawSurface);
 
     const start = new Date(ev.start).getTime();
     const end = new Date(ev.end).getTime();
@@ -162,45 +134,13 @@ function getFieldUsageAtTime(dt, events) {
   return usage;
 }
 
-
-
-
-function normalizeSurface(s) {
-  if (!s) return null;
-
-  s = s.trim();
-
-  // FULL stays FULL
-  if (s === "FULL") return "FULL";
-
-  // A/B split → number
-  if (/^\d[A-B]$/.test(s)) {
-    return s[0]; // "1A" → "1"
-  }
-
-  // Numbered fields
-  if (/^\d+$/.test(s)) return s;
-
-  // Butler fields → treat as FULL
-  if (s.startsWith("BU")) return "FULL";
-
-  // Softball → treat as FULL
-  if (s.toLowerCase().includes("softball")) return "FULL";
-
-  // Mini Kickers → treat as FULL
-  if (s.toLowerCase().includes("mini")) return "FULL";
-
-  return s;
-}
-
-
-
 // =========================
-// UPDATE MAP OVERLAY
+// UPDATE OVERLAY
 // =========================
 function updateUsageOverlay(usage) {
   document.querySelectorAll(".field-box").forEach(el => {
-    const [canonical, surface] = el.dataset.label.split(" – ");
+    const [canonical, rawSurface] = el.dataset.label.split(" – ");
+    const surface = normalizeSurface(rawSurface);
 
     const u = usage[canonical]?.[surface];
 
@@ -213,31 +153,27 @@ function updateUsageOverlay(usage) {
     }
   });
 
-  // FULL field logic
+  // FULL logic
   Object.keys(usage).forEach(canonical => {
     const surfaces = usage[canonical];
-    if (!surfaces) return;
-
     const fullEl = document.querySelector(
       `.field-box[data-label="${canonical} – FULL"]`
     );
     if (!fullEl) return;
 
+    const booked = Object.keys(surfaces).length;
+
     fullEl.classList.remove("open", "booked", "partial", "full");
 
-    const bookedSurfaces = Object.values(surfaces).filter(s => s.status === "booked");
-
-    if (bookedSurfaces.length === 0) {
+    if (booked === 0) {
       fullEl.classList.add("open");
-    } else if (bookedSurfaces.length === Object.keys(surfaces).length) {
-      fullEl.classList.add("full");
-    } else {
+    } else if (booked === 1) {
       fullEl.classList.add("partial");
+    } else {
+      fullEl.classList.add("full");
     }
   });
 }
-
-
 
 // =========================
 // RENDER MAPS
@@ -246,8 +182,8 @@ function renderAllComplexes(active) {
   const container = document.getElementById("all-complexes");
   container.innerHTML = "";
 
-  active.forEach(c => {
-    const map = COMPLEX_MAPS[c];
+  active.forEach(canonical => {
+    const map = COMPLEX_MAPS[canonical];
     if (!map) return;
 
     const wrapper = document.createElement("div");
@@ -267,7 +203,8 @@ function renderAllComplexes(active) {
       box.style.width = pos.width + "%";
       box.style.height = pos.height + "%";
 
-      box.dataset.label = `${map.label} – ${field}`;
+      // IMPORTANT: use canonical internally
+      box.dataset.label = `${canonical} – ${field}`;
 
       wrapper.appendChild(box);
     });
@@ -277,22 +214,16 @@ function renderAllComplexes(active) {
 }
 
 // =========================
-// MAIN INIT
+// INIT
 // =========================
 async function init() {
   const snapshot = await loadSnapshot();
-
-  // Build active complexes from events
   const events = snapshot.events || [];
-  const active = [...new Set(events.map(ev => ev.extendedProps?.canonical))];
 
-  console.log("Snapshot:", snapshot);
-  console.log("Active complexes:", active);
-  console.log("COMPLEX_MAPS keys:", Object.keys(COMPLEX_MAPS));
+  const active = [...new Set(events.map(ev => ev.extendedProps?.canonical))];
 
   renderAllComplexes(active);
 
-  // Slider listener
   const slider = document.getElementById("timeSlider");
   slider.addEventListener("input", e => {
     const dt = sliderToDate(e.target.value);
@@ -302,10 +233,8 @@ async function init() {
     updateUsageOverlay(usage);
   });
 
-  // Initialize at current time
   const now = new Date();
-  const minutes = now.getHours() * 60 + now.getMinutes();
-  slider.value = minutes;
+  slider.value = now.getHours() * 60 + now.getMinutes();
   updateTimeLabel(now);
 
   const usage = getFieldUsageAtTime(now, events);
@@ -313,4 +242,3 @@ async function init() {
 }
 
 init();
-
