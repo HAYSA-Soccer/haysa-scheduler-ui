@@ -3,24 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HAYSA Field Map</title>
-  <link rel="stylesheet" href="field-map.css" />
+  <title>Field Usage Visualizer</title>
+  <link rel="stylesheet" href="style_v2.css" />
 </head>
 
 <body>
-  <header>
-    <h1>HAYSA Field Availability Map</h1>
-  </header>
+  <h1>Field Usage Visualizer</h1>
 
-  <!-- Tabs -->
-  <nav id="complex-tabs" class="tabs"></nav>
+  <label>Select Time:</label>
+  <input id="usageTimeInput" type="datetime-local">
 
-  <!-- All Complexes Container -->
-  <div id="all-complexes" class="complex-grid"></div>
+  <div id="fieldUsageGrid"></div>
 
-  <!-- Single Complex Container -->
-  <div id="single-complex" class="single-complex hidden"></div>
-
-  <script src="field-map.js"></script>
+  <script src="field-usage.js"></script>
 </body>
 </html>
