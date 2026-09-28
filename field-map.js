@@ -32,14 +32,11 @@ const COMPLEX_MAPS = {
       "2A": { left: 60, top: 23.5, width: 15.5, height: 8.5 },
       "2B": { left: 60, top: 15, width: 15.5, height: 8.5 },
       
-      "3": { left: 30, top: 45, width: 90, height: 15 },
-      "3A": { left: 5, top: 45, width: 40, height: 15, rotate: 45 },
-      "3B": { left: 50, top: 45, width: 40, height: 15, rotate: 45 },
-
+      "3": { left: 5, top: 60, width: 15.5, height: 17, rotate: 15 },
       
-      "4": { left: 40, top: 65, width: 90, height: 15, rotate: 30},
-      "4A": { left: 40, top: 65, width: 40, height: 15, rotate: 30 },
-      "4B": { left: 50, top: 65, width: 40, height: 15, rotate: 30 }
+      "4": { left: 40, top: 75, width: 90, height: 15, rotate: 20},
+      "4A": { left: 40, top: 75, width: 40, height: 15, rotate: 20 },
+      "4B": { left: 50, top: 75, width: 40, height: 15, rotate: 20 }
     }
   },
 
