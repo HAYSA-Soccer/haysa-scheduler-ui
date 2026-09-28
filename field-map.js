@@ -220,6 +220,19 @@ async function init() {
   const snapshot = await loadSnapshot();
   const events = snapshot.events || [];
 
+  // ⭐ ADD DEBUG BLOCK HERE ⭐
+  console.log("=== RAW FIELD DATA FROM BACKEND ===");
+  events.slice(0, 50).forEach(ev => {
+    console.log({
+      title: ev.title,
+      canonical: ev.extendedProps?.canonical,
+      surface: ev.extendedProps?.surface,
+      canonicalField: ev.extendedProps?.canonicalField,
+      rawExtendedProps: ev.extendedProps
+    });
+  });
+  // ⭐ END DEBUG BLOCK ⭐
+
   const active = [...new Set(events.map(ev => ev.extendedProps?.canonical))];
 
   renderAllComplexes(active);
@@ -240,5 +253,6 @@ async function init() {
   const usage = getFieldUsageAtTime(now, events);
   updateUsageOverlay(usage);
 }
+
 
 init();
