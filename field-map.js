@@ -13,8 +13,8 @@ const COMPLEX_MAPS = {
     label: "Turf",
     image: "/haysa-scheduler-ui/assets/turf.jpg",
     fields: {
-      "FULL": { left: 20, top: 10, width: 60, height: 40 },
-      "1": { left: 20, top: 5, width: 40, height: 20 },
+      "FULL": { left: 22, top: 15, width: 50, height: 80 },
+      "1": { left: 22, top: 5, width: 40, height: 20 },
       "2": { left: 40, top: 30, width: 40, height: 20 },
     }
   },
