@@ -116,23 +116,29 @@ function getFieldUsageAtTime(dt, events) {
 
   events.forEach(ev => {
     const canonical = ev.extendedProps?.canonical;
-    const rawSurface = ev.extendedProps?.surface;
+    const fieldList = ev.extendedProps?.fields;
 
-    if (!canonical || !rawSurface) return;
-
-    const surface = normalizeSurface(rawSurface);
+    if (!canonical || !fieldList) return;
 
     const start = new Date(ev.start).getTime();
     const end = new Date(ev.end).getTime();
 
-    if (ts >= start && ts < end) {
+    if (ts < start || ts >= end) return;
+
+    // Split fields: "1, 1A, 1B, 2, 2A, 2B"
+    const fields = fieldList.split(",").map(f => f.trim());
+
+    fields.forEach(raw => {
+      const surface = normalizeSurface(raw); // 1A → 1, 1B → 1, etc.
+
       if (!usage[canonical]) usage[canonical] = {};
       usage[canonical][surface] = { status: "booked", event: ev };
-    }
+    });
   });
 
   return usage;
 }
+
 
 // =========================
 // UPDATE OVERLAY
