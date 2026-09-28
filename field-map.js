@@ -148,7 +148,9 @@ function updateUsageOverlay(usage) {
     const [canonical, rawSurface] = el.dataset.label.split(" – ");
     const surface = normalizeSurface(rawSurface);
 
-    const u = usage[canonical]?.[surface];
+    const normalized = normalizeSurface(rawSurface);
+    const u = usage[canonical]?.[normalized];
+
 
     el.classList.remove("open", "booked", "partial", "full");
 
