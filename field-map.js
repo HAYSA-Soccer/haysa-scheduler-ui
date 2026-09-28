@@ -14,34 +14,94 @@ const LABELS = {
 // COMPLEX MAP DEFINITIONS
 // =========================
 const COMPLEX_MAPS = {
-  "AVON BUTLER": {
-    label: "Butler",
-    image: "assets/butler-layout.jpg",
 
-    fields: {
-      "3A": { left: 55.8, top: 27.0, width: 10.5, height: 10.4 },
-      "3B": { left: 55.8, top: 27.0, width: 10.5, height: 10.4 },
-      "4A": { left: 71.3, top: 27.0, width: 10.3, height: 10.6 },
-      "4B": { left: 71.3, top: 27.0, width: 10.3, height: 10.6 },
-      "1A": { left: 55.8, top: 39.1, width: 10.3, height: 10.6 },
-      "1B": { left: 55.8, top: 39.1, width: 10.3, height: 10.6 },
-      "2A": { left: 69.8, top: 40.1, width: 10.3, height: 10.6 },
-      "2B": { left: 69.8, top: 40.1, width: 10.3, height: 10.6 },
-      "5A": { left: 55.8, top: 57.7, width: 10.3, height: 10.2 },
-      "5B": { left: 55.8, top: 57.7, width: 10.3, height: 10.2 },
-      "6A": { left: 55.8, top: 68.4, width: 10.3, height: 10.4 },
-      "6B": { left: 55.8, top: 68.4, width: 10.3, height: 10.4 },
-      "FULL": { left: 10, top: 10, width: 80, height: 80 }
-    }
-  },
-
+  // ============================
+  // TURF (placeholder layout)
+  // ============================
   "TURF": {
     label: "Turf",
     image: "assets/turf.jpg",
     fields: {
-      "A": { left: 10, top: 10, width: 40, height: 80 },
-      "B": { left: 50, top: 10, width: 40, height: 80 },
-      "FULL": { left: 10, top: 10, width: 80, height: 80 }
+      "FULL": { left: 5, top: 5, width: 90, height: 90 },
+
+      "1":  { left: 5, top: 5, width: 40, height: 20 },
+      "1B": { left: 50, top: 5, width: 40, height: 20 },
+
+      "2":  { left: 5, top: 30, width: 40, height: 20 },
+      "2B": { left: 50, top: 30, width: 40, height: 20 },
+
+      "3":  { left: 5, top: 55, width: 40, height: 20 },
+      "3B": { left: 50, top: 55, width: 40, height: 20 },
+
+      "4":  { left: 5, top: 80, width: 40, height: 20 },
+      "4B": { left: 50, top: 80, width: 40, height: 20 }
+    }
+  },
+
+  // ============================
+  // SUMNER / SEAN JOYCE
+  // ============================
+  "SUMNER/SEAN JOYCE": {
+    label: "Sumner/Sean Joyce",
+    image: "assets/sumner.jpg",
+    fields: {
+      "1":  { left: 5, top: 5, width: 90, height: 15 },
+      "1A": { left: 5, top: 5, width: 40, height: 15 },
+      "1B": { left: 50, top: 5, width: 40, height: 15 },
+
+      "2":  { left: 5, top: 25, width: 90, height: 15 },
+      "2A": { left: 5, top: 25, width: 40, height: 15 },
+      "2B": { left: 50, top: 25, width: 40, height: 15 },
+
+      "3":  { left: 5, top: 45, width: 90, height: 15 },
+      "3A": { left: 5, top: 45, width: 40, height: 15 },
+      "3B": { left: 50, top: 45, width: 40, height: 15 },
+
+      "4":  { left: 5, top: 65, width: 90, height: 15 },
+      "4A": { left: 5, top: 65, width: 40, height: 15 },
+      "4B": { left: 50, top: 65, width: 40, height: 15 }
+    }
+  },
+
+  // ============================
+  // BROOKVILLE
+  // ============================
+  "BROOKVILLE": {
+    label: "Brookville",
+    image: "assets/brookville.jpg",
+    fields: {
+      "FULL": { left: 5, top: 5, width: 90, height: 90 },
+
+      "1A": { left: 5, top: 5, width: 40, height: 40 },
+      "1B": { left: 50, top: 5, width: 40, height: 40 },
+
+      "2A": { left: 5, top: 50, width: 40, height: 40 },
+      "2B": { left: 50, top: 50, width: 40, height: 40 }
+    }
+  },
+
+  // ============================
+  // AVON BUTLER (placeholder)
+  // ============================
+  "AVON BUTLER": {
+    label: "Butler",
+    image: "assets/butler-layout.jpg",
+    fields: {
+      "FULL": { left: 5, top: 5, width: 90, height: 90 },
+
+      "1": { left: 5, top: 5, width: 40, height: 20 },
+      "2": { left: 50, top: 5, width: 40, height: 20 },
+
+      "3": { left: 5, top: 30, width: 40, height: 20 },
+      "4": { left: 50, top: 30, width: 40, height: 20 },
+
+      "5": { left: 5, top: 55, width: 40, height: 20 },
+      "6": { left: 50, top: 55, width: 40, height: 20 },
+
+      "BU1": { left: 5, top: 80, width: 40, height: 15 },
+      "BU2": { left: 50, top: 80, width: 40, height: 15 },
+
+      "Softball Diamond": { left: 30, top: 80, width: 40, height: 15 }
     }
   }
 };
