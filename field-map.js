@@ -203,17 +203,23 @@ function renderAllComplexes(active) {
     Object.entries(map.fields).forEach(([field, pos]) => {
       const box = document.createElement("div");
       box.className = "field-box";
-
+    
       box.style.left = pos.left + "%";
       box.style.top = pos.top + "%";
       box.style.width = pos.width + "%";
       box.style.height = pos.height + "%";
-
-      // IMPORTANT: use canonical internally
+    
+      // ⭐ rotation support
+      if (pos.rotate) {
+        box.style.transform = `rotate(${pos.rotate}deg)`;
+        box.style.transformOrigin = "center";
+      }
+    
       box.dataset.label = `${canonical} – ${field}`;
-
+    
       wrapper.appendChild(box);
     });
+
 
     container.appendChild(wrapper);
   });
