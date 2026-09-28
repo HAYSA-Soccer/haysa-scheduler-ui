@@ -33,6 +33,8 @@ const COMPLEX_MAPS = {
       "2B": { left: 60, top: 15, width: 15.5, height: 8.5 },
       
       "3": { left: 5, top: 60, width: 15.5, height: 17, rotate: 15 },
+      "3A": { left: 40, top: 75, width: 0, height: 0, rotate: 20 },
+      "3B": { left: 50, top: 75, width: 0, height: 0, rotate: 20 }
       
       "4": { left: 40, top: 75, width: 90, height: 15, rotate: 20},
       "4A": { left: 40, top: 75, width: 40, height: 15, rotate: 20 },
