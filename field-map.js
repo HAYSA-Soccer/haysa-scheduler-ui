@@ -144,11 +144,11 @@ function getFieldUsageAtTime(dt, events) {
 
   events.forEach(ev => {
     const canonical = ev.extendedProps?.canonical;
-    const rawField = ev.extendedProps?.canonicalField;  // <-- THIS IS THE FIX
+    const rawSurface = ev.extendedProps?.surface;  // <-- BACK TO SURFACE
 
-    if (!canonical || !rawField) return;
+    if (!canonical || !rawSurface) return;
 
-    const surface = rawField.trim();  // exact match to your field-box labels
+    const surface = normalizeSurface(rawSurface);  // <-- USE NORMALIZER
 
     const start = new Date(ev.start).getTime();
     const end = new Date(ev.end).getTime();
@@ -174,20 +174,22 @@ function normalizeSurface(s) {
   // FULL stays FULL
   if (s === "FULL") return "FULL";
 
-  // Softball Diamond → Softball
-  if (s.toLowerCase().includes("softball")) return "Softball";
+  // A/B split → number
+  if (/^\d[A-B]$/.test(s)) {
+    return s[0]; // "1A" → "1"
+  }
 
-  // Mini Kickers
-  if (s.toLowerCase().includes("mini")) return "Mini Kickers";
-
-  // BU1 / BU2
-  if (s.startsWith("BU")) return s;
-
-  // 1A / 1B / 2A / 2B / etc.
-  if (/^\d[A-B]$/.test(s)) return s;
-
-  // 1 / 2 / 3 / 4
+  // Numbered fields
   if (/^\d+$/.test(s)) return s;
+
+  // Butler fields → treat as FULL (backend does not send BU1/BU2)
+  if (s.startsWith("BU")) return "FULL";
+
+  // Softball → treat as FULL
+  if (s.toLowerCase().includes("softball")) return "FULL";
+
+  // Mini Kickers → treat as FULL
+  if (s.toLowerCase().includes("mini")) return "FULL";
 
   return s;
 }
