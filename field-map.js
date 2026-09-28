@@ -16,11 +16,11 @@ const LABELS = {
 const COMPLEX_MAPS = {
 
   // ============================
-  // TURF (placeholder layout)
+  // TURF
   // ============================
   "TURF": {
     label: "Turf",
-    image: "assets/turf.jpg",
+    image: "/assets/turf.jpg",
     fields: {
       "FULL": { left: 5, top: 5, width: 90, height: 90 },
 
@@ -43,7 +43,7 @@ const COMPLEX_MAPS = {
   // ============================
   "SUMNER/SEAN JOYCE": {
     label: "Sumner/Sean Joyce",
-    image: "assets/sumner.jpg",
+    image: "/assets/sumner.jpg",
     fields: {
       "1":  { left: 5, top: 5, width: 90, height: 15 },
       "1A": { left: 5, top: 5, width: 40, height: 15 },
@@ -68,7 +68,7 @@ const COMPLEX_MAPS = {
   // ============================
   "BROOKVILLE": {
     label: "Brookville",
-    image: "assets/brookville.jpg",
+    image: "/assets/brookville.jpg",
     fields: {
       "FULL": { left: 5, top: 5, width: 90, height: 90 },
 
@@ -81,11 +81,11 @@ const COMPLEX_MAPS = {
   },
 
   // ============================
-  // AVON BUTLER (placeholder)
+  // AVON BUTLER
   // ============================
   "AVON BUTLER": {
     label: "Butler",
-    image: "assets/butler-layout.jpg",
+    image: "/assets/butler-layout.jpg",
     fields: {
       "FULL": { left: 5, top: 5, width: 90, height: 90 },
 
@@ -105,6 +105,7 @@ const COMPLEX_MAPS = {
     }
   }
 };
+
 
 // =========================
 // FETCH BACKEND SNAPSHOT
