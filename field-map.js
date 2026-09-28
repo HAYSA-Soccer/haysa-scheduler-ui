@@ -15,13 +15,7 @@ const COMPLEX_MAPS = {
     fields: {
       "FULL": { left: 5, top: 5, width: 90, height: 90 },
       "1": { left: 5, top: 5, width: 40, height: 20 },
-      "1B": { left: 50, top: 5, width: 40, height: 20 },
       "2": { left: 5, top: 30, width: 40, height: 20 },
-      "2B": { left: 50, top: 30, width: 40, height: 20 },
-      "3": { left: 5, top: 55, width: 40, height: 20 },
-      "3B": { left: 50, top: 55, width: 40, height: 20 },
-      "4": { left: 5, top: 80, width: 40, height: 20 },
-      "4B": { left: 50, top: 80, width: 40, height: 20 }
     }
   },
 
