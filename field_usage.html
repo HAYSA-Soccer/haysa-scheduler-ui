@@ -1,19 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Field Usage Visualizer</title>
-  <link rel="stylesheet" href="style_v2.css">
-  <link rel="stylesheet" href="field-usage.css">
+
+  <!-- Use your existing global stylesheet -->
+  <link rel="stylesheet" href="style_v2.css" />
+
+  <!-- Optional: only include if you actually created field-usage.css -->
+  <link rel="stylesheet" href="field-usage.css" />
 </head>
+
 <body>
 
-<h1>Field Usage Visualizer</h1>
+  <h1>Field Usage Visualizer</h1>
 
-<label>Select Time:</label>
-<input id="usageTimeInput" type="datetime-local">
+  <label for="usageTimeInput">Select Time:</label>
+  <input id="usageTimeInput" type="datetime-local">
 
-<div id="fieldUsageGrid"></div>
+  <div id="fieldUsageGrid"></div>
 
-<script src="field-usage.js"></script>
+  <!-- IMPORTANT: this must match your JS filename exactly -->
+  <script src="field-usage.js"></script>
+
 </body>
 </html>
