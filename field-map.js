@@ -24,7 +24,7 @@ const COMPLEX_MAPS = {
     label: "Sumner/Sean Joyce",
     image: "/haysa-scheduler-ui/assets/sumner.jpg",
     fields: {
-      "1": { left: 5, top: 5, width: 90, height: 15 },
+      "1": { left: 25, top: 15, width: 10, height: 20 },
       "1A": { left: 5, top: 5, width: 40, height: 15 },
       "1B": { left: 50, top: 5, width: 40, height: 15 },
       "2": { left: 5, top: 25, width: 90, height: 15 },
