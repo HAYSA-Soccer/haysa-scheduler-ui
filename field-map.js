@@ -165,7 +165,6 @@ function getFieldUsageAtTime(dt, events) {
 
 
 
-
 function normalizeSurface(s) {
   if (!s) return null;
 
