@@ -146,6 +146,8 @@ function getFieldUsageAtTime(dt, events) {
     const canonical = ev.extendedProps?.canonical;
     const rawSurface = ev.extendedProps?.surface;
 
+    console.log("SURFACE FROM BACKEND:", canonical, rawSurface);
+
     if (!canonical || !rawSurface) return;
 
     const surface = normalizeSurface(rawSurface);
@@ -161,6 +163,7 @@ function getFieldUsageAtTime(dt, events) {
 
   return usage;
 }
+
 
 
 
