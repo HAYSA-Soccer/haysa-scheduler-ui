@@ -104,7 +104,73 @@ const COMPLEX_MAPS = {
       "Softball Diamond": { left: 30, top: 80, width: 40, height: 15 }
     }
   }
+};const COMPLEX_MAPS = {
+
+  "TURF": {
+    label: "Turf",
+    image: "/haysa-scheduler-ui/assets/turf.jpg",
+    fields: {
+      "FULL": { left: 5, top: 5, width: 90, height: 90 },
+      "1":  { left: 5, top: 5, width: 40, height: 20 },
+      "1B": { left: 50, top: 5, width: 40, height: 20 },
+      "2":  { left: 5, top: 30, width: 40, height: 20 },
+      "2B": { left: 50, top: 30, width: 40, height: 20 },
+      "3":  { left: 5, top: 55, width: 40, height: 20 },
+      "3B": { left: 50, top: 55, width: 40, height: 20 },
+      "4":  { left: 5, top: 80, width: 40, height: 20 },
+      "4B": { left: 50, top: 80, width: 40, height: 20 }
+    }
+  },
+
+  "SUMNER/SEAN JOYCE": {
+    label: "Sumner/Sean Joyce",
+    image: "/haysa-scheduler-ui/assets/sumner.jpg",
+    fields: {
+      "1":  { left: 5, top: 5, width: 90, height: 15 },
+      "1A": { left: 5, top: 5, width: 40, height: 15 },
+      "1B": { left: 50, top: 5, width: 40, height: 15 },
+      "2":  { left: 5, top: 25, width: 90, height: 15 },
+      "2A": { left: 5, top: 25, width: 40, height: 15 },
+      "2B": { left: 50, top: 25, width: 40, height: 15 },
+      "3":  { left: 5, top: 45, width: 90, height: 15 },
+      "3A": { left: 5, top: 45, width: 40, height: 15 },
+      "3B": { left: 50, top: 45, width: 40, height: 15 },
+      "4":  { left: 5, top: 65, width: 90, height: 15 },
+      "4A": { left: 5, top: 65, width: 40, height: 15 },
+      "4B": { left: 50, top: 65, width: 40, height: 15 }
+    }
+  },
+
+  "BROOKVILLE": {
+    label: "Brookville",
+    image: "/haysa-scheduler-ui/assets/brookville.jpg",
+    fields: {
+      "FULL": { left: 5, top: 5, width: 90, height: 90 },
+      "1A": { left: 5, top: 5, width: 40, height: 40 },
+      "1B": { left: 50, top: 5, width: 40, height: 40 },
+      "2A": { left: 5, top: 50, width: 40, height: 40 },
+      "2B": { left: 50, top: 50, width: 40, height: 40 }
+    }
+  },
+
+  "AVON BUTLER": {
+    label: "Butler",
+    image: "/haysa-scheduler-ui/assets/butler-layout.jpg",
+    fields: {
+      "FULL": { left: 5, top: 5, width: 90, height: 90 },
+      "1": { left: 5, top: 5, width: 40, height: 20 },
+      "2": { left: 50, top: 5, width: 40, height: 20 },
+      "3": { left: 5, top: 30, width: 40, height: 20 },
+      "4": { left: 50, top: 30, width: 40, height: 20 },
+      "5": { left: 5, top: 55, width: 40, height: 20 },
+      "6": { left: 50, top: 55, width: 40, height: 20 },
+      "BU1": { left: 5, top: 80, width: 40, height: 15 },
+      "BU2": { left: 50, top: 80, width: 40, height: 15 },
+      "Softball Diamond": { left: 30, top: 80, width: 40, height: 15 }
+    }
+  }
 };
+
 
 
 // =========================
