@@ -30,7 +30,7 @@ const COMPLEX_MAPS = {
       
       "2": { left: 60, top: 15, width: 15.5, height: 17 },
       "2A": { left: 60, top: 23.5, width: 15.5, height: 8.5 },
-      "2B": { left: 60, top: 20, width: 15.5, height: 8.5 },
+      "2B": { left: 60, top: 15, width: 15.5, height: 8.5 },
       
       "3": { left: 5, top: 45, width: 90, height: 15 },
       "3A": { left: 5, top: 45, width: 40, height: 15 },
