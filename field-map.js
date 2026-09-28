@@ -13,9 +13,9 @@ const COMPLEX_MAPS = {
     label: "Turf",
     image: "/haysa-scheduler-ui/assets/turf.jpg",
     fields: {
-      "FULL": { left: 22, top: 15, width: 50, height: 80 },
-      "1": { left: 22, top: 5, width: 40, height: 20 },
-      "2": { left: 40, top: 30, width: 40, height: 20 },
+      "FULL": { left: 22, top: 15, width: 52, height: 60 },
+      "1": { left: 22, top: 5, width: 25.55, height: 60 },
+      "2": { left: 52, top: 5, width: 25.55, height: 60 },
     }
   },
 
@@ -24,10 +24,10 @@ const COMPLEX_MAPS = {
     label: "Sumner/Sean Joyce",
     image: "/haysa-scheduler-ui/assets/sumner.jpg",
     fields: {
-      "1": { left: 35, top: 15, width: 15, height: 18 },
-      "1A": { left: 5, top: 5, width: 40, height: 15 },
-      "1B": { left: 50, top: 5, width: 40, height: 15 },
-      "2": { left: 5, top: 25, width: 90, height: 15 },
+      "1": { left: 40, top: 15, width: 15, height: 17 },
+      "1A": { left: 40, top: 30, width: 15, height: 8.5 },
+      "1B": { left: 55, top: 15, width: 15, height: 8.5 },
+      "2": { left: 80, top: 15, width: 15, height: 17 },
       "2A": { left: 5, top: 25, width: 40, height: 15 },
       "2B": { left: 50, top: 25, width: 40, height: 15 },
       "3": { left: 5, top: 45, width: 90, height: 15 },
