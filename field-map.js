@@ -242,6 +242,12 @@ function renderAllComplexes(active) {
 // =========================
 async function init() {
   const snapshot = await loadSnapshot();
+
+  // ⭐ ADD THESE THREE LINES HERE ⭐
+  console.log("Snapshot:", snapshot);
+  console.log("Active complexes:", snapshot.activeComplexes);
+  console.log("COMPLEX_MAPS keys:", Object.keys(COMPLEX_MAPS));
+
   const events = snapshot.events || [];
   const active = snapshot.activeComplexes || [];
 
