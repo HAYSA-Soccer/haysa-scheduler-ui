@@ -144,13 +144,11 @@ function getFieldUsageAtTime(dt, events) {
 
   events.forEach(ev => {
     const canonical = ev.extendedProps?.canonical;
-    const rawSurface = ev.extendedProps?.surface;
-
-    console.log("SURFACE FROM BACKEND:", canonical, rawSurface);
+    const rawSurface = ev.extendedProps?.canonicalField;   // <-- THE FIX
 
     if (!canonical || !rawSurface) return;
 
-    const surface = normalizeSurface(rawSurface);
+    const surface = rawSurface.trim(); // exact match to your field-box labels
 
     const start = new Date(ev.start).getTime();
     const end = new Date(ev.end).getTime();
