@@ -24,12 +24,12 @@ const COMPLEX_MAPS = {
     label: "Sumner/Sean Joyce",
     image: "/haysa-scheduler-ui/assets/sumner.jpg",
     fields: {
-      "1": { left: 40, top: 15, width: 15.5, height: 20 },
-      "1A": { left: 40, top: 20, width: 15.5, height: 8.5 },
+      "1": { left: 40, top: 15, width: 15.5, height: 17 },
+      "1A": { left: 40, top: 23.5, width: 15.5, height: 8.5 },
       "1B": { left: 40, top: 15, width: 15.5, height: 8.5 },
       
-      "2": { left: 60, top: 15, width: 15.5, height: 20 },
-      "2A": { left: 60, top: 20, width: 15.5, height: 8.5 },
+      "2": { left: 60, top: 15, width: 15.5, height: 17 },
+      "2A": { left: 60, top: 23.5, width: 15.5, height: 8.5 },
       "2B": { left: 60, top: 20, width: 15.5, height: 8.5 },
       
       "3": { left: 5, top: 45, width: 90, height: 15 },
