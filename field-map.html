@@ -3,14 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HAYSA Field Map</title>
+  <title>HAYSA Field Usage Radar</title>
+
   <link rel="stylesheet" href="field-map.css" />
 </head>
 
 <body>
+
   <header>
-    <h1>HAYSA Field Availability Map</h1>
+    <h1>Field Usage Radar</h1>
   </header>
+
+  <!-- Time Slider -->
+  <div class="time-slider-container">
+    <label for="timeSlider">Time:</label>
+    <input id="timeSlider" type="range" min="0" max="1440" step="15">
+    <span id="timeLabel"></span>
+  </div>
 
   <!-- Tabs -->
   <nav id="complex-tabs" class="tabs"></nav>
