@@ -144,8 +144,11 @@ function getFieldUsageAtTime(dt, events) {
 
   events.forEach(ev => {
     const canonical = ev.extendedProps?.canonical;
-    const surface = ev.extendedProps?.surface;
-    if (!canonical || !surface) return;
+    const rawSurface = ev.extendedProps?.surface;
+
+    if (!canonical || !rawSurface) return;
+
+    const surface = normalizeSurface(rawSurface);
 
     const start = new Date(ev.start).getTime();
     const end = new Date(ev.end).getTime();
@@ -159,13 +162,43 @@ function getFieldUsageAtTime(dt, events) {
   return usage;
 }
 
+
+
+function normalizeSurface(s) {
+  if (!s) return null;
+
+  s = s.trim();
+
+  // FULL stays FULL
+  if (s === "FULL") return "FULL";
+
+  // Softball Diamond → Softball
+  if (s.toLowerCase().includes("softball")) return "Softball";
+
+  // Mini Kickers
+  if (s.toLowerCase().includes("mini")) return "Mini Kickers";
+
+  // BU1 / BU2
+  if (s.startsWith("BU")) return s;
+
+  // 1A / 1B / 2A / 2B / etc.
+  if (/^\d[A-B]$/.test(s)) return s;
+
+  // 1 / 2 / 3 / 4
+  if (/^\d+$/.test(s)) return s;
+
+  return s;
+}
+
+
+
 // =========================
 // UPDATE MAP OVERLAY
 // =========================
 function updateUsageOverlay(usage) {
   document.querySelectorAll(".field-box").forEach(el => {
-    const label = el.dataset.label; // e.g. "Turf – A"
-    const [canonical, surface] = label.split(" – ");
+    const [canonical, rawSurface] = el.dataset.label.split(" – ");
+    const surface = normalizeSurface(rawSurface);
 
     const u = usage[canonical]?.[surface];
 
@@ -183,26 +216,25 @@ function updateUsageOverlay(usage) {
     const surfaces = usage[canonical];
     if (!surfaces) return;
 
-    const A = surfaces["A"]?.status === "booked";
-    const B = surfaces["B"]?.status === "booked";
-
     const fullEl = document.querySelector(
       `.field-box[data-label="${canonical} – FULL"]`
     );
-
     if (!fullEl) return;
 
     fullEl.classList.remove("open", "booked", "partial", "full");
 
-    if (!A && !B) {
+    const bookedSurfaces = Object.values(surfaces).filter(s => s.status === "booked");
+
+    if (bookedSurfaces.length === 0) {
       fullEl.classList.add("open");
-    } else if (A && B) {
+    } else if (bookedSurfaces.length === Object.keys(surfaces).length) {
       fullEl.classList.add("full");
     } else {
       fullEl.classList.add("partial");
     }
   });
 }
+
 
 // =========================
 // RENDER MAPS
