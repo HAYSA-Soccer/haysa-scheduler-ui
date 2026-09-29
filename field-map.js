@@ -79,8 +79,8 @@ const COMPLEX_MAPS = {
       "2": { left: 50, top: 15, width: 20, height: 20 },
       "3": { left: 5, top: 20, width: 20, height: 20 },
       "4": { left: 50, top: 25, width: 20, height: 20 },
-      "5": { left: 5, top: 30, width: 20, height: 20 },
-      "6": { left: 50, top: 35, width: 20, height: 20 },
+      "5": { left: 5, top: 50, width: 20, height: 20 },
+      "6": { left: 50, top: 70, width: 20, height: 20 },
       "BU1": { left: 5, top: 40, width: 20, height: 15 },
       "BU2": { left: 50, top: 45, width: 20, height: 15 },
       "Softball Diamond": { left: 50, top: 80, width: 20, height: 15 }
