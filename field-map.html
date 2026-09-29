@@ -22,7 +22,25 @@
       </label>
     </div>
   </header>
+  
+  <header>
+    <h1>Field Usage Radar</h1>
+    <div class="day-controls">
+      <button id="prevDay">Prev</button>
+      <span id="dayLabel"></span>
+      <button id="nextDay">Next</button>
+      <label>
+        Date:
+        <input type="date" id="radarDate">
+      </label>
+  
+      <!-- ⭐ ADD THIS BUTTON ⭐ -->
+      <button id="debugToggle">Debug</button>
+    </div>
+  </header>
 
+
+  
   <div class="time-slider-container">
     <label for="timeSlider">Time:</label>
     <input id="timeSlider" type="range" min="0" max="1440" step="15">
