@@ -110,14 +110,12 @@ function isFreeOfBookings(timelineBooked, startTs, endTs) {
 }
 
 // =========================
-// AVAILABILITY CHECK
+// AVAILABILITY CHECK (LOOSER: inside any block)
 // =========================
-function isWithinAvailability(timelineAvail, startTs, endTs) {
+function isTimeInsideAnyAvailability(timelineAvail, startTs) {
   const intervals = timelineAvail || [];
   for (const interval of intervals) {
-    const s = interval.start;
-    const e = interval.end;
-    if (startTs >= s && endTs <= e) {
+    if (startTs >= interval.start && startTs < interval.end) {
       return true;
     }
   }
@@ -151,18 +149,12 @@ async function initSearch() {
     const [h, m] = startStr.split(":").map(Number);
     const day = new Date(dateStr);
 
-    const dayStart = new Date(day);
-    dayStart.setHours(8, 0, 0, 0);
+    const allowedStartTs = new Date(day).setHours(8, 0, 0, 0);
+    const allowedEndTs = new Date(day).setHours(21, 0, 0, 0);
 
-    const dayEnd = new Date(day);
-    dayEnd.setHours(21, 0, 0, 0);
-
-    let earliestTs = new Date(day).setHours(h, m, 0, 0);
-    const allowedStartTs = new Date(day).setHours(8, 0, 0, 0).getTime();
-    const allowedEndTs = new Date(day).setHours(21, 0, 0, 0).getTime();
-
-    if (earliestTs < allowedStartTs) earliestTs = allowedStartTs;
-    if (earliestTs >= allowedEndTs) {
+    let searchStartTs = new Date(day).setHours(h, m, 0, 0);
+    if (searchStartTs < allowedStartTs) searchStartTs = allowedStartTs;
+    if (searchStartTs >= allowedEndTs) {
       alert("Start time must be between 8:00 AM and 9:00 PM.");
       return;
     }
@@ -191,17 +183,19 @@ async function initSearch() {
         if (searchType === "earliest") {
           let chosenSlot = null;
 
+          // Scan availability intervals starting at searchStartTs
           for (const interval of timelineAvail) {
-            let slotStart = Math.max(interval.start, earliestTs);
-            const slotEnd = slotStart + minDurationMs;
+            let slotStart = Math.max(interval.start, searchStartTs);
+            let slotEnd = slotStart + minDurationMs;
 
-            if (slotEnd > interval.end) continue;
+            // Must be within allowed hours
             if (slotStart < allowedStartTs || slotEnd > allowedEndTs) continue;
 
-            if (isFreeOfBookings(timelineBooked, slotStart, slotEnd)) {
-              chosenSlot = { start: slotStart, end: slotEnd };
-              break;
-            }
+            // Must be free of bookings
+            if (!isFreeOfBookings(timelineBooked, slotStart, slotEnd)) continue;
+
+            chosenSlot = { start: slotStart, end: slotEnd };
+            break;
           }
 
           if (chosenSlot) {
@@ -214,12 +208,15 @@ async function initSearch() {
           }
 
         } else if (searchType === "exact") {
-          const startTs = earliestTs;
+          const startTs = searchStartTs;
           const endTs = startTs + minDurationMs;
 
           if (startTs < allowedStartTs || endTs > allowedEndTs) return;
 
-          if (!isWithinAvailability(timelineAvail, startTs, endTs)) return;
+          // Must be inside any availability block at start time
+          if (!isTimeInsideAnyAvailability(timelineAvail, startTs)) return;
+
+          // Must be free of bookings
           if (!isFreeOfBookings(timelineBooked, startTs, endTs)) return;
 
           results.push({
@@ -242,11 +239,11 @@ async function initSearch() {
 
     results.sort((a, b) => a.start - b.start);
 
-    // Set radarJump for the search time (no specific field)
+    // Global radarJump: show the time searched for
     localStorage.setItem("radarJump", JSON.stringify({
       canonical: null,
       surface: null,
-      start: results[0].start // use earliest result time
+      start: results[0].start
     }));
     const frame = document.getElementById("radarFrame");
     if (frame && frame.contentWindow) {
