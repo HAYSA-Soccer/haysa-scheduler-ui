@@ -64,7 +64,14 @@ const COMPLEX_MAPS = {
 
       "3":  { left: 15, top: 69.5, width: 15.5, height: 17, rotate: 10 },
 
-      "4":  { left: 38, top: 64.5, width: 28.5, height: 10 },
+      //"4":  { left: 38, top: 64.5, width: 28.5, height: 10 },
+
+      "4": {
+        svgShape: {
+          type: "polygon",
+          points: "39.17, 62.29 65.50, 63.89 37.33, 72.00 63.17, 74.57"
+            
+      
       "4A": { left: 38, top: 63.5, width: 15.5,   height: 10 },
       "4B": { left: 51, top: 64.5, width: 15.5,   height: 10 }
     }
