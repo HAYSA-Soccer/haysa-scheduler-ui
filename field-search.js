@@ -5,22 +5,22 @@ const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
 // =========================
-// NORMALIZE SURFACE
+// FIELD TYPE DEFINITIONS
 // =========================
-function normalizeSurface(s) {
-  if (!s) return null;
-  s = s.trim();
-
-  if (s === "FULL") return "FULL";
-  if (/^\d[A-B]$/.test(s)) return s[0]; // 1A → 1
-  if (/^\d+$/.test(s)) return s;
-
-  if (s.startsWith("BU")) return "FULL";
-  if (s.toLowerCase().includes("softball")) return "FULL";
-  if (s.toLowerCase().includes("mini")) return "FULL";
-
-  return s;
-}
+const FIELD_TYPE = {
+  "SUMNER/SEAN JOYCE": {
+    full: ["1", "2", "3", "4"],
+    half: ["1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B"]
+  },
+  "TURF": {
+    full: ["FULL"],
+    half: ["1", "2"] // or rename to H-HST1/H-HST2 if needed
+  },
+  "AVON BUTLER": {
+    full: ["FULL"],
+    half: ["1", "2", "3", "4", "5", "6", "BU1", "BU2"]
+  }
+};
 
 // =========================
 // FETCH SNAPSHOT
@@ -44,7 +44,7 @@ function filterEventsForDay(events, day) {
 }
 
 // =========================
-// FIELD TIMELINES
+// FIELD TIMELINES (NO NORMALIZATION)
 // =========================
 function buildFieldTimelines(events) {
   const timelines = {};
@@ -58,9 +58,7 @@ function buildFieldTimelines(events) {
     const end = new Date(ev.end).getTime();
 
     const fields = fieldList.split(",").map(f => f.trim());
-    fields.forEach(raw => {
-      const surface = normalizeSurface(raw);
-
+    fields.forEach(surface => {
       if (!timelines[canonical]) timelines[canonical] = {};
       if (!timelines[canonical][surface]) timelines[canonical][surface] = [];
 
@@ -78,7 +76,7 @@ function buildFieldTimelines(events) {
 }
 
 // =========================
-// GAP / SLOT FINDER
+// GAP FINDER (EARLIEST START)
 // =========================
 function findAvailabilitySlots(timeline, dayStartTs, dayEndTs, minDurationMs, earliestTs) {
   const slots = [];
@@ -110,6 +108,24 @@ function findAvailabilitySlots(timeline, dayStartTs, dayEndTs, minDurationMs, ea
 }
 
 // =========================
+// EXACT-TIME CHECK
+// =========================
+function isFieldFreeForDuration(timeline, startTs, durationMs) {
+  const endTs = startTs + durationMs;
+
+  if (!timeline || timeline.length === 0) return true;
+
+  for (const interval of timeline) {
+    // If ANY overlap → not free
+    if (!(interval.end <= startTs || interval.start >= endTs)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// =========================
 // INIT SEARCH
 // =========================
 async function initSearch() {
@@ -117,17 +133,19 @@ async function initSearch() {
   const events = snapshot.events || [];
 
   const dateInput = document.getElementById("dateInput");
-  const todayStr = new Date().toISOString().slice(0, 10);
-  dateInput.value = todayStr;
+  dateInput.value = new Date().toISOString().slice(0, 10);
 
   document.getElementById("searchBtn").addEventListener("click", () => {
     const complex = document.getElementById("complexSelect").value;
+    const fieldType = document.getElementById("fieldTypeSelect").value;
+    const searchType = document.getElementById("searchTypeSelect").value;
+
     const durationMin = parseInt(document.getElementById("durationInput").value, 10);
     const startStr = document.getElementById("startInput").value;
     const dateStr = document.getElementById("dateInput").value;
 
     if (!durationMin || !startStr || !dateStr) {
-      alert("Please fill duration, earliest start, and day.");
+      alert("Please fill duration, start time, and day.");
       return;
     }
 
@@ -135,9 +153,10 @@ async function initSearch() {
     const day = new Date(dateStr);
 
     const dayStart = new Date(day);
-    dayStart.setHours(6, 0, 0, 0);   // configurable day window start
+    dayStart.setHours(6, 0, 0, 0);
+
     const dayEnd = new Date(day);
-    dayEnd.setHours(21, 0, 0, 0);   // configurable day window end
+    dayEnd.setHours(21, 0, 0, 0);
 
     const earliestTs = new Date(day).setHours(h, m, 0, 0);
     const minDurationMs = durationMin * 60 * 1000;
@@ -151,23 +170,49 @@ async function initSearch() {
       if (complex && canonical !== complex) return;
 
       Object.keys(timelines[canonical]).forEach(surface => {
-        const timeline = timelines[canonical][surface];
-        const slots = findAvailabilitySlots(
-          timeline,
-          dayStart.getTime(),
-          dayEnd.getTime(),
-          minDurationMs,
-          earliestTs
-        );
+        // FIELD TYPE FILTER
+        if (fieldType === "full" &&
+            !FIELD_TYPE[canonical].full.includes(surface)) return;
 
-        slots.forEach(slot => {
-          results.push({
-            canonical,
-            surface,
-            start: slot.start,
-            end: slot.end
+        if (fieldType === "half" &&
+            !FIELD_TYPE[canonical].half.includes(surface)) return;
+
+        const timeline = timelines[canonical][surface];
+
+        // SEARCH TYPE LOGIC
+        if (searchType === "earliest") {
+          const slots = findAvailabilitySlots(
+            timeline,
+            dayStart.getTime(),
+            dayEnd.getTime(),
+            minDurationMs,
+            earliestTs
+          );
+
+          slots.forEach(slot => {
+            results.push({
+              canonical,
+              surface,
+              start: slot.start,
+              end: slot.end
+            });
           });
-        });
+
+        } else if (searchType === "exact") {
+          const startTs = earliestTs;
+          const endTs = startTs + minDurationMs;
+
+          if (startTs >= dayStart.getTime() && endTs <= dayEnd.getTime()) {
+            if (isFieldFreeForDuration(timeline, startTs, minDurationMs)) {
+              results.push({
+                canonical,
+                surface,
+                start: startTs,
+                end: endTs
+              });
+            }
+          }
+        }
       });
     });
 
@@ -181,8 +226,10 @@ async function initSearch() {
 
     results.sort((a, b) => a.start - b.start);
 
-    results.slice(0, 30).forEach(r => {
+    results.slice(0, 50).forEach(r => {
       const div = document.createElement("div");
+      div.className = "result-item";
+
       const startStr = new Date(r.start).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit"
@@ -192,7 +239,24 @@ async function initSearch() {
         minute: "2-digit"
       });
 
-      div.textContent = `${r.canonical} – ${r.surface}: Available ${startStr}–${endStr}`;
+      div.innerHTML = `
+        <strong>${r.canonical} – ${r.surface}</strong>
+        Available ${startStr}–${endStr}
+      `;
+
+      // SHOW ON RADAR BUTTON
+      const btn = document.createElement("button");
+      btn.textContent = "Show on Radar";
+      btn.addEventListener("click", () => {
+        localStorage.setItem("radarJump", JSON.stringify({
+          canonical: r.canonical,
+          surface: r.surface,
+          start: r.start
+        }));
+        window.location.href = "/haysa-scheduler-ui/field-map.html";
+      });
+
+      div.appendChild(btn);
       resultsDiv.appendChild(div);
     });
   });
