@@ -107,6 +107,44 @@ function normalizeSurface(s) {
 // =========================
 // USAGE ENGINE
 // =========================
+
+// =========================
+// FIELD TIMELINES
+// =========================
+function buildFieldTimelines(events) {
+  const timelines = {};
+
+  events.forEach(ev => {
+    const canonical = ev.extendedProps?.canonical;
+    const fieldList = ev.extendedProps?.fields;
+    if (!canonical || !fieldList) return;
+
+    const start = new Date(ev.start).getTime();
+    const end = new Date(ev.end).getTime();
+
+    const fields = fieldList.split(",").map(f => f.trim());
+    fields.forEach(raw => {
+      const surface = normalizeSurface(raw);
+
+      if (!timelines[canonical]) timelines[canonical] = {};
+      if (!timelines[canonical][surface]) timelines[canonical][surface] = [];
+
+      timelines[canonical][surface].push({ start, end });
+    });
+  });
+
+  // sort each timeline by start time
+  Object.keys(timelines).forEach(canonical => {
+    Object.keys(timelines[canonical]).forEach(surface => {
+      timelines[canonical][surface].sort((a, b) => a.start - b.start);
+    });
+  });
+
+  return timelines;
+}
+
+
+
 function getFieldUsageAtTime(dt, events) {
   const ts = dt.getTime();
   const usage = {};
@@ -231,6 +269,9 @@ async function init() {
   const snapshot = await loadSnapshot();
   const events = snapshot.events || [];
 
+  // build timelines from all events
+  const fieldTimelines = buildFieldTimelines(events);
+
   // ⭐ ADD DEBUG BLOCK HERE ⭐
   console.log("=== RAW FIELD DATA FROM BACKEND ===");
   events.slice(0, 50).forEach(ev => {
@@ -254,7 +295,7 @@ async function init() {
     updateTimeLabel(dt);
 
     const usage = getFieldUsageAtTime(dt, events);
-    updateUsageOverlay(usage);
+    updateUsageOverlay(usage, fieldTimelines, dt);
   });
 
   const now = new Date();
@@ -262,8 +303,7 @@ async function init() {
   updateTimeLabel(now);
 
   const usage = getFieldUsageAtTime(now, events);
-  updateUsageOverlay(usage);
+  updateUsageOverlay(usage, fieldTimelines, now);
 }
-
 
 init();
