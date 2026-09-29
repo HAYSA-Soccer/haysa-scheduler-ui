@@ -8,7 +8,7 @@ let currentDate = new Date();
 
 // Allowed hours (8am–9pm)
 const ALLOWED_START_MIN = 8 * 60;   // 8:00 AM
-const ALLOWED_END_MIN   = 21 * 60;  // 9:00 PM
+const ALLOWED_END_MIN   = 21 * 60;  // 9:00 PM;
 
 // =========================
 // DAY HELPERS
@@ -34,7 +34,7 @@ function updateDayLabel() {
 }
 
 // =========================
-// COMPLEX MAPS
+– COMPLEX MAPS
 // =========================
 const COMPLEX_MAPS = {
   "TURF": {
@@ -120,16 +120,19 @@ function updateTimeLabel(dt) {
 // =========================
 function normalizeSurface(s) {
   if (!s) return null;
-  return s.trim(); // no collapsing
+  return s.trim();
 }
 
 // =========================
-// FIELD TIMELINES
+// FIELD TIMELINES (AVAILABILITY ONLY)
 // =========================
-function buildFieldTimelines(events) {
+function buildAvailabilityTimelines(events) {
   const timelines = {};
 
   events.forEach(ev => {
+    const title = (ev.title || "").toLowerCase();
+    if (!title.includes("available")) return;
+
     const canonical = ev.extendedProps?.canonical;
     const fieldList = ev.extendedProps?.fields;
     if (!canonical || !fieldList) return;
@@ -158,7 +161,7 @@ function buildFieldTimelines(events) {
 }
 
 // =========================
-// USAGE ENGINE
+// USAGE ENGINE (BOOKINGS)
 // =========================
 function getFieldUsageAtTime(dt, events) {
   const ts = dt.getTime();
@@ -190,6 +193,23 @@ function getFieldUsageAtTime(dt, events) {
   });
 
   return usage;
+}
+
+// =========================
+// AVAILABILITY WINDOW (WITHIN AVAILABILITY BLOCKS)
+// =========================
+function getAvailabilityWindow(timeline, ts) {
+  if (!timeline || timeline.length === 0) {
+    return null; // no availability blocks at all
+  }
+
+  for (const interval of timeline) {
+    if (ts >= interval.start && ts < interval.end) {
+      return { from: ts, to: interval.end };
+    }
+  }
+
+  return null; // not inside any availability block
 }
 
 // =========================
@@ -252,7 +272,7 @@ function updateUsageOverlay(usage, timelines, dt) {
       return;
     }
 
-    // NOT AVAILABLE (no events, no availability block)
+    // NOT AVAILABLE (no availability block)
     el.classList.add("closed");
     el.textContent = "Outside of available hours";
   });
@@ -328,7 +348,7 @@ async function init() {
   const events = snapshot.events || [];
 
   let dayEvents = filterEventsForDay(events, currentDate);
-  let dayTimelines = buildFieldTimelines(dayEvents);
+  let dayTimelines = buildAvailabilityTimelines(dayEvents);
 
   const active = [...new Set(events.map(ev => ev.extendedProps?.canonical))];
   renderAllComplexes(active);
@@ -347,7 +367,7 @@ async function init() {
     updateDayLabel();
 
     dayEvents = filterEventsForDay(events, currentDate);
-    dayTimelines = buildFieldTimelines(dayEvents);
+    dayTimelines = buildAvailabilityTimelines(dayEvents);
 
     const dt = new Date(jump.start);
     slider.value = dt.getHours() * 60 + dt.getMinutes();
@@ -356,9 +376,11 @@ async function init() {
     const usage = getFieldUsageAtTime(dt, dayEvents);
     updateUsageOverlay(usage, dayTimelines, dt);
 
-    const label = `${jump.canonical} – ${normalizeSurface(jump.surface)}`;
-    const el = document.querySelector(`.field-box[data-label="${label}"]`);
-    if (el) el.classList.add("highlight");
+    if (jump.canonical && jump.surface) {
+      const label = `${jump.canonical} – ${normalizeSurface(jump.surface)}`;
+      const el = document.querySelector(`.field-box[data-label="${label}"]`);
+      if (el) el.classList.add("highlight");
+    }
 
     localStorage.removeItem("radarJump");
   } else {
@@ -377,7 +399,7 @@ async function init() {
       updateDayLabel();
 
       dayEvents = filterEventsForDay(events, currentDate);
-      dayTimelines = buildFieldTimelines(dayEvents);
+      dayTimelines = buildAvailabilityTimelines(dayEvents);
 
       const dt = new Date(currentDate);
       dt.setHours(17, 0, 0, 0);
@@ -404,7 +426,7 @@ async function init() {
       updateDayLabel();
 
       dayEvents = filterEventsForDay(events, currentDate);
-      dayTimelines = buildFieldTimelines(dayEvents);
+      dayTimelines = buildAvailabilityTimelines(dayEvents);
 
       const dt = new Date(currentDate);
       dt.setHours(17, 0, 0, 0);
@@ -427,7 +449,7 @@ async function init() {
       updateDayLabel();
 
       dayEvents = filterEventsForDay(events, currentDate);
-      dayTimelines = buildFieldTimelines(dayEvents);
+      dayTimelines = buildAvailabilityTimelines(dayEvents);
 
       const dt = new Date(currentDate);
       dt.setHours(17, 0, 0, 0);
