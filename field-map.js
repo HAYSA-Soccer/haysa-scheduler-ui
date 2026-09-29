@@ -6,6 +6,10 @@ const API_URL =
 
 let currentDate = new Date();
 
+// Allowed hours (8am–9pm)
+const ALLOWED_START_MIN = 8 * 60;   // 8:00 AM
+const ALLOWED_END_MIN   = 21 * 60;  // 9:00 PM
+
 // =========================
 // DAY HELPERS
 // =========================
@@ -116,7 +120,7 @@ function updateTimeLabel(dt) {
 // =========================
 function normalizeSurface(s) {
   if (!s) return null;
-  return s.trim(); // no collapsing; keep exact field names
+  return s.trim(); // no collapsing
 }
 
 // =========================
@@ -179,7 +183,6 @@ function getFieldUsageAtTime(dt, events) {
       const surface = normalizeSurface(raw);
       if (!usage[canonical]) usage[canonical] = {};
 
-      // Only mark as booked if NOT an availability block
       if (!isAvailabilityBlock) {
         usage[canonical][surface] = { status: "booked", event: ev, start, end };
       }
@@ -190,35 +193,10 @@ function getFieldUsageAtTime(dt, events) {
 }
 
 // =========================
-// AVAILABILITY WINDOW
-// =========================
-function getAvailabilityWindow(timeline, ts) {
-  if (!timeline || timeline.length === 0) {
-    return { from: ts, to: null }; // free all day
-  }
-
-  let currentlyBooked = false;
-  let nextStart = null;
-
-  for (const interval of timeline) {
-    if (ts >= interval.start && ts < interval.end) {
-      currentlyBooked = true;
-      break;
-    }
-    if (interval.start > ts && nextStart === null) {
-      nextStart = interval.start;
-    }
-  }
-
-  if (currentlyBooked) return null;
-
-  return { from: ts, to: nextStart };
-}
-
-// =========================
 // UPDATE OVERLAY
 // =========================
 function updateUsageOverlay(usage, timelines, dt) {
+  const minutes = dt.getHours() * 60 + dt.getMinutes();
   const ts = dt.getTime();
 
   document.querySelectorAll(".field-box").forEach(el => {
@@ -227,25 +205,18 @@ function updateUsageOverlay(usage, timelines, dt) {
 
     const u = usage[canonical]?.[surface];
 
-    el.classList.remove("open", "booked", "partial", "full", "highlight");
+    el.classList.remove("open", "booked", "partial", "full", "highlight", "closed");
     el.textContent = "";
 
-    if (!u) {
-      el.classList.add("open");
+    // Outside allowed hours
+    if (minutes < ALLOWED_START_MIN || minutes >= ALLOWED_END_MIN) {
+      el.classList.add("closed");
+      el.textContent = "Outside of available hours";
+      return;
+    }
 
-      const timeline = timelines[canonical]?.[surface];
-      const window = getAvailabilityWindow(timeline, ts);
-      if (window) {
-        const toStr = window.to
-          ? new Date(window.to).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit"
-            })
-          : "end of day";
-
-        el.textContent = `Available until ${toStr}`;
-      }
-    } else {
+    // BOOKED
+    if (u) {
       el.classList.add("booked");
 
       const startStr = new Date(u.start).toLocaleTimeString([], {
@@ -260,7 +231,30 @@ function updateUsageOverlay(usage, timelines, dt) {
       const durationMin = Math.round((u.end - u.start) / (60 * 1000));
 
       el.textContent = `Booked ${startStr}–${endStr} (${durationMin} min)`;
+      return;
     }
+
+    // AVAILABLE (only if an availability block covers this time)
+    const timeline = timelines[canonical]?.[surface];
+    const window = getAvailabilityWindow(timeline, ts);
+
+    if (window) {
+      el.classList.add("open");
+
+      const toStr = window.to
+        ? new Date(window.to).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit"
+          })
+        : "end of available hours";
+
+      el.textContent = `Available until ${toStr}`;
+      return;
+    }
+
+    // NOT AVAILABLE (no events, no availability block)
+    el.classList.add("closed");
+    el.textContent = "Outside of available hours";
   });
 
   // FULL logic
