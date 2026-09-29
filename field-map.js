@@ -75,15 +75,15 @@ const COMPLEX_MAPS = {
     image: "/haysa-scheduler-ui/assets/butler-layout.jpg",
     fields: {
       "FULL": { left: 5, top: 5, width: 40, height: 40 },
-      "1": { left: 5, top: 5, width: 20, height: 20 },
-      "2": { left: 50, top: 5, width: 20, height: 20 },
-      "3": { left: 5, top: 30, width: 20, height: 20 },
-      "4": { left: 50, top: 30, width: 20, height: 20 },
-      "5": { left: 5, top: 55, width: 20, height: 20 },
-      "6": { left: 50, top: 55, width: 20, height: 20 },
-      "BU1": { left: 5, top: 80, width: 20, height: 15 },
-      "BU2": { left: 50, top: 80, width: 20, height: 15 },
-      "Softball Diamond": { left: 30, top: 80, width: 20, height: 15 }
+      "1": { left: 5, top: 10, width: 20, height: 20 },
+      "2": { left: 50, top: 15, width: 20, height: 20 },
+      "3": { left: 5, top: 20, width: 20, height: 20 },
+      "4": { left: 50, top: 25, width: 20, height: 20 },
+      "5": { left: 5, top: 30, width: 20, height: 20 },
+      "6": { left: 50, top: 35, width: 20, height: 20 },
+      "BU1": { left: 5, top: 40, width: 20, height: 15 },
+      "BU2": { left: 50, top: 45, width: 20, height: 15 },
+      "Softball Diamond": { left: 50, top: 80, width: 20, height: 15 }
     }
   }
 };
