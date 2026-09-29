@@ -34,7 +34,7 @@ function updateDayLabel() {
 }
 
 // =========================
-– COMPLEX MAPS
+// COMPLEX MAPS
 // =========================
 const COMPLEX_MAPS = {
   "TURF": {
