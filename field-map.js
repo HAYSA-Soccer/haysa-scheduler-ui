@@ -79,13 +79,13 @@ const COMPLEX_MAPS = {
       "3": { left: 55, top: 25, width: 13, height: 10 },      "4": { left: 73, top: 25, width: 13, height: 10 },
      
 
-       "1": { left: 2, top: 2, width: 13, height: 10 },      "2": { left: 25, top: 2, width: 13, height: 10 }, 
+       "1": { left: 55, top: 2, width: 13, height: 10 },      "2": { left: 73, top: 2, width: 13, height: 10 }, 
       
         "5": { left: 55, top: 57, width: 13, height: 10 }, 
         "6": { left: 55, top: 68, width: 15, height: 10 },
       
-        "BU1": { left: 55, top: 40, width: 15, height: 10 },
-        "BU2": { left: 55, top: 45, width: 15, height: 10 },
+        "BU1": { left: 55, top: 40, width: 0, height: 0 },
+        "BU2": { left: 55, top: 45, width: 0, height: 0 },
 
         "Softball Diamond": { left: 55, top: 80, width: 15, height: 10, rotate: 10 }
     }
