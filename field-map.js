@@ -36,9 +36,9 @@ const COMPLEX_MAPS = {
       "3A": { left: 40, top: 75, width: 0, height: 0, rotate: 20 },
       "3B": { left: 50, top: 75, width: 0, height: 0, rotate: 20 },
       
-      "4": { left: 38, top: 63.5, width: 28.5, height: 9, rotate: 8},
+      "4": { left: 38, top: 64.5, width: 28.5, height: 9, rotate: 8},
       "4A": { left: 38, top: 63.5, width: 13, height: 9, rotate: 8},
-      "4B": { left: 51, top: 63.5, width: 13, height: 9, rotate: 8}
+      "4B": { left: 51, top: 64.5, width: 13, height: 9, rotate: 8}
     }
   },
 
