@@ -4,7 +4,7 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
-let currentDate = new Date(); // today by default
+let currentDate = new Date();
 
 // =========================
 // DAY HELPERS
@@ -16,10 +16,7 @@ function isSameDay(a, b) {
 }
 
 function filterEventsForDay(events, day) {
-  return events.filter(ev => {
-    const start = new Date(ev.start);
-    return isSameDay(start, day);
-  });
+  return events.filter(ev => isSameDay(new Date(ev.start), day));
 }
 
 function updateDayLabel() {
@@ -33,7 +30,7 @@ function updateDayLabel() {
 }
 
 // =========================
-// COMPLEX MAP DEFINITIONS
+// COMPLEX MAPS
 // =========================
 const COMPLEX_MAPS = {
   "TURF": {
@@ -64,9 +61,9 @@ const COMPLEX_MAPS = {
       "3A": { left: 40, top: 75,   width: 0,    height: 0,  rotate: 20 },
       "3B": { left: 50, top: 75,   width: 0,    height: 0,  rotate: 20 },
 
-      "4":  { left: 38, top: 64.5, width: 28.5, height: 9,  rotate: 0 },
-      "4A": { left: 38, top: 63.5, width: 13,   height: 9,  rotate: 8 },
-      "4B": { left: 51, top: 64.5, width: 13,   height: 9,  rotate: 8 }
+      "4":  { left: 38, top: 64.5, width: 28.5, height: 9 },
+      "4A": { left: 38, top: 63.5, width: 13,   height: 9 },
+      "4B": { left: 51, top: 64.5, width: 13,   height: 9 }
     }
   },
 
@@ -119,17 +116,7 @@ function updateTimeLabel(dt) {
 // =========================
 function normalizeSurface(s) {
   if (!s) return null;
-  s = s.trim();
-
-  if (s === "FULL") return "FULL";
-  if (/^\d[A-B]$/.test(s)) return s[0];
-  if (/^\d+$/.test(s)) return s;
-
-  if (s.startsWith("BU")) return "FULL";
-  if (s.toLowerCase().includes("softball")) return "FULL";
-  if (s.toLowerCase().includes("mini")) return "FULL";
-
-  return s;
+  return s.trim(); // no collapsing; keep exact field names
 }
 
 // =========================
@@ -176,7 +163,6 @@ function getFieldUsageAtTime(dt, events) {
   events.forEach(ev => {
     const canonical = ev.extendedProps?.canonical;
     const fieldList = ev.extendedProps?.fields;
-
     if (!canonical || !fieldList) return;
 
     const start = new Date(ev.start).getTime();
@@ -184,13 +170,19 @@ function getFieldUsageAtTime(dt, events) {
 
     if (ts < start || ts >= end) return;
 
+    const isAvailabilityBlock =
+      (ev.title || "").toLowerCase().includes("available");
+
     const fields = fieldList.split(",").map(f => f.trim());
 
     fields.forEach(raw => {
       const surface = normalizeSurface(raw);
-
       if (!usage[canonical]) usage[canonical] = {};
-      usage[canonical][surface] = { status: "booked", event: ev, start, end };
+
+      // Only mark as booked if NOT an availability block
+      if (!isAvailabilityBlock) {
+        usage[canonical][surface] = { status: "booked", event: ev, start, end };
+      }
     });
   });
 
@@ -202,7 +194,7 @@ function getFieldUsageAtTime(dt, events) {
 // =========================
 function getAvailabilityWindow(timeline, ts) {
   if (!timeline || timeline.length === 0) {
-    return { from: ts, to: null };
+    return { from: ts, to: null }; // free all day
   }
 
   let currentlyBooked = false;
@@ -231,9 +223,9 @@ function updateUsageOverlay(usage, timelines, dt) {
 
   document.querySelectorAll(".field-box").forEach(el => {
     const [canonical, rawSurface] = el.dataset.label.split(" – ");
-    const normalized = normalizeSurface(rawSurface);
+    const surface = normalizeSurface(rawSurface);
 
-    const u = usage[canonical]?.[normalized];
+    const u = usage[canonical]?.[surface];
 
     el.classList.remove("open", "booked", "partial", "full", "highlight");
     el.textContent = "";
@@ -241,7 +233,7 @@ function updateUsageOverlay(usage, timelines, dt) {
     if (!u) {
       el.classList.add("open");
 
-      const timeline = timelines[canonical]?.[normalized];
+      const timeline = timelines[canonical]?.[surface];
       const window = getAvailabilityWindow(timeline, ts);
       if (window) {
         const toStr = window.to
@@ -271,6 +263,7 @@ function updateUsageOverlay(usage, timelines, dt) {
     }
   });
 
+  // FULL logic
   Object.keys(timelines).forEach(canonical => {
     const fullEl = document.querySelector(
       `.field-box[data-label="${canonical} – FULL"]`
@@ -349,7 +342,11 @@ async function init() {
   updateDayLabel();
 
   const slider = document.getElementById("timeSlider");
+  const radarDate = document.getElementById("radarDate");
+  const prevBtn = document.getElementById("prevDay");
+  const nextBtn = document.getElementById("nextDay");
 
+  // Handle jump from search
   const jump = JSON.parse(localStorage.getItem("radarJump") || "null");
   if (jump) {
     currentDate = new Date(jump.start);
@@ -365,9 +362,8 @@ async function init() {
     const usage = getFieldUsageAtTime(dt, dayEvents);
     updateUsageOverlay(usage, dayTimelines, dt);
 
-    const el = document.querySelector(
-      `.field-box[data-label="${jump.canonical} – ${normalizeSurface(jump.surface)}"]`
-    );
+    const label = `${jump.canonical} – ${normalizeSurface(jump.surface)}`;
+    const el = document.querySelector(`.field-box[data-label="${label}"]`);
     if (el) el.classList.add("highlight");
 
     localStorage.removeItem("radarJump");
@@ -379,18 +375,6 @@ async function init() {
     const usage = getFieldUsageAtTime(now, dayEvents);
     updateUsageOverlay(usage, dayTimelines, now);
   }
-
-  slider.addEventListener("input", e => {
-    const dt = sliderToDate(e.target.value);
-    updateTimeLabel(dt);
-
-    const usage = getFieldUsageAtTime(dt, dayEvents);
-    updateUsageOverlay(usage, dayTimelines, dt);
-  });
-
-  const prevBtn = document.getElementById("prevDay");
-  const nextBtn = document.getElementById("nextDay");
-  const radarDate = document.getElementById("radarDate");
 
   if (radarDate) {
     radarDate.value = currentDate.toISOString().slice(0, 10);
@@ -411,6 +395,14 @@ async function init() {
       updateUsageOverlay(usage, dayTimelines, dt);
     });
   }
+
+  slider.addEventListener("input", e => {
+    const dt = sliderToDate(e.target.value);
+    updateTimeLabel(dt);
+
+    const usage = getFieldUsageAtTime(dt, dayEvents);
+    updateUsageOverlay(usage, dayTimelines, dt);
+  });
 
   if (prevBtn) {
     prevBtn.addEventListener("click", () => {
