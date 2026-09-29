@@ -14,7 +14,7 @@ const FIELD_TYPE = {
   },
   "TURF": {
     full: ["FULL"],
-    half: ["1", "2"] // or rename to H-HST1/H-HST2 if needed
+    half: ["1", "2"]
   },
   "AVON BUTLER": {
     full: ["FULL"],
@@ -116,7 +116,6 @@ function isFieldFreeForDuration(timeline, startTs, durationMs) {
   if (!timeline || timeline.length === 0) return true;
 
   for (const interval of timeline) {
-    // If ANY overlap → not free
     if (!(interval.end <= startTs || interval.start >= endTs)) {
       return false;
     }
@@ -170,16 +169,14 @@ async function initSearch() {
       if (complex && canonical !== complex) return;
 
       Object.keys(timelines[canonical]).forEach(surface => {
-        // FIELD TYPE FILTER
         if (fieldType === "full" &&
-            !FIELD_TYPE[canonical].full.includes(surface)) return;
+            !FIELD_TYPE[canonical]?.full.includes(surface)) return;
 
         if (fieldType === "half" &&
-            !FIELD_TYPE[canonical].half.includes(surface)) return;
+            !FIELD_TYPE[canonical]?.half.includes(surface)) return;
 
         const timeline = timelines[canonical][surface];
 
-        // SEARCH TYPE LOGIC
         if (searchType === "earliest") {
           const slots = findAvailabilitySlots(
             timeline,
@@ -244,7 +241,6 @@ async function initSearch() {
         Available ${startStr}–${endStr}
       `;
 
-      // SHOW ON RADAR BUTTON
       const btn = document.createElement("button");
       btn.textContent = "Show on Radar";
       btn.addEventListener("click", () => {
@@ -253,7 +249,10 @@ async function initSearch() {
           surface: r.surface,
           start: r.start
         }));
-        window.location.href = "/haysa-scheduler-ui/field-map.html";
+        const frame = document.getElementById("radarFrame");
+        if (frame && frame.contentWindow) {
+          frame.contentWindow.location.reload();
+        }
       });
 
       div.appendChild(btn);
