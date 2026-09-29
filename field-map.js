@@ -5,6 +5,7 @@ const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
 let currentDate = new Date();
+let debugMode = false; // NEW: debug toggle for coordinate capture
 
 // Allowed hours (8am–9pm)
 const ALLOWED_START_MIN = 8 * 60;   // 8:00 AM
@@ -76,20 +77,19 @@ const COMPLEX_MAPS = {
     fields: {
       "FULL": { left: 5, top: 5, width: 0, height: 0 },
 
-      "3": { left: 56, top: 27, width: 13, height: 10 },      "4": { left: 71.5, top: 27, width: 13, height: 10 },
-     
+      "3": { left: 56, top: 27, width: 13, height: 10 },
+      "4": { left: 71.5, top: 27, width: 13, height: 10 },
 
-       "1": { left: 56, top: 40, width: 13, height: 10 },      "2": { left: 70, top: 40, width: 13, height: 10 }, 
-      
-        "5": { left: 56, top: 58, width: 15, height: 9 }, 
-        "6": { left: 56, top: 68.5, width: 15, height: 9 },
+      "1": { left: 56, top: 40, width: 13, height: 10 },
+      "2": { left: 70, top: 40, width: 13, height: 10 },
 
+      "5": { left: 56, top: 58, width: 15, height: 9 },
+      "6": { left: 56, top: 68.5, width: 15, height: 9 },
 
-      
-        "BU1": { left: 55, top: 40, width: 0, height: 0 },
-        "BU2": { left: 55, top: 45, width: 0, height: 0 },
+      "BU1": { left: 55, top: 40, width: 0, height: 0 },
+      "BU2": { left: 55, top: 45, width: 0, height: 0 },
 
-        "Softball Diamond": { left: 45, top: 80, width: 15, height: 10, rotate: 10 }
+      "Softball Diamond": { left: 45, top: 80, width: 15, height: 10, rotate: 10 }
     }
   }
 };
@@ -327,6 +327,14 @@ function renderAllComplexes(active) {
     img.className = "map-image";
     wrapper.appendChild(img);
 
+    // NEW: SVG overlay for precise shapes / coordinate capture
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add("map-svg");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.setAttribute("preserveAspectRatio", "none");
+    wrapper.appendChild(svg);
+
+    // Existing field-box rectangles (still used for now)
     Object.entries(map.fields).forEach(([field, pos]) => {
       const box = document.createElement("div");
       box.className = "field-box";
@@ -369,6 +377,41 @@ async function init() {
   const radarDate = document.getElementById("radarDate");
   const prevBtn = document.getElementById("prevDay");
   const nextBtn = document.getElementById("nextDay");
+  const debugToggle = document.getElementById("debugToggle");
+
+  // NEW: click-to-log coordinates on SVG when debugMode is on
+  function attachSvgDebugHandlers() {
+    document.querySelectorAll(".map-svg").forEach(svg => {
+      svg.style.pointerEvents = debugMode ? "auto" : "none";
+
+      // remove any existing listener by cloning (simple way)
+      const newSvg = svg.cloneNode(true);
+      svg.parentNode.replaceChild(newSvg, svg);
+
+      newSvg.addEventListener("click", e => {
+        if (!debugMode) return;
+
+        const rect = newSvg.getBoundingClientRect();
+        const xPx = e.clientX - rect.left;
+        const yPx = e.clientY - rect.top;
+
+        const x = (xPx / rect.width) * 100;
+        const y = (yPx / rect.height) * 100;
+
+        console.log(`Clicked at: ${x.toFixed(2)}, ${y.toFixed(2)}`);
+      });
+    });
+  }
+
+  attachSvgDebugHandlers();
+
+  if (debugToggle) {
+    debugToggle.addEventListener("click", () => {
+      debugMode = !debugMode;
+      debugToggle.textContent = debugMode ? "Debug (ON)" : "Debug";
+      attachSvgDebugHandlers();
+    });
+  }
 
   // Handle jump from search
   const jump = JSON.parse(localStorage.getItem("radarJump") || "null");
