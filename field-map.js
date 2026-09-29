@@ -69,11 +69,11 @@ const COMPLEX_MAPS = {
       "4": {
         svgShape: {
           type: "polygon",
-          points: "
+          points: '
             38.91, 62.19 
             65.96, 63.79 
             62.89, 74.70 
-            34.90, 74.24"}},
+            34.90, 74.24'}},
             
       
       "4A": { left: 38, top: 63.5, width: 15.5,   height: 10 },
