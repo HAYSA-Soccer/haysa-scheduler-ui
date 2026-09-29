@@ -98,7 +98,7 @@ async function loadSnapshot() {
 }
 
 // =========================
-– TIME SLIDER
+// TIME SLIDER
 // =========================
 function sliderToDate(value) {
   const minutes = parseInt(value, 10);
