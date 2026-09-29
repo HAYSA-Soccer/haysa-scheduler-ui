@@ -76,7 +76,7 @@ const COMPLEX_MAPS = {
     fields: {
       "FULL": { left: 5, top: 5, width: 0, height: 0 },
 
-      "3": { left: 55, top: 20, width: 13, height: 10 },
+      "3": { left: 55, top: 2, width: 13, height: 10 },
       "4": { left: 73, top: 20, width: 13, height: 10 },
      
       "1": { left: 55, top: 43, width: 13, height: 10 },
