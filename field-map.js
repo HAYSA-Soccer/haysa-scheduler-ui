@@ -337,15 +337,52 @@ function renderAllComplexes(active) {
     img.className = "map-image";
     wrapper.appendChild(img);
 
-    // NEW: SVG overlay for precise shapes / coordinate capture
+    // SVG overlay
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.classList.add("map-svg");
     svg.setAttribute("viewBox", "0 0 100 100");
     svg.setAttribute("preserveAspectRatio", "none");
     wrapper.appendChild(svg);
 
+    // ⭐ NEW: Render SVG shapes
+    Object.entries(map.fields).forEach(([field, pos]) => {
+      if (pos.svgShape) {
+        let shape;
+
+        if (pos.svgShape.type === "polygon") {
+          shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+          shape.setAttribute("points", pos.svgShape.points);
+        }
+
+        if (pos.svgShape.type === "rect") {
+          shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+          shape.setAttribute("x", pos.svgShape.x);
+          shape.setAttribute("y", pos.svgShape.y);
+          shape.setAttribute("width", pos.svgShape.width);
+          shape.setAttribute("height", pos.svgShape.height);
+        }
+
+        if (pos.svgShape.type === "circle") {
+          shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          shape.setAttribute("cx", pos.svgShape.cx);
+          shape.setAttribute("cy", pos.svgShape.cy);
+          shape.setAttribute("r", pos.svgShape.r);
+        }
+
+        // Style class
+        shape.classList.add("field-shape");
+
+        // Label for usage overlay
+        shape.dataset.label = `${canonical} – ${field}`;
+
+        svg.appendChild(shape);
+      }
+    });
+
     // Existing field-box rectangles (still used for now)
     Object.entries(map.fields).forEach(([field, pos]) => {
+      if (pos.svgShape) return; // skip rectangles for SVG fields
+
       const box = document.createElement("div");
       box.className = "field-box";
 
@@ -367,6 +404,7 @@ function renderAllComplexes(active) {
     container.appendChild(wrapper);
   });
 }
+
 
 // =========================
 // INIT
