@@ -43,7 +43,7 @@ const COMPLEX_MAPS = {
     fields: {
       "FULL": { left: 22, top: 15, width: 54, height: 62 },
       "1": { left: 22, top: 15, width: 27, height: 62 },
-      "2": { left: 49, top: 15, width: 27, height: 62 },
+      "2": { left: 49, top: 15, width: 27, height: 62 }
     }
   },
 
@@ -55,15 +55,15 @@ const COMPLEX_MAPS = {
       "1": { left: 40, top: 15, width: 15.5, height: 17 },
       "1A": { left: 40, top: 23.5, width: 15.5, height: 8.5 },
       "1B": { left: 40, top: 15, width: 15.5, height: 8.5 },
-      
+
       "2": { left: 60, top: 15, width: 15.5, height: 17 },
       "2A": { left: 60, top: 23.5, width: 15.5, height: 8.5 },
       "2B": { left: 60, top: 15, width: 15.5, height: 8.5 },
-      
+
       "3":  { left: 15, top: 69.5, width: 15.5, height: 17, rotate: 10.2 },
       "3A": { left: 40, top: 75,   width: 0,    height: 0,  rotate: 20 },
       "3B": { left: 50, top: 75,   width: 0,    height: 0,  rotate: 20 },
-      
+
       "4":  { left: 38, top: 64.5, width: 28.5, height: 9,  rotate: 0 },
       "4A": { left: 38, top: 63.5, width: 13,   height: 9,  rotate: 8 },
       "4B": { left: 51, top: 64.5, width: 13,   height: 9,  rotate: 8 }
@@ -122,7 +122,7 @@ function normalizeSurface(s) {
   s = s.trim();
 
   if (s === "FULL") return "FULL";
-  if (/^\d[A-B]$/.test(s)) return s[0]; // 1A → 1
+  if (/^\d[A-B]$/.test(s)) return s[0];
   if (/^\d+$/.test(s)) return s;
 
   if (s.startsWith("BU")) return "FULL";
@@ -190,7 +190,7 @@ function getFieldUsageAtTime(dt, events) {
       const surface = normalizeSurface(raw);
 
       if (!usage[canonical]) usage[canonical] = {};
-      usage[canonical][surface] = { status: "booked", event: ev };
+      usage[canonical][surface] = { status: "booked", event: ev, start, end };
     });
   });
 
@@ -202,7 +202,7 @@ function getFieldUsageAtTime(dt, events) {
 // =========================
 function getAvailabilityWindow(timeline, ts) {
   if (!timeline || timeline.length === 0) {
-    return { from: ts, to: null }; // free all day
+    return { from: ts, to: null };
   }
 
   let currentlyBooked = false;
@@ -224,7 +224,7 @@ function getAvailabilityWindow(timeline, ts) {
 }
 
 // =========================
-// UPDATE OVERLAY
+– UPDATE OVERLAY
 // =========================
 function updateUsageOverlay(usage, timelines, dt) {
   const ts = dt.getTime();
@@ -235,7 +235,7 @@ function updateUsageOverlay(usage, timelines, dt) {
 
     const u = usage[canonical]?.[normalized];
 
-    el.classList.remove("open", "booked", "partial", "full");
+    el.classList.remove("open", "booked", "partial", "full", "highlight");
     el.textContent = "";
 
     if (!u) {
@@ -255,17 +255,28 @@ function updateUsageOverlay(usage, timelines, dt) {
       }
     } else {
       el.classList.add("booked");
+
+      const startStr = new Date(u.start).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      const endStr = new Date(u.end).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+      const durationMin = Math.round((u.end - u.start) / (60 * 1000));
+
+      el.textContent = `Booked ${startStr}–${endStr} (${durationMin} min)`;
     }
   });
 
-  // FULL logic
   Object.keys(timelines).forEach(canonical => {
     const fullEl = document.querySelector(
       `.field-box[data-label="${canonical} – FULL"]`
     );
     if (!fullEl) return;
 
-    const surfaces = timelines[canonical];
     const bookedCount = Object.keys(usage[canonical] || {}).length;
 
     fullEl.classList.remove("open", "booked", "partial", "full");
@@ -332,23 +343,43 @@ async function init() {
   let dayEvents = filterEventsForDay(events, currentDate);
   let dayTimelines = buildFieldTimelines(dayEvents);
 
-  console.log("=== RAW FIELD DATA FROM BACKEND ===");
-  events.slice(0, 50).forEach(ev => {
-    console.log({
-      title: ev.title,
-      canonical: ev.extendedProps?.canonical,
-      surface: ev.extendedProps?.surface,
-      canonicalField: ev.extendedProps?.canonicalField,
-      rawExtendedProps: ev.extendedProps
-    });
-  });
-
   const active = [...new Set(events.map(ev => ev.extendedProps?.canonical))];
   renderAllComplexes(active);
 
   updateDayLabel();
 
   const slider = document.getElementById("timeSlider");
+
+  const jump = JSON.parse(localStorage.getItem("radarJump") || "null");
+  if (jump) {
+    currentDate = new Date(jump.start);
+    updateDayLabel();
+
+    dayEvents = filterEventsForDay(events, currentDate);
+    dayTimelines = buildFieldTimelines(dayEvents);
+
+    const dt = new Date(jump.start);
+    slider.value = dt.getHours() * 60 + dt.getMinutes();
+    updateTimeLabel(dt);
+
+    const usage = getFieldUsageAtTime(dt, dayEvents);
+    updateUsageOverlay(usage, dayTimelines, dt);
+
+    const el = document.querySelector(
+      `.field-box[data-label="${jump.canonical} – ${normalizeSurface(jump.surface)}"]`
+    );
+    if (el) el.classList.add("highlight");
+
+    localStorage.removeItem("radarJump");
+  } else {
+    const now = new Date(currentDate);
+    slider.value = now.getHours() * 60 + now.getMinutes();
+    updateTimeLabel(now);
+
+    const usage = getFieldUsageAtTime(now, dayEvents);
+    updateUsageOverlay(usage, dayTimelines, now);
+  }
+
   slider.addEventListener("input", e => {
     const dt = sliderToDate(e.target.value);
     updateTimeLabel(dt);
@@ -357,15 +388,29 @@ async function init() {
     updateUsageOverlay(usage, dayTimelines, dt);
   });
 
-  const now = new Date(currentDate);
-  slider.value = now.getHours() * 60 + now.getMinutes();
-  updateTimeLabel(now);
-
-  let usage = getFieldUsageAtTime(now, dayEvents);
-  updateUsageOverlay(usage, dayTimelines, now);
-
   const prevBtn = document.getElementById("prevDay");
   const nextBtn = document.getElementById("nextDay");
+  const radarDate = document.getElementById("radarDate");
+
+  if (radarDate) {
+    radarDate.value = currentDate.toISOString().slice(0, 10);
+    radarDate.addEventListener("change", e => {
+      currentDate = new Date(e.target.value);
+      updateDayLabel();
+
+      dayEvents = filterEventsForDay(events, currentDate);
+      dayTimelines = buildFieldTimelines(dayEvents);
+
+      const dt = new Date(currentDate);
+      dt.setHours(17, 0, 0, 0);
+
+      slider.value = dt.getHours() * 60 + dt.getMinutes();
+      updateTimeLabel(dt);
+
+      const usage = getFieldUsageAtTime(dt, dayEvents);
+      updateUsageOverlay(usage, dayTimelines, dt);
+    });
+  }
 
   if (prevBtn) {
     prevBtn.addEventListener("click", () => {
@@ -383,6 +428,10 @@ async function init() {
 
       const usage = getFieldUsageAtTime(dt, dayEvents);
       updateUsageOverlay(usage, dayTimelines, dt);
+
+      if (radarDate) {
+        radarDate.value = currentDate.toISOString().slice(0, 10);
+      }
     });
   }
 
@@ -402,6 +451,10 @@ async function init() {
 
       const usage = getFieldUsageAtTime(dt, dayEvents);
       updateUsageOverlay(usage, dayTimelines, dt);
+
+      if (radarDate) {
+        radarDate.value = currentDate.toISOString().slice(0, 10);
+      }
     });
   }
 }
