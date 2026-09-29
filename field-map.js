@@ -76,12 +76,12 @@ const COMPLEX_MAPS = {
     fields: {
       "FULL": { left: 5, top: 5, width: 0, height: 0 },
 
-      "3": { left: 56, top: 25, width: 13, height: 10 },      "4": { left: 72, top: 25, width: 13, height: 10 },
+      "3": { left: 56, top: 27, width: 13, height: 10 },      "4": { left: 71.5, top: 27, width: 13, height: 10 },
      
 
-       "1": { left: 56, top: 40, width: 13, height: 10 },      "2": { left: 72, top: 40, width: 13, height: 10 }, 
+       "1": { left: 56, top: 40, width: 13, height: 10 },      "2": { left: 70, top: 40, width: 13, height: 10 }, 
       
-        "5": { left: 56, top: 59, width: 15, height: 9 }, 
+        "5": { left: 56, top: 58, width: 15, height: 9 }, 
         "6": { left: 56, top: 68.5, width: 15, height: 9 },
 
 
@@ -89,7 +89,7 @@ const COMPLEX_MAPS = {
         "BU1": { left: 55, top: 40, width: 0, height: 0 },
         "BU2": { left: 55, top: 45, width: 0, height: 0 },
 
-        "Softball Diamond": { left: 55, top: 80, width: 15, height: 10, rotate: 10 }
+        "Softball Diamond": { left: 45, top: 80, width: 15, height: 10, rotate: 10 }
     }
   }
 };
