@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Field Availability Search</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 20px; }
+    label { display: block; margin: 8px 0; }
+    input, select, button { padding: 4px 8px; margin-top: 4px; }
+    #results > div { margin: 6px 0; padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Find Field Availability</h1>
+
+  <label>
+    Complex:
+    <select id="complexSelect">
+      <option value="">Any</option>
+      <option value="SUMNER/SEAN JOYCE">Sumner / Sean Joyce</option>
+      <option value="TURF">Turf</option>
+      <option value="AVON BUTLER">Avon Butler</option>
+    </select>
+  </label>
+
+  <label>
+    Duration (minutes):
+    <input type="number" id="durationInput" value="90" min="15" step="15">
+  </label>
+
+  <label>
+    Earliest start time:
+    <input type="time" id="startInput" value="17:00">
+  </label>
+
+  <label>
+    Day:
+    <input type="date" id="dateInput">
+  </label>
+
+  <button id="searchBtn">Search</button>
+
+  <h2>Results</h2>
+  <div id="results"></div>
+
+  <script src="field-search.js"></script>
+</body>
+</html>
