@@ -5,8 +5,8 @@ const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
 // Allowed hours (8am–9pm)
-const ALLOWED_START_MIN = 8 * 60;   // 8:00 AM
-const ALLOWED_END_MIN   = 21 * 60;  // 9:00 PM;
+const ALLOWED_START_MIN = 8 * 60;
+const ALLOWED_END_MIN   = 21 * 60;
 
 // =========================
 // FIELD TYPE DEFINITIONS
@@ -14,7 +14,7 @@ const ALLOWED_END_MIN   = 21 * 60;  // 9:00 PM;
 const FIELD_TYPE = {
   "SUMNER/SEAN JOYCE": {
     full: ["1", "2", "3", "4"],
-    half: ["1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B"]
+    half: ["1A", "1B", "2A", "2B", "4A", "4B"] // 3A/3B removed
   },
   "TURF": {
     full: ["FULL"],
@@ -110,7 +110,7 @@ function isFreeOfBookings(timelineBooked, startTs, endTs) {
 }
 
 // =========================
-// AVAILABILITY CHECK (LOOSER: inside any block)
+// AVAILABILITY CHECK (LOOSER)
 // =========================
 function isTimeInsideAnyAvailability(timelineAvail, startTs) {
   const intervals = timelineAvail || [];
@@ -183,15 +183,11 @@ async function initSearch() {
         if (searchType === "earliest") {
           let chosenSlot = null;
 
-          // Scan availability intervals starting at searchStartTs
           for (const interval of timelineAvail) {
             let slotStart = Math.max(interval.start, searchStartTs);
             let slotEnd = slotStart + minDurationMs;
 
-            // Must be within allowed hours
             if (slotStart < allowedStartTs || slotEnd > allowedEndTs) continue;
-
-            // Must be free of bookings
             if (!isFreeOfBookings(timelineBooked, slotStart, slotEnd)) continue;
 
             chosenSlot = { start: slotStart, end: slotEnd };
@@ -212,11 +208,7 @@ async function initSearch() {
           const endTs = startTs + minDurationMs;
 
           if (startTs < allowedStartTs || endTs > allowedEndTs) return;
-
-          // Must be inside any availability block at start time
           if (!isTimeInsideAnyAvailability(timelineAvail, startTs)) return;
-
-          // Must be free of bookings
           if (!isFreeOfBookings(timelineBooked, startTs, endTs)) return;
 
           results.push({
