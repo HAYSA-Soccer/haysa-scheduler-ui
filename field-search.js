@@ -4,6 +4,10 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
+// Allowed hours (8am–9pm)
+const ALLOWED_START_MIN = 8 * 60;   // 8:00 AM
+const ALLOWED_END_MIN   = 21 * 60;  // 9:00 PM;
+
 // =========================
 // FIELD TYPE DEFINITIONS
 // =========================
@@ -44,12 +48,19 @@ function filterEventsForDay(events, day) {
 }
 
 // =========================
-// FIELD TIMELINES (NO NORMALIZATION)
+// TIMELINE BUILDERS
 // =========================
-function buildFieldTimelines(events) {
+function normalizeSurface(s) {
+  if (!s) return null;
+  return s.trim();
+}
+
+function buildTimelines(events, predicateFn) {
   const timelines = {};
 
   events.forEach(ev => {
+    if (!predicateFn(ev)) return;
+
     const canonical = ev.extendedProps?.canonical;
     const fieldList = ev.extendedProps?.fields;
     if (!canonical || !fieldList) return;
@@ -58,7 +69,9 @@ function buildFieldTimelines(events) {
     const end = new Date(ev.end).getTime();
 
     const fields = fieldList.split(",").map(f => f.trim());
-    fields.forEach(surface => {
+    fields.forEach(raw => {
+      const surface = normalizeSurface(raw);
+
       if (!timelines[canonical]) timelines[canonical] = {};
       if (!timelines[canonical][surface]) timelines[canonical][surface] = [];
 
@@ -75,53 +88,40 @@ function buildFieldTimelines(events) {
   return timelines;
 }
 
-// =========================
-// GAP FINDER (EARLIEST START)
-// =========================
-function findAvailabilitySlots(timeline, dayStartTs, dayEndTs, minDurationMs, earliestTs) {
-  const slots = [];
-  let cursor = Math.max(dayStartTs, earliestTs);
+function isAvailabilityEvent(ev) {
+  return (ev.title || "").toLowerCase().includes("available");
+}
 
-  const intervals = timeline || [];
-
-  for (const interval of intervals) {
-    if (interval.start > cursor) {
-      const gapStart = cursor;
-      const gapEnd = Math.min(interval.start, dayEndTs);
-      if (gapEnd - gapStart >= minDurationMs) {
-        slots.push({ start: gapStart, end: gapEnd });
-      }
-      cursor = Math.max(cursor, interval.end);
-    } else {
-      cursor = Math.max(cursor, interval.end);
-    }
-    if (cursor >= dayEndTs) break;
-  }
-
-  if (cursor < dayEndTs) {
-    if (dayEndTs - cursor >= minDurationMs) {
-      slots.push({ start: cursor, end: dayEndTs });
-    }
-  }
-
-  return slots;
+function isBookingEvent(ev) {
+  return !(ev.title || "").toLowerCase().includes("available");
 }
 
 // =========================
-// EXACT-TIME CHECK
+// BOOKING CHECK
 // =========================
-function isFieldFreeForDuration(timeline, startTs, durationMs) {
-  const endTs = startTs + durationMs;
-
-  if (!timeline || timeline.length === 0) return true;
-
-  for (const interval of timeline) {
+function isFreeOfBookings(timelineBooked, startTs, endTs) {
+  const intervals = timelineBooked || [];
+  for (const interval of intervals) {
     if (!(interval.end <= startTs || interval.start >= endTs)) {
       return false;
     }
   }
-
   return true;
+}
+
+// =========================
+// AVAILABILITY CHECK
+// =========================
+function isWithinAvailability(timelineAvail, startTs, endTs) {
+  const intervals = timelineAvail || [];
+  for (const interval of intervals) {
+    const s = interval.start;
+    const e = interval.end;
+    if (startTs >= s && endTs <= e) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // =========================
@@ -152,63 +152,82 @@ async function initSearch() {
     const day = new Date(dateStr);
 
     const dayStart = new Date(day);
-    dayStart.setHours(6, 0, 0, 0);
+    dayStart.setHours(8, 0, 0, 0);
 
     const dayEnd = new Date(day);
     dayEnd.setHours(21, 0, 0, 0);
 
-    const earliestTs = new Date(day).setHours(h, m, 0, 0);
+    let earliestTs = new Date(day).setHours(h, m, 0, 0);
+    const allowedStartTs = new Date(day).setHours(8, 0, 0, 0).getTime();
+    const allowedEndTs = new Date(day).setHours(21, 0, 0, 0).getTime();
+
+    if (earliestTs < allowedStartTs) earliestTs = allowedStartTs;
+    if (earliestTs >= allowedEndTs) {
+      alert("Start time must be between 8:00 AM and 9:00 PM.");
+      return;
+    }
+
     const minDurationMs = durationMin * 60 * 1000;
 
     const dayEvents = filterEventsForDay(events, day);
-    const timelines = buildFieldTimelines(dayEvents);
+    const availTimelines = buildTimelines(dayEvents, isAvailabilityEvent);
+    const bookingTimelines = buildTimelines(dayEvents, isBookingEvent);
 
     const results = [];
 
-    Object.keys(timelines).forEach(canonical => {
+    Object.keys(availTimelines).forEach(canonical => {
       if (complex && canonical !== complex) return;
 
-      Object.keys(timelines[canonical]).forEach(surface => {
+      Object.keys(availTimelines[canonical]).forEach(surface => {
         if (fieldType === "full" &&
             !FIELD_TYPE[canonical]?.full.includes(surface)) return;
 
         if (fieldType === "half" &&
             !FIELD_TYPE[canonical]?.half.includes(surface)) return;
 
-        const timeline = timelines[canonical][surface];
+        const timelineAvail = availTimelines[canonical][surface];
+        const timelineBooked = bookingTimelines[canonical]?.[surface] || [];
 
         if (searchType === "earliest") {
-          const slots = findAvailabilitySlots(
-            timeline,
-            dayStart.getTime(),
-            dayEnd.getTime(),
-            minDurationMs,
-            earliestTs
-          );
+          let chosenSlot = null;
 
-          slots.forEach(slot => {
+          for (const interval of timelineAvail) {
+            let slotStart = Math.max(interval.start, earliestTs);
+            const slotEnd = slotStart + minDurationMs;
+
+            if (slotEnd > interval.end) continue;
+            if (slotStart < allowedStartTs || slotEnd > allowedEndTs) continue;
+
+            if (isFreeOfBookings(timelineBooked, slotStart, slotEnd)) {
+              chosenSlot = { start: slotStart, end: slotEnd };
+              break;
+            }
+          }
+
+          if (chosenSlot) {
             results.push({
               canonical,
               surface,
-              start: slot.start,
-              end: slot.end
+              start: chosenSlot.start,
+              end: chosenSlot.end
             });
-          });
+          }
 
         } else if (searchType === "exact") {
           const startTs = earliestTs;
           const endTs = startTs + minDurationMs;
 
-          if (startTs >= dayStart.getTime() && endTs <= dayEnd.getTime()) {
-            if (isFieldFreeForDuration(timeline, startTs, minDurationMs)) {
-              results.push({
-                canonical,
-                surface,
-                start: startTs,
-                end: endTs
-              });
-            }
-          }
+          if (startTs < allowedStartTs || endTs > allowedEndTs) return;
+
+          if (!isWithinAvailability(timelineAvail, startTs, endTs)) return;
+          if (!isFreeOfBookings(timelineBooked, startTs, endTs)) return;
+
+          results.push({
+            canonical,
+            surface,
+            start: startTs,
+            end: endTs
+          });
         }
       });
     });
@@ -222,6 +241,17 @@ async function initSearch() {
     }
 
     results.sort((a, b) => a.start - b.start);
+
+    // Set radarJump for the search time (no specific field)
+    localStorage.setItem("radarJump", JSON.stringify({
+      canonical: null,
+      surface: null,
+      start: results[0].start // use earliest result time
+    }));
+    const frame = document.getElementById("radarFrame");
+    if (frame && frame.contentWindow) {
+      frame.contentWindow.location.reload();
+    }
 
     results.slice(0, 50).forEach(r => {
       const div = document.createElement("div");
