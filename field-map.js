@@ -123,6 +123,13 @@ function normalizeSurface(s) {
   return s.trim();
 }
 
+function isHalfField(surface) {
+  if (!surface) return false;
+  return surface.endsWith("A") ||
+         surface.endsWith("B") ||
+         surface.startsWith("BU");
+}
+
 // =========================
 // FIELD TIMELINES (AVAILABILITY ONLY)
 // =========================
@@ -200,7 +207,7 @@ function getFieldUsageAtTime(dt, events) {
 // =========================
 function getAvailabilityWindow(timeline, ts) {
   if (!timeline || timeline.length === 0) {
-    return null; // no availability blocks at all
+    return null;
   }
 
   for (const interval of timeline) {
@@ -209,7 +216,7 @@ function getAvailabilityWindow(timeline, ts) {
     }
   }
 
-  return null; // not inside any availability block
+  return null;
 }
 
 // =========================
@@ -227,6 +234,8 @@ function updateUsageOverlay(usage, timelines, dt) {
 
     el.classList.remove("open", "booked", "partial", "full", "highlight", "closed");
     el.textContent = "";
+
+    const half = isHalfField(surface);
 
     // Outside allowed hours
     if (minutes < ALLOWED_START_MIN || minutes >= ALLOWED_END_MIN) {
@@ -250,6 +259,7 @@ function updateUsageOverlay(usage, timelines, dt) {
 
       const durationMin = Math.round((u.end - u.start) / (60 * 1000));
 
+      // Half fields: show text when booked
       el.textContent = `Booked ${startStr}–${endStr} (${durationMin} min)`;
       return;
     }
@@ -268,7 +278,10 @@ function updateUsageOverlay(usage, timelines, dt) {
           })
         : "end of available hours";
 
-      el.textContent = `Available until ${toStr}`;
+      // Half fields: no text unless highlighted
+      if (!half || el.classList.contains("highlight")) {
+        el.textContent = `Available until ${toStr}`;
+      }
       return;
     }
 
@@ -379,7 +392,10 @@ async function init() {
     if (jump.canonical && jump.surface) {
       const label = `${jump.canonical} – ${normalizeSurface(jump.surface)}`;
       const el = document.querySelector(`.field-box[data-label="${label}"]`);
-      if (el) el.classList.add("highlight");
+      if (el) {
+        el.classList.add("highlight");
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     }
 
     localStorage.removeItem("radarJump");
