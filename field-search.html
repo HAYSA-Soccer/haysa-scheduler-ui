@@ -8,11 +8,14 @@
     label { display: block; margin: 8px 0; }
     input, select, button { padding: 4px 8px; margin-top: 4px; }
     #results > div { margin: 6px 0; padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+    .result-item { display: flex; flex-direction: column; gap: 6px; }
+    .result-item button { width: fit-content; }
   </style>
 </head>
 <body>
   <h1>Find Field Availability</h1>
 
+  <!-- COMPLEX SELECTOR -->
   <label>
     Complex:
     <select id="complexSelect">
@@ -23,16 +26,38 @@
     </select>
   </label>
 
+  <!-- FIELD TYPE SELECTOR -->
   <label>
-    Duration (minutes):
-    <input type="number" id="durationInput" value="90" min="15" step="15">
+    Field Type:
+    <select id="fieldTypeSelect">
+      <option value="any">Any</option>
+      <option value="full">Full Field Only</option>
+      <option value="half">Half Field Only</option>
+    </select>
   </label>
 
+  <!-- SEARCH TYPE SELECTOR -->
   <label>
-    Earliest start time:
+    Search Type:
+    <select id="searchTypeSelect">
+      <option value="earliest">Earliest Start After Time</option>
+      <option value="exact">Available Exactly At Time</option>
+    </select>
+  </label>
+
+  <!-- DURATION -->
+  <label>
+    Duration (minutes):
+    <input type="number" id="durationInput" value="60" min="15" step="15">
+  </label>
+
+  <!-- START TIME -->
+  <label>
+    Start time:
     <input type="time" id="startInput" value="17:00">
   </label>
 
+  <!-- DAY -->
   <label>
     Day:
     <input type="date" id="dateInput">
