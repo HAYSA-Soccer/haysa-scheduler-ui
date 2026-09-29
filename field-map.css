@@ -148,4 +148,64 @@ h1 {
 ============================ */
 .hidden {
   display: none;
+
+
+  .map-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 20px;
+}
+
+.map-image {
+  width: 100%;
+  display: block;
+}
+
+.field-box {
+  position: absolute;
+  border: 2px solid #333;
+  box-sizing: border-box;
+  font-size: 11px;
+  line-height: 1.2;
+  padding: 2px;
+  overflow: hidden;
+}
+
+/* States */
+.field-box.open {
+  background-color: rgba(0, 200, 0, 0.35);
+  border-color: #0a0;
+}
+
+.field-box.booked {
+  background-color: rgba(200, 0, 0, 0.45);
+  border-color: #a00;
+  color: #fff;
+}
+
+.field-box.closed {
+  background-color: rgba(120, 120, 120, 0.35);
+  border-color: #666;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.field-box.partial {
+  background-color: rgba(255, 165, 0, 0.45);
+  border-color: #d2691e;
+}
+
+.field-box.full {
+  background-color: rgba(200, 0, 0, 0.65);
+  border-color: #a00;
+}
+
+.field-box.highlight {
+  box-shadow: 0 0 0 3px #00f;
+  z-index: 10;
+}
+
 }
