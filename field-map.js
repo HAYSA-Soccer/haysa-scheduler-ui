@@ -89,7 +89,14 @@ const COMPLEX_MAPS = {
       "BU1": { left: 55, top: 40, width: 0, height: 0 },
       "BU2": { left: 55, top: 45, width: 0, height: 0 },
 
-      "Softball Diamond": { left: 45, top: 80, width: 15, height: 10, rotate: 10 }
+      // "Softball Diamond": { left: 45, top: 80, width: 15, height: 10, rotate: 10 }
+      "Softball Diamond": {
+        svgShape: {
+          type: "polygon",
+          //points: "42.13,17.89 60.02,20.11 55.77,35.44 35.90,32.00"
+          points: "55.77, 27.99 68.96, 28.24 56.44, 37.74 68.63, 37.44"
+        }
+      }     
     }
   }
 };
