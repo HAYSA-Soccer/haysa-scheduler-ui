@@ -75,7 +75,10 @@ header {
   top: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* we’ll turn this on in debug mode when needed */
+  pointer-events: none;
+  border: 0;
+  outline: 0;
+  stroke: none;/* we’ll turn this on in debug mode when needed */
 }
 
 .field-shape {
