@@ -224,7 +224,7 @@ function getAvailabilityWindow(timeline, ts) {
 }
 
 // =========================
-– UPDATE OVERLAY
+// UPDATE OVERLAY
 // =========================
 function updateUsageOverlay(usage, timelines, dt) {
   const ts = dt.getTime();
