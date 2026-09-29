@@ -61,11 +61,11 @@ const COMPLEX_MAPS = {
       "2A": { left: 60, top: 23.5, width: 15.5, height: 8.5 },
       "2B": { left: 60, top: 15, width: 15.5, height: 8.5 },
 
-      "3":  { left: 15, top: 69.5, width: 15.5, height: 17, rotate: 10.2 },
+      "3":  { left: 15, top: 69.5, width: 15.5, height: 17, rotate: 10 },
 
-      "4":  { left: 38, top: 64.5, width: 28.5, height: 9 },
-      "4A": { left: 38, top: 63.5, width: 13,   height: 9 },
-      "4B": { left: 51, top: 64.5, width: 13,   height: 9 }
+      "4":  { left: 38, top: 64.5, width: 28.5, height: 10 },
+      "4A": { left: 38, top: 63.5, width: 13,   height: 10 },
+      "4B": { left: 51, top: 64.5, width: 13,   height: 10 }
     }
   },
 
