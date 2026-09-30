@@ -88,8 +88,15 @@ function buildTimelines(events, predicateFn) {
 }
 
 function isAvailabilityEvent(ev) {
-  return (ev.title || "").toLowerCase().includes("available");
+  const t = (ev.title || "").toLowerCase();
+  return (
+    t.includes("available") ||
+    t.includes("open") ||
+    t.includes("free") ||
+    t.includes("avail")
+  );
 }
+
 
 function isBookingEvent(ev) {
   return !(ev.title || "").toLowerCase().includes("available");
