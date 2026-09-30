@@ -5,37 +5,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HAYSA Field Usage Radar</title>
 
+  <!-- New radar stylesheet -->
   <link rel="stylesheet" href="field-map.css" />
 </head>
 
 <body>
 
-  <header>
-    <h1>Field Usage Radar</h1>
-    <div class="day-controls">
-      <button id="prevDay">Prev</button>
-      <span id="dayLabel"></span>
-      <button id="nextDay">Next</button>
-      <label>
+  <!-- ========================= -->
+  <!-- HEADER + CONTROLS         -->
+  <!-- ========================= -->
+  <header id="radar-header">
+
+    <div class="header-left">
+      <h1>Field Usage Radar</h1>
+
+      <div class="day-controls">
+        <button id="prevDay" class="nav-btn">Prev</button>
+        <span id="dayLabel" class="day-label"></span>
+        <button id="nextDay" class="nav-btn">Next</button>
+      </div>
+
+      <label class="date-label">
         Date:
         <input type="date" id="radarDate">
       </label>
-  
-      <!-- ⭐ ADD THIS BUTTON ⭐ -->
-      <button id="debugToggle">Debug</button>
     </div>
+
+    <div class="header-right">
+      <button id="debugToggle" class="debug-btn">Debug</button>
+    </div>
+
   </header>
 
 
-  
-  <div class="time-slider-container">
-    <label for="timeSlider">Time:</label>
+  <!-- ========================= -->
+  <!-- TIME SLIDER               -->
+  <!-- ========================= -->
+  <div id="time-slider-bar">
+    <label for="timeSlider" class="time-label">Time:</label>
     <input id="timeSlider" type="range" min="0" max="1440" step="15">
-    <span id="timeLabel"></span>
+    <span id="timeLabel" class="time-value"></span>
   </div>
 
+
+  <!-- ========================= -->
+  <!-- LEGEND                    -->
+  <!-- ========================= -->
+  <div id="legend">
+    <div class="legend-item">
+      <span class="legend-color available"></span>
+      <span>Available</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color booked"></span>
+      <span>Booked</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color blocked"></span>
+      <span>Blocked</span>
+    </div>
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- COMPLEX GRID (RADAR SVGs) -->
+  <!-- ========================= -->
   <div id="all-complexes" class="complex-grid"></div>
 
+
+  <!-- Radar logic -->
   <script src="field-map.js"></script>
+
 </body>
 </html>
