@@ -2,7 +2,7 @@
 // CONFIG
 // =========================
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbyHJZ_HOZZFYe8ASTrEKN9axfpXqR0Uu09PG6jgBCXLJCE3jwzYVRqGPSrl3AjwGXoJ/exec"
+  "https://script.google.com/macros/s/AKfycbyHJZ_HOZZFYe8ASTrEKN9axfpXqR0Uu09PG6jgBCXLJCE3jwzYVRqGPSrl3AjwGXoJ/exec";
 
 let currentDate = new Date();
 let debugMode = false;
@@ -31,7 +31,6 @@ function filterEventsForDay(events, day) {
     return isSameDay(evDate, dayDate);
   });
 }
-
 
 function updateDayLabel() {
   const el = document.getElementById("dayLabel");
@@ -96,14 +95,13 @@ const COMPLEX_MAPS = {
       "FULL": {
         svgShape: {
           type: "polygon",
-            points: `
+          points: `
               32.66,64.92
               48.93,84.99
               60.57,73.98
               44.49,54.49
               32.66,64.92
-              `
-
+          `
         }
       }
     }
@@ -357,7 +355,6 @@ const COMPLEX_MAPS = {
   }
 };
 
-
 // =========================
 // FETCH SNAPSHOT
 // =========================
@@ -408,7 +405,6 @@ function buildAvailabilityTimelines(events) {
     const title = (ev.title || "").toLowerCase();
     if (!title.includes("available")) return;
 
-    // FIXED: read from ICS fields
     const canonical = ev.canonical;
     const fieldList = String(ev.surface);
     if (!canonical || !fieldList) return;
@@ -416,8 +412,7 @@ function buildAvailabilityTimelines(events) {
     const start = new Date(ev.start).getTime();
     const end = new Date(ev.end).getTime();
 
-    // FIXED: ICS only has one surface, not a list
-    const fields = [ fieldList ];
+    const fields = [fieldList];
 
     fields.forEach(raw => {
       const surface = normalizeSurface(raw);
@@ -446,7 +441,6 @@ function getFieldUsageAtTime(dt, events) {
   const usage = {};
 
   events.forEach(ev => {
-    // FIXED: read ICS fields instead of extendedProps
     const canonical = ev.canonical;
     const fieldList = String(ev.surface);
     if (!canonical || !fieldList) return;
@@ -459,8 +453,7 @@ function getFieldUsageAtTime(dt, events) {
     const isAvailabilityBlock =
       (ev.title || "").toLowerCase().includes("available");
 
-    // FIXED: ICS only has one surface
-    const fields = [ fieldList ];
+    const fields = [fieldList];
 
     fields.forEach(raw => {
       const surface = normalizeSurface(raw);
@@ -474,7 +467,6 @@ function getFieldUsageAtTime(dt, events) {
 
   return usage;
 }
-
 
 // =========================
 // AVAILABILITY WINDOW
@@ -614,7 +606,7 @@ function addFieldPolygon(polyLayer, canonical, surface, fieldDef) {
 }
 
 // =========================
-// UPDATE OVERLAY
+// UPDATE OVERLAY (FULLY PATCHED)
 // =========================
 function updateUsageOverlay(usage, timelines, dt) {
 
@@ -623,9 +615,7 @@ function updateUsageOverlay(usage, timelines, dt) {
 
   document.querySelectorAll(".label-layer text").forEach(t => t.remove());
 
-  // ===============================
   // SURFACE INHERITANCE MAP
-  // ===============================
   const SURFACE_RELATIONS = {
     "1": ["1A", "1B"],
     "1A": ["1"],
@@ -648,46 +638,18 @@ function updateUsageOverlay(usage, timelines, dt) {
     "BU2": ["FULL"]
   };
 
-  // ===============================
-  // CENTROID CALCULATOR
-  // ===============================
-  function getPolygonCentroid(poly) {
-    const pts = poly.points;
-    let x = 0, y = 0, len = pts.numberOfItems;
-
-    for (let i = 0; i < len; i++) {
-      x += pts.getItem(i).x;
-      y += pts.getItem(i).y;
-    }
-    return { x: x / len, y: y / len };
-  }
-
-  // ===============================
-  // CLEAN LABEL PLACEMENT
-  // ===============================
-  function placeShortLabel(svg, poly, text) {
-    const centroid = getPolygonCentroid(poly);
-
-    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label.setAttribute("x", centroid.x);
-    label.setAttribute("y", centroid.y);
-    label.setAttribute("text-anchor", "middle");
-    label.setAttribute("dominant-baseline", "middle");
-    label.setAttribute("class", "usage-label");
-    label.textContent = text;
-
-    svg.querySelector(".label-layer").appendChild(label);
-  }
+  // FULL-field children per complex
+  const FULL_CHILDREN = {
+    "TURF": ["1", "2"],
+    "AVON BUTLER": ["BU1", "BU2"]
+  };
 
   document.querySelectorAll("polygon.field-poly").forEach(poly => {
     const canonical = poly.dataset.canonical;
     const surface = normalizeSurface(poly.dataset.surface);
-
     const svg = poly.ownerSVGElement;
 
-    // ===============================
     // BOOKING INHERITANCE
-    // ===============================
     let u = usage[canonical]?.[surface];
 
     if (!u && SURFACE_RELATIONS[surface]) {
@@ -700,9 +662,7 @@ function updateUsageOverlay(usage, timelines, dt) {
       }
     }
 
-    // ===============================
     // AVAILABILITY INHERITANCE
-    // ===============================
     let timeline = timelines[canonical]?.[surface];
     let window = getAvailabilityWindow(timeline, ts);
 
@@ -738,7 +698,7 @@ function updateUsageOverlay(usage, timelines, dt) {
         minute: "2-digit"
       });
 
-      placeShortLabel(svg, poly, `${startStr}–${endStr}`);
+      placeSvgLabel(svg, poly, `${startStr}–${endStr}`);
       return;
     }
 
@@ -751,7 +711,7 @@ function updateUsageOverlay(usage, timelines, dt) {
         minute: "2-digit"
       });
 
-      placeShortLabel(svg, poly, `until ${toStr}`);
+      placeSvgLabel(svg, poly, `until ${toStr}`);
       return;
     }
 
@@ -759,32 +719,30 @@ function updateUsageOverlay(usage, timelines, dt) {
     poly.classList.add("blocked");
   });
 
-  // ===============================
   // FULL FIELD PARTIAL/FULL LOGIC
-  // ===============================
   Object.keys(timelines).forEach(canonical => {
     const fullPoly = document.querySelector(
       `polygon.field-poly[data-canonical="${canonical}"][data-surface="FULL"]`
     );
     if (!fullPoly) return;
 
-    // Count only REAL booked surfaces (ignore inherited)
-    const realBooked = Object.keys(usage[canonical] || {}).filter(s => {
-      return !SURFACE_RELATIONS[s] || SURFACE_RELATIONS[s].includes("FULL");
-    });
+    const bookedSurfaces = Object.keys(usage[canonical] || {});
+    const children = FULL_CHILDREN[canonical] || [];
+    const childBooked = bookedSurfaces.filter(
+      s => children.includes(s) || s === "FULL"
+    );
 
     fullPoly.classList.remove("available", "booked", "blocked", "partial", "full");
 
-    if (realBooked.length === 0) {
+    if (childBooked.length === 0) {
       fullPoly.classList.add("available");
-    } else if (realBooked.length === 1) {
+    } else if (childBooked.length === 1) {
       fullPoly.classList.add("partial");
     } else {
       fullPoly.classList.add("full");
     }
   });
 }
-
 
 // =========================
 // RENDER MAPS
@@ -818,7 +776,6 @@ async function init() {
   console.log("DAY:", currentDate.toISOString().slice(0,10));
   console.log("DAY EVENTS:", dayEvents.length, dayEvents);
 
-  
   let dayTimelines = buildAvailabilityTimelines(dayEvents);
 
   const active = Object.keys(COMPLEX_MAPS);
