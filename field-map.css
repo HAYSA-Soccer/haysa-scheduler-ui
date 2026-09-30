@@ -1,5 +1,5 @@
 /* ============================
-   FIELD MAP — FULL CSS FILE
+   CORE LAYOUT
    ============================ */
 
 body {
@@ -24,11 +24,6 @@ header {
   gap: 12px;
 }
 
-.day-controls button {
-  padding: 6px 10px;
-  font-size: 14px;
-}
-
 .time-slider-container {
   padding: 12px 20px;
   background: #eee;
@@ -41,113 +36,80 @@ header {
   width: 300px;
 }
 
+/* ============================
+   COMPLEX GRID
+   ============================ */
+
 .complex-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
   gap: 30px;
   padding: 20px;
 }
 
 /* ============================
-   MAP WRAPPER + IMAGE
+   SVG COMPLEX WRAPPER
    ============================ */
 
-.map-wrapper {
-  position: relative;
-  width: 600px;
+.complex-wrapper {
+  width: 100%;
+  background: #222;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+.complex-svg {
+  width: 100%;
   height: auto;
-}
-
-.map-image {
-  width: 100%;
   display: block;
-  border: none;        /* remove border */
-  border-radius: 6px;  /* optional */
+  border-radius: 6px;
 }
 
-
 /* ============================
-   SVG OVERLAY
+   FIELD POLYGONS
    ============================ */
 
-.map-svg {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
+polygon.field-poly {
+  fill: rgba(0,0,0,0.25);
+  stroke: #000;
+  stroke-width: 0.4;
+}
+
+polygon.available {
+  fill: rgba(0,200,0,0.35);
+}
+
+polygon.booked {
+  fill: rgba(200,0,0,0.45);
+}
+
+polygon.blocked {
+  fill: rgba(120,120,120,0.35);
+}
+
+polygon.partial {
+  fill: rgba(255,165,0,0.45);
+}
+
+polygon.full {
+  fill: rgba(200,0,0,0.65);
+}
+
+polygon.highlight {
+  stroke: yellow;
+  stroke-width: 1.2;
+}
+
+/* ============================
+   LABELS
+   ============================ */
+
+.label-layer text {
+  font-family: sans-serif;
   pointer-events: none;
-  border: 0;
-  outline: 0;
-  stroke: none;/* we’ll turn this on in debug mode when needed */
-}
-
-.field-shape {
-  fill: rgba(0, 180, 0, 0.35);   /* default: available-style */
-  stroke: #333;
+  fill: #fff;
+  stroke: #000;
   stroke-width: 0.5;
-}
-
-/* ============================
-   FIELD BOXES
-   ============================ */
-
-.field-box {
-  position: absolute;
-  border: 2px solid #333;
-  box-sizing: border-box;
-  font-size: 12px;
-  padding: 2px;
-  overflow: hidden;
-
-  /* Center text for booked/available */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-
-  border-radius: 4px;
-}
-
-/* ============================
-   STATE COLORS
-   ============================ */
-
-/* AVAILABLE */
-.field-box.open {
-  background-color: rgba(0, 180, 0, 0.35);
-  border-color: #0a0;
-  color: #000;
-}
-
-/* BOOKED */
-.field-box.booked {
-  background-color: rgba(200, 0, 0, 0.55);
-  border-color: #a00;
-  color: #fff;
-}
-
-/* BLOCKED (inside allowed hours OR outside allowed hours) */
-.field-box.blocked {
-  background-color: #999;
-  border-color: #666;
-  color: transparent; /* no text */
-}
-
-/* PARTIAL (for FULL fields only) */
-.field-box.partial {
-  background-color: rgba(255, 165, 0, 0.45);
-  border-color: #d2691e;
-}
-
-/* FULL (for FULL fields only) */
-.field-box.full {
-  background-color: rgba(200, 0, 0, 0.65);
-  border-color: #a00;
-}
-
-/* Highlight from search */
-.field-box.highlight {
-  box-shadow: 0 0 0 3px #00f;
-  z-index: 10;
+  paint-order: stroke fill;
 }
