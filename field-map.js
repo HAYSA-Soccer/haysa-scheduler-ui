@@ -778,8 +778,16 @@ async function init() {
 
   let dayTimelines = buildAvailabilityTimelines(dayEvents);
 
-  const active = Object.keys(COMPLEX_MAPS);
+  // Read selected complexes from search page
+  const selected = JSON.parse(localStorage.getItem("selectedComplexes") || "[]");
+  
+  // If none selected, show all. If selected, show only those.
+  const active = (selected.length === 0)
+    ? Object.keys(COMPLEX_MAPS)
+    : selected;
+  
   renderAllComplexes(active);
+
 
   updateDayLabel();
 
