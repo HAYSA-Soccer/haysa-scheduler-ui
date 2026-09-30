@@ -4,9 +4,8 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
-// Allowed hours (8am–9pm)
 const ALLOWED_START_MIN = 8 * 60;
-const ALLOWED_END_MIN   = 21 * 60;
+const ALLOWED_END_MIN = 21 * 60;
 
 // =========================
 // FIELD TYPE DEFINITIONS
@@ -14,9 +13,9 @@ const ALLOWED_END_MIN   = 21 * 60;
 const FIELD_TYPE = {
   "SUMNER/SEAN JOYCE": {
     full: ["1", "2", "3", "4"],
-    half: ["1A", "1B", "2A", "2B", "4A", "4B"] // 3A/3B removed
+    half: ["1A", "1B", "2A", "2B", "4A", "4B"]
   },
-  "TURF": {
+  TURF: {
     full: ["FULL"],
     half: ["1", "2"]
   },
@@ -38,9 +37,11 @@ async function loadSnapshot() {
 // DAY HELPERS
 // =========================
 function isSameDay(a, b) {
-  return a.getFullYear() === b.getFullYear() &&
-         a.getMonth() === b.getMonth() &&
-         a.getDate() === b.getDate();
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
 function filterEventsForDay(events, day) {
@@ -67,14 +68,12 @@ function buildTimelines(events, predicateFn) {
 
     const start = new Date(ev.start).getTime();
     const end = new Date(ev.end).getTime();
-
     const fields = fieldList.split(",").map(f => f.trim());
+
     fields.forEach(raw => {
       const surface = normalizeSurface(raw);
-
       if (!timelines[canonical]) timelines[canonical] = {};
       if (!timelines[canonical][surface]) timelines[canonical][surface] = [];
-
       timelines[canonical][surface].push({ start, end });
     });
   });
@@ -110,7 +109,7 @@ function isFreeOfBookings(timelineBooked, startTs, endTs) {
 }
 
 // =========================
-// AVAILABILITY CHECK (LOOSER)
+// AVAILABILITY CHECK
 // =========================
 function isTimeInsideAnyAvailability(timelineAvail, startTs) {
   const intervals = timelineAvail || [];
@@ -136,8 +135,10 @@ async function initSearch() {
     const complex = document.getElementById("complexSelect").value;
     const fieldType = document.getElementById("fieldTypeSelect").value;
     const searchType = document.getElementById("searchTypeSelect").value;
-
-    const durationMin = parseInt(document.getElementById("durationInput").value, 10);
+    const durationMin = parseInt(
+      document.getElementById("durationInput").value,
+      10
+    );
     const startStr = document.getElementById("startInput").value;
     const dateStr = document.getElementById("dateInput").value;
 
@@ -171,14 +172,20 @@ async function initSearch() {
       if (complex && canonical !== complex) return;
 
       Object.keys(availTimelines[canonical]).forEach(surface => {
-        if (fieldType === "full" &&
-            !FIELD_TYPE[canonical]?.full.includes(surface)) return;
-
-        if (fieldType === "half" &&
-            !FIELD_TYPE[canonical]?.half.includes(surface)) return;
+        if (
+          fieldType === "full" &&
+          !FIELD_TYPE[canonical]?.full.includes(surface)
+        )
+          return;
+        if (
+          fieldType === "half" &&
+          !FIELD_TYPE[canonical]?.half.includes(surface)
+        )
+          return;
 
         const timelineAvail = availTimelines[canonical][surface];
-        const timelineBooked = bookingTimelines[canonical]?.[surface] || [];
+        const timelineBooked =
+          bookingTimelines[canonical]?.[surface] || [];
 
         if (searchType === "earliest") {
           let chosenSlot = null;
@@ -187,8 +194,10 @@ async function initSearch() {
             let slotStart = Math.max(interval.start, searchStartTs);
             let slotEnd = slotStart + minDurationMs;
 
-            if (slotStart < allowedStartTs || slotEnd > allowedEndTs) continue;
-            if (!isFreeOfBookings(timelineBooked, slotStart, slotEnd)) continue;
+            if (slotStart < allowedStartTs || slotEnd > allowedEndTs)
+              continue;
+            if (!isFreeOfBookings(timelineBooked, slotStart, slotEnd))
+              continue;
 
             chosenSlot = { start: slotStart, end: slotEnd };
             break;
@@ -202,7 +211,6 @@ async function initSearch() {
               end: chosenSlot.end
             });
           }
-
         } else if (searchType === "exact") {
           const startTs = searchStartTs;
           const endTs = startTs + minDurationMs;
@@ -211,12 +219,7 @@ async function initSearch() {
           if (!isTimeInsideAnyAvailability(timelineAvail, startTs)) return;
           if (!isFreeOfBookings(timelineBooked, startTs, endTs)) return;
 
-          results.push({
-            canonical,
-            surface,
-            start: startTs,
-            end: endTs
-          });
+          results.push({ canonical, surface, start: startTs, end: endTs });
         }
       });
     });
@@ -225,23 +228,30 @@ async function initSearch() {
     resultsDiv.innerHTML = "";
 
     if (results.length === 0) {
-      resultsDiv.textContent = "No matching availability. Try a different time, duration, or complex.";
+      resultsDiv.textContent =
+        "No matching availability. Try a different time, duration, or complex.";
       return;
     }
 
     results.sort((a, b) => a.start - b.start);
 
-    // Global radarJump: show the time searched for
-    localStorage.setItem("radarJump", JSON.stringify({
-      canonical: null,
-      surface: null,
-      start: results[0].start
-    }));
+    // Store jump info for radar
+    localStorage.setItem(
+      "radarJump",
+      JSON.stringify({
+        canonical: null,
+        surface: null,
+        start: results[0].start
+      })
+    );
+
+    // Smooth reload (no flicker)
     const frame = document.getElementById("radarFrame");
     if (frame && frame.contentWindow) {
-      frame.contentWindow.location.reload();
+      frame.contentWindow.postMessage({ type: "radarReload" }, "*");
     }
 
+    // Render results
     results.slice(0, 50).forEach(r => {
       const div = document.createElement("div");
       div.className = "result-item";
@@ -262,15 +272,19 @@ async function initSearch() {
 
       const btn = document.createElement("button");
       btn.textContent = "Show on Radar";
+
       btn.addEventListener("click", () => {
-        localStorage.setItem("radarJump", JSON.stringify({
-          canonical: r.canonical,
-          surface: r.surface,
-          start: r.start
-        }));
-        const frame = document.getElementById("radarFrame");
+        localStorage.setItem(
+          "radarJump",
+          JSON.stringify({
+            canonical: r.canonical,
+            surface: r.surface,
+            start: r.start
+          })
+        );
+
         if (frame && frame.contentWindow) {
-          frame.contentWindow.location.reload();
+          frame.contentWindow.postMessage({ type: "radarReload" }, "*");
         }
       });
 
