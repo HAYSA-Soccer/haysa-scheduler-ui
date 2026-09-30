@@ -409,7 +409,7 @@ function buildAvailabilityTimelines(events) {
     if (!title.includes("available")) return;
 
     // FIXED: read from ICS fields
-    const canonical = ev.field;
+    const canonical = ev.canonical;
     const fieldList = String(ev.surface);
     if (!canonical || !fieldList) return;
 
@@ -447,7 +447,7 @@ function getFieldUsageAtTime(dt, events) {
 
   events.forEach(ev => {
     // FIXED: read ICS fields instead of extendedProps
-    const canonical = ev.field;
+    const canonical = ev.canonical;
     const fieldList = String(ev.surface);
     if (!canonical || !fieldList) return;
 
