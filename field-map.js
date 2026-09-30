@@ -43,7 +43,6 @@ const COMPLEX_MAPS = {
     label: "Turf",
     image: "/haysa-scheduler-ui/assets/turf.jpg",
     fields: {
-      //"FULL": { left: 22, top: 15, width: 54, height: 62 },
       "1": { left: 22, top: 15, width: 27, height: 62 },
       "2": { left: 49, top: 15, width: 27, height: 62 },
 
@@ -52,8 +51,8 @@ const COMPLEX_MAPS = {
           type: "polygon",
           points: `
             22.00,14.75
-            76.00,14.75 
-            75.50,77.47 
+            76.00,14.75
+            75.50,77.47
             22.33,77.11
           `
         }
@@ -93,17 +92,15 @@ const COMPLEX_MAPS = {
       "2A": { left: 60, top: 23.5, width: 15.5, height: 8.5 },
       "2B": { left: 60, top: 15, width: 15.5, height: 8.5 },
 
-      "3":  { left: 15, top: 69.5, width: 15.5, height: 17, rotate: 10 },
-
-      //"4":  { left: 38, top: 64.5, width: 28.5, height: 10 },
+      "3": { left: 15, top: 69.5, width: 15.5, height: 17, rotate: 10 },
 
       "4": {
         svgShape: {
           type: "polygon",
           points: `
-            38.91,62.19 
-            65.96,63.79 
-            63.83,74.70 
+            38.91,62.19
+            65.96,63.79
+            63.83,74.70
             37.67,73.39
           `
         }
@@ -113,9 +110,9 @@ const COMPLEX_MAPS = {
         svgShape: {
           type: "polygon",
           points: `
-            38.91,62.19 
-            51.17,62.91 
-            49.83,73.84 
+            38.91,62.19
+            51.17,62.91
+            49.83,73.84
             37.67,73.39
           `
         }
@@ -126,15 +123,12 @@ const COMPLEX_MAPS = {
           type: "polygon",
           points: `
             51.17,62.91
-            65.96,63.79 
-            63.83,74.70 
+            65.96,63.79
+            63.83,74.70
             49.83,73.84
           `
         }
       }
-
-      // "4A": { left: 38, top: 63.5, width: 15.5,   height: 10 },
-      // "4B": { left: 51, top: 64.5, width: 15.5,   height: 10 }
     }
   },
 
@@ -157,20 +151,18 @@ const COMPLEX_MAPS = {
       "BU1": { left: 55, top: 40, width: 0, height: 0 },
       "BU2": { left: 55, top: 45, width: 0, height: 0 },
 
-      // "Softball Diamond": { left: 45, top: 80, width: 15, height: 10, rotate: 10 }
       "Softball Diamond": {
         svgShape: {
           type: "polygon",
-          //points: "42.13,17.89 60.02,20.11 55.77,35.44 35.90,32.00"
           points: `
-            42.41,80.03 
-            50.43,76.65 
-            58.11,79.65 
-            60.61,86.91 
+            42.41,80.03
+            50.43,76.65
+            58.11,79.65
+            60.61,86.91
             48.09,90.29
           `
         }
-      }     
+      }
     }
   }
 };
