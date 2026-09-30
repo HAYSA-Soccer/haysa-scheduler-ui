@@ -132,4 +132,20 @@ header {
   z-index: 1100;
 }
 
+#search-and-radar {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+#search-results {
+  max-height: 400px;
+  overflow-y: auto;
+  flex: 0 0 300px;
+}
+
+#all-complexes {
+  flex: 1;
+}
+
 
