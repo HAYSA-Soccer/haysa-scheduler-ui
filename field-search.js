@@ -139,7 +139,12 @@ async function initSearch() {
   dateInput.value = new Date().toISOString().slice(0, 10);
 
   document.getElementById("searchBtn").addEventListener("click", () => {
-    const complex = document.getElementById("complexSelect").value;
+    const complexSelect = document.getElementById("complexSelect");
+    const selectedComplexes = Array.from(complexSelect.selectedOptions).map(o => o.value);
+    
+    // Save selection for radar
+    localStorage.setItem("selectedComplexes", JSON.stringify(selectedComplexes));
+
     const fieldType = document.getElementById("fieldTypeSelect").value;
     const searchType = document.getElementById("searchTypeSelect").value;
     const durationMin = parseInt(
@@ -176,7 +181,7 @@ async function initSearch() {
     const results = [];
 
     Object.keys(availTimelines).forEach(canonical => {
-      if (complex && canonical !== complex) return;
+      if (selectedComplexes.length > 0 && !selectedComplexes.includes(canonical)) return;
 
       Object.keys(availTimelines[canonical]).forEach(surface => {
         if (
