@@ -332,8 +332,15 @@ function drawSvgLabel(el, text) {
   t.setAttribute("y", cy);
   t.setAttribute("text-anchor", "middle");
   t.setAttribute("dominant-baseline", "middle");
-  t.setAttribute("font-size", "4");
-  t.setAttribute("fill", "#000");
+
+  // Better readability
+  t.setAttribute("font-size", "5.5");
+  t.setAttribute("font-weight", "600");
+  t.setAttribute("fill", "#fff");
+  t.setAttribute("stroke", "#000");
+  t.setAttribute("stroke-width", "0.5");
+  t.setAttribute("paint-order", "stroke fill");
+
   t.dataset.label = el.dataset.label;
   t.textContent = text;
 
