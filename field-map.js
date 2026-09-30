@@ -244,6 +244,32 @@ function getAvailabilityWindow(timeline, ts) {
   return null;
 }
 
+function polygonCentroid(pointsStr) {
+  const pts = pointsStr
+    .trim()
+    .split(/\s+/)
+    .map(p => p.split(",").map(Number));
+
+  let area = 0, cx = 0, cy = 0;
+
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const [x1, y1] = pts[j];
+    const [x2, y2] = pts[i];
+    const f = x1 * y2 - x2 * y1;
+    area += f;
+    cx += (x1 + x2) * f;
+    cy += (y1 + y2) * f;
+  }
+
+  area *= 0.5;
+  cx /= (6 * area);
+  cy /= (6 * area);
+
+  return { cx, cy };
+}
+
+
+
 // =========================
 // UPDATE OVERLAY (FINAL LOGIC)
 // =========================
@@ -251,7 +277,10 @@ function updateUsageOverlay(usage, timelines, dt) {
   const minutes = dt.getHours() * 60 + dt.getMinutes();
   const ts = dt.getTime();
 
-  document.querySelectorAll(".field-box").forEach(el => {
+  // Remove all old SVG text labels
+  document.querySelectorAll(".svg-text-layer text").forEach(t => t.remove());
+
+  document.querySelectorAll(".field-box, .field-shape").forEach(el => {
     const [canonical, rawSurface] = el.dataset.label.split(" – ");
     const surface = normalizeSurface(rawSurface);
 
@@ -259,15 +288,17 @@ function updateUsageOverlay(usage, timelines, dt) {
     const half = isHalfField(surface);
 
     el.classList.remove("open", "booked", "partial", "full", "highlight", "blocked");
-    el.textContent = "";
+    if (el.classList.contains("field-box")) {
+      el.textContent = "";
+    }
 
-    // OUTSIDE ALLOWED HOURS → BLOCKED (gray, no text)
+    // OUTSIDE ALLOWED HOURS → BLOCKED
     if (minutes < ALLOWED_START_MIN || minutes >= ALLOWED_END_MIN) {
       el.classList.add("blocked");
       return;
     }
 
-    // BOOKED → red + text
+    // BOOKED
     if (u) {
       el.classList.add("booked");
 
@@ -279,14 +310,21 @@ function updateUsageOverlay(usage, timelines, dt) {
         hour: "2-digit",
         minute: "2-digit"
       });
+      const durationMin = Math.round((u.end - u.start) / 60000);
 
-      const durationMin = Math.round((u.end - u.start) / (60 * 1000));
+      const text = `Booked ${startStr}–${endStr} (${durationMin} min)`;
 
-      el.textContent = `Booked ${startStr}–${endStr} (${durationMin} min)`;
+      if (el.classList.contains("field-box")) {
+        el.textContent = text;
+      } else {
+        // SVG polygon → draw text
+        drawSvgLabel(el, text);
+      }
+
       return;
     }
 
-    // AVAILABLE → green + text
+    // AVAILABLE
     const timeline = timelines[canonical]?.[surface];
     const window = getAvailabilityWindow(timeline, ts);
 
@@ -298,13 +336,20 @@ function updateUsageOverlay(usage, timelines, dt) {
         minute: "2-digit"
       });
 
+      const text = `Available until ${toStr}`;
+
       if (!half || el.classList.contains("highlight")) {
-        el.textContent = `Available until ${toStr}`;
+        if (el.classList.contains("field-box")) {
+          el.textContent = text;
+        } else {
+          drawSvgLabel(el, text);
+        }
       }
+
       return;
     }
 
-    // BLOCKED (inside allowed hours) → gray, no text
+    // BLOCKED (inside allowed hours)
     el.classList.add("blocked");
   });
 
@@ -328,6 +373,7 @@ function updateUsageOverlay(usage, timelines, dt) {
     }
   });
 }
+
 
 // =========================
 // RENDER MAPS
@@ -354,6 +400,12 @@ function renderAllComplexes(active) {
     svg.setAttribute("viewBox", "0 0 100 100");
     svg.setAttribute("preserveAspectRatio", "none");
     wrapper.appendChild(svg);
+
+    // Container for dynamic SVG text labels
+    const svgTextLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    svgTextLayer.classList.add("svg-text-layer");
+    svg.appendChild(svgTextLayer);
+
 
     // ⭐ NEW: Render SVG shapes
     Object.entries(map.fields).forEach(([field, pos]) => {
