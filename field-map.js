@@ -5,7 +5,7 @@ const API_URL =
   "https://script.google.com/macros/s/AKfycbz14OzCFeMIyWMY6FRLckWwgBBtlLej71cDkYNb-qGEISJVHHWSe57Tp_49wHmwlRTQ/exec";
 
 let currentDate = new Date();
-let debugMode = false; // NEW: debug toggle for coordinate capture
+let debugMode = false;
 
 // Allowed hours (8am–9pm)
 const ALLOWED_START_MIN = 8 * 60;   // 8:00 AM
@@ -35,7 +35,7 @@ function updateDayLabel() {
 }
 
 // =========================
-// COMPLEX MAPS (3A & 3B REMOVED)
+// COMPLEX MAPS
 // =========================
 const COMPLEX_MAPS = {
   "TURF": {
@@ -69,10 +69,10 @@ const COMPLEX_MAPS = {
         svgShape: {
           type: "polygon",
           points: `
-            50.17, 84.38
-            61.00, 73.74
-            44.17, 54.04
-            32.33, 64.68
+            50.17,84.38
+            61.00,73.74
+            44.17,54.04
+            32.33,64.68
           `
         }
       }
@@ -84,15 +84,15 @@ const COMPLEX_MAPS = {
     label: "Sumner/Sean Joyce",
     image: "/haysa-scheduler-ui/assets/sumner.jpg",
     fields: {
-      "1": { left: 40, top: 15, width: 15.5, height: 17 },
+      "1":  { left: 40, top: 15,   width: 15.5, height: 17 },
       "1A": { left: 40, top: 23.5, width: 15.5, height: 8.5 },
-      "1B": { left: 40, top: 15, width: 15.5, height: 8.5 },
+      "1B": { left: 40, top: 15,   width: 15.5, height: 8.5 },
 
-      "2": { left: 60, top: 15, width: 15.5, height: 17 },
+      "2":  { left: 60, top: 15,   width: 15.5, height: 17 },
       "2A": { left: 60, top: 23.5, width: 15.5, height: 8.5 },
-      "2B": { left: 60, top: 15, width: 15.5, height: 8.5 },
+      "2B": { left: 60, top: 15,   width: 15.5, height: 8.5 },
 
-      "3": { left: 15, top: 69.5, width: 15.5, height: 17, rotate: 10 },
+      "3":  { left: 15, top: 69.5, width: 15.5, height: 17 },
 
       "4": {
         svgShape: {
@@ -139,14 +139,14 @@ const COMPLEX_MAPS = {
     fields: {
       "FULL": { left: 5, top: 5, width: 0, height: 0 },
 
-      "3": { left: 56, top: 27, width: 13, height: 10 },
-      "4": { left: 71.5, top: 27, width: 13, height: 10 },
+      "3": { left: 56,  top: 27,   width: 13, height: 10 },
+      "4": { left: 71.5,top: 27,   width: 13, height: 10 },
 
-      "1": { left: 56, top: 40, width: 13, height: 10 },
-      "2": { left: 70, top: 40, width: 13, height: 10 },
+      "1": { left: 56,  top: 40,   width: 13, height: 10 },
+      "2": { left: 70,  top: 40,   width: 13, height: 10 },
 
-      "5": { left: 56, top: 58, width: 15, height: 9 },
-      "6": { left: 56, top: 68.5, width: 15, height: 9 },
+      "5": { left: 56,  top: 58,   width: 15, height: 9 },
+      "6": { left: 56,  top: 68.5, width: 15, height: 9 },
 
       "BU1": { left: 55, top: 40, width: 0, height: 0 },
       "BU2": { left: 55, top: 45, width: 0, height: 0 },
@@ -296,6 +296,9 @@ function getAvailabilityWindow(timeline, ts) {
   return null;
 }
 
+// =========================
+// SVG HELPERS
+// =========================
 function polygonCentroid(pointsStr) {
   const pts = pointsStr
     .trim()
@@ -320,11 +323,9 @@ function polygonCentroid(pointsStr) {
   return { cx, cy };
 }
 
-function drawSvgLabel(el, text) {
-  const svg = el.closest(".map-wrapper").querySelector("svg");
-  const layer = svg.querySelector(".svg-text-layer");
-
-  const points = el.getAttribute("points");
+function placeSvgLabel(svg, poly, text) {
+  const layer = svg.querySelector(".label-layer");
+  const points = poly.getAttribute("points");
   const { cx, cy } = polygonCentroid(points);
 
   const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -332,52 +333,116 @@ function drawSvgLabel(el, text) {
   t.setAttribute("y", cy);
   t.setAttribute("text-anchor", "middle");
   t.setAttribute("dominant-baseline", "middle");
-
-  // Better readability
   t.setAttribute("font-size", "5.5");
   t.setAttribute("font-weight", "600");
   t.setAttribute("fill", "#fff");
   t.setAttribute("stroke", "#000");
   t.setAttribute("stroke-width", "0.5");
   t.setAttribute("paint-order", "stroke fill");
-
-  t.dataset.label = el.dataset.label;
   t.textContent = text;
 
   layer.appendChild(t);
 }
 
+function createComplexSVG(complexKey, complexDef) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "complex-wrapper";
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.classList.add("complex-svg");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+  const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+  img.setAttribute("href", complexDef.image);
+  img.setAttribute("x", "0");
+  img.setAttribute("y", "0");
+  img.setAttribute("width", "100");
+  img.setAttribute("height", "100");
+  svg.appendChild(img);
+
+  const polyLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  polyLayer.classList.add("polygon-layer");
+  svg.appendChild(polyLayer);
+
+  const labelLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  labelLayer.classList.add("label-layer");
+  svg.appendChild(labelLayer);
+
+  wrapper.appendChild(svg);
+  return { wrapper, svg, polyLayer, labelLayer };
+}
+
+function rectToPolygonPoints(left, top, width, height) {
+  const x1 = left;
+  const y1 = top;
+  const x2 = left + width;
+  const y2 = top + height;
+
+  return `
+    ${x1.toFixed(2)},${y1.toFixed(2)}
+    ${x2.toFixed(2)},${y1.toFixed(2)}
+    ${x2.toFixed(2)},${y2.toFixed(2)}
+    ${x1.toFixed(2)},${y2.toFixed(2)}
+  `;
+}
+
+function addFieldPolygon(polyLayer, canonical, surface, fieldDef) {
+  const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  poly.dataset.canonical = canonical;
+  poly.dataset.surface = surface;
+  poly.classList.add("field-poly");
+
+  if (fieldDef.svgShape && fieldDef.svgShape.type === "polygon") {
+    poly.setAttribute("points", fieldDef.svgShape.points.trim());
+  } else if (
+    typeof fieldDef.left === "number" &&
+    typeof fieldDef.top === "number" &&
+    typeof fieldDef.width === "number" &&
+    typeof fieldDef.height === "number"
+  ) {
+    const pts = rectToPolygonPoints(fieldDef.left, fieldDef.top, fieldDef.width, fieldDef.height);
+    poly.setAttribute("points", pts.trim());
+  } else {
+    const pts = `
+      10.00,10.00
+      40.00,10.00
+      40.00,40.00
+      10.00,40.00
+    `;
+    poly.setAttribute("points", pts.trim());
+  }
+
+  polyLayer.appendChild(poly);
+}
+
 // =========================
-// UPDATE OVERLAY (FINAL LOGIC)
+// UPDATE OVERLAY
 // =========================
 function updateUsageOverlay(usage, timelines, dt) {
   const minutes = dt.getHours() * 60 + dt.getMinutes();
   const ts = dt.getTime();
 
-  // Remove all old SVG text labels
-  document.querySelectorAll(".svg-text-layer text").forEach(t => t.remove());
+  document.querySelectorAll(".label-layer text").forEach(t => t.remove());
 
-  document.querySelectorAll(".field-box, .field-shape").forEach(el => {
-    const [canonical, rawSurface] = el.dataset.label.split(" – ");
-    const surface = normalizeSurface(rawSurface);
+  document.querySelectorAll("polygon.field-poly").forEach(poly => {
+    const canonical = poly.dataset.canonical;
+    const surface = normalizeSurface(poly.dataset.surface);
+    const svg = poly.ownerSVGElement;
 
     const u = usage[canonical]?.[surface];
-    const half = isHalfField(surface);
+    const timeline = timelines[canonical]?.[surface];
+    const window = getAvailabilityWindow(timeline, ts);
 
-    el.classList.remove("open", "booked", "partial", "full", "highlight", "blocked");
-    if (el.classList.contains("field-box")) {
-      el.textContent = "";
-    }
+    poly.classList.remove("available", "booked", "blocked");
 
-    // OUTSIDE ALLOWED HOURS → BLOCKED
     if (minutes < ALLOWED_START_MIN || minutes >= ALLOWED_END_MIN) {
-      el.classList.add("blocked");
+      poly.classList.add("blocked");
       return;
     }
 
-    // BOOKED
     if (u) {
-      el.classList.add("booked");
+      poly.classList.add("booked");
 
       const startStr = new Date(u.start).toLocaleTimeString([], {
         hour: "2-digit",
@@ -387,66 +452,42 @@ function updateUsageOverlay(usage, timelines, dt) {
         hour: "2-digit",
         minute: "2-digit"
       });
-      const durationMin = Math.round((u.end - u.start) / 60000);
 
-      const text = `Booked ${startStr}–${endStr} (${durationMin} min)`;
-
-      if (el.classList.contains("field-box")) {
-        el.textContent = text;
-      } else {
-        // SVG polygon → draw text
-        drawSvgLabel(el, text);
-      }
-
+      placeSvgLabel(svg, poly, `Booked ${startStr}–${endStr}`);
       return;
     }
 
-    // AVAILABLE
-    const timeline = timelines[canonical]?.[surface];
-    const window = getAvailabilityWindow(timeline, ts);
-
     if (window) {
-      el.classList.add("open");
+      poly.classList.add("available");
 
       const toStr = new Date(window.to).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit"
       });
 
-      const text = `Available until ${toStr}`;
-
-      if (!half || el.classList.contains("highlight")) {
-        if (el.classList.contains("field-box")) {
-          el.textContent = text;
-        } else {
-          drawSvgLabel(el, text);
-        }
-      }
-
+      placeSvgLabel(svg, poly, `Available until ${toStr}`);
       return;
     }
 
-    // BLOCKED (inside allowed hours)
-    el.classList.add("blocked");
+    poly.classList.add("blocked");
   });
 
-  // FULL logic
   Object.keys(timelines).forEach(canonical => {
-    const fullEl = document.querySelector(
-      `.field-box[data-label="${canonical} – FULL"]`
+    const fullPoly = document.querySelector(
+      `polygon.field-poly[data-canonical="${canonical}"][data-surface="FULL"]`
     );
-    if (!fullEl) return;
+    if (!fullPoly) return;
 
     const bookedCount = Object.keys(usage[canonical] || {}).length;
 
-    fullEl.classList.remove("open", "booked", "partial", "full");
+    fullPoly.classList.remove("available", "booked", "blocked", "partial", "full");
 
     if (bookedCount === 0) {
-      fullEl.classList.add("open");
+      fullPoly.classList.add("available");
     } else if (bookedCount === 1) {
-      fullEl.classList.add("partial");
+      fullPoly.classList.add("partial");
     } else {
-      fullEl.classList.add("full");
+      fullPoly.classList.add("full");
     }
   });
 }
@@ -459,81 +500,13 @@ function renderAllComplexes(active) {
   container.innerHTML = "";
 
   active.forEach(canonical => {
-    const map = COMPLEX_MAPS[canonical];
-    if (!map) return;
+    const def = COMPLEX_MAPS[canonical];
+    if (!def) return;
 
-    const wrapper = document.createElement("div");
-    wrapper.className = "map-wrapper";
+    const { wrapper, svg, polyLayer } = createComplexSVG(canonical, def);
 
-    const img = document.createElement("img");
-    img.src = map.image;
-    img.className = "map-image";
-    wrapper.appendChild(img);
-
-    // SVG overlay
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.classList.add("map-svg");
-    svg.setAttribute("viewBox", "0 0 100 100");
-    svg.setAttribute("preserveAspectRatio", "none");
-    wrapper.appendChild(svg);
-
-    // Container for dynamic SVG text labels
-    const svgTextLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    svgTextLayer.classList.add("svg-text-layer");
-    svg.appendChild(svgTextLayer);
-
-    // Render SVG shapes
-    Object.entries(map.fields).forEach(([field, pos]) => {
-      if (pos.svgShape) {
-        let shape;
-
-        if (pos.svgShape.type === "polygon") {
-          shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-          shape.setAttribute("points", pos.svgShape.points);
-        }
-
-        if (pos.svgShape.type === "rect") {
-          shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-          shape.setAttribute("x", pos.svgShape.x);
-          shape.setAttribute("y", pos.svgShape.y);
-          shape.setAttribute("width", pos.svgShape.width);
-          shape.setAttribute("height", pos.svgShape.height);
-        }
-
-        if (pos.svgShape.type === "circle") {
-          shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-          shape.setAttribute("cx", pos.svgShape.cx);
-          shape.setAttribute("cy", pos.svgShape.cy);
-          shape.setAttribute("r", pos.svgShape.r);
-        }
-
-        shape.classList.add("field-shape");
-        shape.dataset.label = `${canonical} – ${field}`;
-
-        svg.appendChild(shape);
-      }
-    });
-
-    // Existing field-box rectangles (still used for now)
-    Object.entries(map.fields).forEach(([field, pos]) => {
-      if (pos.svgShape) return; // skip rectangles for SVG fields
-
-      const box = document.createElement("div");
-      box.className = "field-box";
-
-      box.style.left = pos.left + "%";
-      box.style.top = pos.top + "%";
-      box.style.width = pos.width + "%";
-      box.style.height = pos.height + "%";
-
-      if (pos.rotate) {
-        box.style.transform = `rotate(${pos.rotate}deg)`;
-        box.style.transformOrigin = "center";
-      }
-
-      box.dataset.label = `${canonical} – ${field}`;
-
-      wrapper.appendChild(box);
+    Object.entries(def.fields).forEach(([surface, fieldDef]) => {
+      addFieldPolygon(polyLayer, canonical, surface, fieldDef);
     });
 
     container.appendChild(wrapper);
@@ -561,9 +534,8 @@ async function init() {
   const nextBtn = document.getElementById("nextDay");
   const debugToggle = document.getElementById("debugToggle");
 
-  // NEW: click-to-log coordinates on SVG when debugMode is on
   function attachSvgDebugHandlers() {
-    document.querySelectorAll(".map-svg").forEach(svg => {
+    document.querySelectorAll(".complex-svg").forEach(svg => {
       svg.style.pointerEvents = debugMode ? "auto" : "none";
 
       const newSvg = svg.cloneNode(true);
@@ -610,11 +582,13 @@ async function init() {
     updateUsageOverlay(usage, dayTimelines, dt);
 
     if (jump.canonical && jump.surface) {
-      const label = `${jump.canonical} – ${normalizeSurface(jump.surface)}`;
-      const el = document.querySelector(`.field-box[data-label="${label}"]`);
-      if (el) {
-        el.classList.add("highlight");
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      const labelSurface = normalizeSurface(jump.surface);
+      const poly = document.querySelector(
+        `polygon.field-poly[data-canonical="${jump.canonical}"][data-surface="${labelSurface}"]`
+      );
+      if (poly) {
+        poly.classList.add("highlight");
+        poly.ownerSVGElement.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }
 
