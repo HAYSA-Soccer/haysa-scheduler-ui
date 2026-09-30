@@ -1,0 +1,152 @@
+/* ================================
+   GLOBAL LAYOUT
+   ================================ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f5f7fa;
+  color: #222;
+}
+
+#layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+
+/* ================================
+   SIDEBAR (450px)
+   ================================ */
+
+#sidebar {
+  width: 450px;
+  background: #d7dce2; /* Cool gray (Option D) */
+  padding: 24px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  border-right: 1px solid #c5c9cf;
+}
+
+.page-title {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #111;
+}
+
+.section-title {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+
+/* ================================
+   FORM STYLING
+   ================================ */
+
+.form-section label {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-section input,
+.form-section select {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #bfc3c9;
+  border-radius: 6px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.primary-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #3a6ee8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.primary-btn:hover {
+  background: #2f5dcc;
+}
+
+
+/* ================================
+   RESULTS LIST
+   ================================ */
+
+.results-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 40px;
+}
+
+.result-item {
+  background: #ffffff;
+  border: 1px solid #cfd3d9;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-item strong {
+  font-size: 15px;
+  color: #222;
+}
+
+.result-item button {
+  align-self: flex-start;
+  padding: 6px 12px;
+  font-size: 14px;
+  background: #3a6ee8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.result-item button:hover {
+  background: #2f5dcc;
+}
+
+
+/* ================================
+   RADAR CONTAINER
+   ================================ */
+
+#radar-container {
+  flex: 1;
+  height: 100vh;
+  overflow: hidden;
+  background: #eef1f5;
+  display: flex;
+}
+
+#radarFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
