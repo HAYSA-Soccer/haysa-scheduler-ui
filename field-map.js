@@ -58,6 +58,23 @@ const COMPLEX_MAPS = {
     }
   },
 
+
+  
+  "BROOKVILLE": {
+    canonical: "BROOKVILLE",
+    label: "Brookville",
+    image: "/haysa-scheduler-ui/assets/brookville.jpg",
+    fields: {
+      "FULL": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            22.00, 14.75
+            76.00, 14.75 
+            75.50, 77.47 
+            22.33, 77.11`}},
+
+      
   "SUMNER/SEAN JOYCE": {
     canonical: "SUMNER/SEAN JOYCE",
     label: "Sumner/Sean Joyce",
