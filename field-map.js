@@ -623,25 +623,82 @@ function updateUsageOverlay(usage, timelines, dt) {
 
   document.querySelectorAll(".label-layer text").forEach(t => t.remove());
 
+  // ===============================
+  // SURFACE INHERITANCE MAP
+  // ===============================
+  const SURFACE_RELATIONS = {
+    // SUMNER / SEAN JOYCE
+    "1": ["1A", "1B"],
+    "1A": ["1"],
+    "1B": ["1"],
+
+    "2": ["2A", "2B"],
+    "2A": ["2"],
+    "2B": ["2"],
+
+    "3": ["3A", "3B"],
+    "3A": ["3"],
+    "3B": ["3"],
+
+    "4": ["4A", "4B"],
+    "4A": ["4"],
+    "4B": ["4"],
+
+    // AVON BUTLER
+    "FULL": ["BU1", "BU2"],
+    "BU1": ["FULL"],
+    "BU2": ["FULL"]
+  };
+
   document.querySelectorAll("polygon.field-poly").forEach(poly => {
     const canonical = poly.dataset.canonical;
     const surface = normalizeSurface(poly.dataset.surface);
 
     console.log("Checking:", canonical, surface, usage[canonical]?.[surface]);
-    
+
     const svg = poly.ownerSVGElement;
 
-    const u = usage[canonical]?.[surface];
-    const timeline = timelines[canonical]?.[surface];
-    const window = getAvailabilityWindow(timeline, ts);
+    // ===============================
+    // BOOKING INHERITANCE
+    // ===============================
+    let u = usage[canonical]?.[surface];
+
+    if (!u && SURFACE_RELATIONS[surface]) {
+      for (const related of SURFACE_RELATIONS[surface]) {
+        const uRelated = usage[canonical]?.[related];
+        if (uRelated) {
+          u = uRelated;
+          break;
+        }
+      }
+    }
+
+    // ===============================
+    // AVAILABILITY INHERITANCE
+    // ===============================
+    let timeline = timelines[canonical]?.[surface];
+    let window = getAvailabilityWindow(timeline, ts);
+
+    if (!window && SURFACE_RELATIONS[surface]) {
+      for (const related of SURFACE_RELATIONS[surface]) {
+        const tRelated = timelines[canonical]?.[related];
+        const wRelated = getAvailabilityWindow(tRelated, ts);
+        if (wRelated) {
+          window = wRelated;
+          break;
+        }
+      }
+    }
 
     poly.classList.remove("available", "booked", "blocked");
 
+    // OUTSIDE ALLOWED HOURS
     if (minutes < ALLOWED_START_MIN || minutes >= ALLOWED_END_MIN) {
       poly.classList.add("blocked");
       return;
     }
 
+    // BOOKED
     if (u) {
       poly.classList.add("booked");
 
@@ -658,6 +715,7 @@ function updateUsageOverlay(usage, timelines, dt) {
       return;
     }
 
+    // AVAILABLE
     if (window) {
       poly.classList.add("available");
 
@@ -670,9 +728,11 @@ function updateUsageOverlay(usage, timelines, dt) {
       return;
     }
 
+    // BLOCKED
     poly.classList.add("blocked");
   });
 
+  // FULL FIELD LOGIC
   Object.keys(timelines).forEach(canonical => {
     const fullPoly = document.querySelector(
       `polygon.field-poly[data-canonical="${canonical}"][data-surface="FULL"]`
@@ -692,6 +752,7 @@ function updateUsageOverlay(usage, timelines, dt) {
     }
   });
 }
+
 
 // =========================
 // RENDER MAPS
