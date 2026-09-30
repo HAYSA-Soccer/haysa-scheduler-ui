@@ -543,7 +543,7 @@ async function init() {
   let dayEvents = filterEventsForDay(events, currentDate);
   let dayTimelines = buildAvailabilityTimelines(dayEvents);
 
-  const active = [...new Set(events.map(ev => ev.extendedProps?.canonical))];
+  const active = Object.keys(COMPLEX_MAPS);
   renderAllComplexes(active);
 
   updateDayLabel();
