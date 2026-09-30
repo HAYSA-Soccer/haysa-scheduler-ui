@@ -437,8 +437,9 @@ function getFieldUsageAtTime(dt, events) {
   const usage = {};
 
   events.forEach(ev => {
-    const canonical = ev.extendedProps?.canonical;
-    const fieldList = ev.extendedProps?.fields;
+    // FIXED: read ICS fields instead of extendedProps
+    const canonical = ev.field;
+    const fieldList = String(ev.surface);
     if (!canonical || !fieldList) return;
 
     const start = new Date(ev.start).getTime();
@@ -449,7 +450,8 @@ function getFieldUsageAtTime(dt, events) {
     const isAvailabilityBlock =
       (ev.title || "").toLowerCase().includes("available");
 
-    const fields = fieldList.split(",").map(f => f.trim());
+    // FIXED: ICS only has one surface
+    const fields = [ fieldList ];
 
     fields.forEach(raw => {
       const surface = normalizeSurface(raw);
@@ -463,6 +465,7 @@ function getFieldUsageAtTime(dt, events) {
 
   return usage;
 }
+
 
 // =========================
 // AVAILABILITY WINDOW
