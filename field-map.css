@@ -184,7 +184,7 @@ html, body {
    ============================================ */
 
 .field-poly {
-  stroke-width: 2px;
+  stroke-width: .25px;
   cursor: pointer;
   transition: stroke 0.15s ease, fill 0.15s ease;
 }
@@ -209,7 +209,7 @@ html, body {
 
 /* HOVER OUTLINE */
 .field-poly:hover {
-  stroke-width: 3px;
+  stroke-width: 1px;
   stroke: #000;
 }
 
