@@ -47,10 +47,10 @@ const COMPLEX_MAPS = {
         svgShape: {
           type: "polygon",
           points: `
-            22,30
-            49,30
-            49,50
-            22,50
+            22,40
+            49,40
+            49,60
+            22,60
           `
         }
       },
@@ -58,10 +58,10 @@ const COMPLEX_MAPS = {
         svgShape: {
           type: "polygon",
           points: `
-            49,30
-            76,30
-            76,50
-            49,50
+            49,40
+            76,40
+            76,60
+            49,60
           `
         }
       },
@@ -69,10 +69,10 @@ const COMPLEX_MAPS = {
         svgShape: {
           type: "polygon",
           points: `
-            22.00,14.75
-            76.00,14.75
-            75.50,77.47
-            22.33,77.11
+            22.00,40
+            76.00,40
+            75.50,60
+            22.33,60
           `
         }
       }
