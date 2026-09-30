@@ -82,13 +82,33 @@ const COMPLEX_MAPS = {
             38.91, 62.19 
             65.96, 63.79 
             63.83, 74.70 
-            37.67, 73.39`}},
+            37.67, 73.39}},
+
+        "4A": {
+          svgShape: {
+            type: "polygon",
+            points: `
+              38.91, 62.19 
+              51.17, 62.91 
+              49.83, 73.84 
+              37.67, 73.39}},
+
+        "4B": {
+          svgShape: {
+            type: "polygon",
+            points: `
+              51.17, 62.91
+              65.96, 63.79 
+              63.83, 74.70 
+              49.83, 73.84}}
+
+            
             
       
-      "4A": { left: 38, top: 63.5, width: 15.5,   height: 10 },
-      "4B": { left: 51, top: 64.5, width: 15.5,   height: 10 }
-    }
-  },
+       // "4A": { left: 38, top: 63.5, width: 15.5,   height: 10 },
+       // "4B": { left: 51, top: 64.5, width: 15.5,   height: 10 }
+     }
+   },
 
   "AVON BUTLER": {
     canonical: "AVON BUTLER",
