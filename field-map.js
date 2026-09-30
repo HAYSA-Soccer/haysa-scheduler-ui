@@ -37,135 +37,47 @@ function updateDayLabel() {
 // =========================
 // COMPLEX MAPS
 // =========================
-const COMPLEX_MAPS = {
-  "TURF": {
-    canonical: "TURF",
-    label: "Turf",
-    image: "/haysa-scheduler-ui/assets/turf.jpg",
-    fields: {
-      "1": { left: 22, top: 15, width: 27, height: 62 },
-      "2": { left: 49, top: 15, width: 27, height: 62 },
-
-      "FULL": {
-        svgShape: {
-          type: "polygon",
-          points: `
-            22.00,14.75
-            76.00,14.75
-            75.50,77.47
-            22.33,77.11
-          `
-        }
+"TURF": {
+  canonical: "TURF",
+  label: "Turf",
+  image: "/haysa-scheduler-ui/assets/turf.jpg",
+  fields: {
+    "1": {
+      svgShape: {
+        type: "polygon",
+        points: `
+          22,15
+          49,15
+          49,77
+          22,77
+        `
       }
-    }
-  },
-
-  "BROOKVILLE": {
-    canonical: "BROOKVILLE",
-    label: "Brookville",
-    image: "/haysa-scheduler-ui/assets/brookville.jpg",
-    fields: {
-      "FULL": {
-        svgShape: {
-          type: "polygon",
-          points: `
-            50.17,84.38
-            61.00,73.74
-            44.17,54.04
-            32.33,64.68
-          `
-        }
+    },
+    "2": {
+      svgShape: {
+        type: "polygon",
+        points: `
+          49,15
+          76,15
+          76,77
+          49,77
+        `
       }
-    }
-  },
+    },
 
-  "SUMNER/SEAN JOYCE": {
-    canonical: "SUMNER/SEAN JOYCE",
-    label: "Sumner/Sean Joyce",
-    image: "/haysa-scheduler-ui/assets/sumner.jpg",
-    fields: {
-      "1":  { left: 40, top: 15,   width: 15.5, height: 17 },
-      "1A": { left: 40, top: 23.5, width: 15.5, height: 8.5 },
-      "1B": { left: 40, top: 15,   width: 15.5, height: 8.5 },
-
-      "2":  { left: 60, top: 15,   width: 15.5, height: 17 },
-      "2A": { left: 60, top: 23.5, width: 15.5, height: 8.5 },
-      "2B": { left: 60, top: 15,   width: 15.5, height: 8.5 },
-
-      "3":  { left: 15, top: 69.5, width: 15.5, height: 17 },
-
-      "4": {
-        svgShape: {
-          type: "polygon",
-          points: `
-            38.91,62.19
-            65.96,63.79
-            63.83,74.70
-            37.67,73.39
-          `
-        }
-      },
-
-      "4A": {
-        svgShape: {
-          type: "polygon",
-          points: `
-            38.91,62.19
-            51.17,62.91
-            49.83,73.84
-            37.67,73.39
-          `
-        }
-      },
-
-      "4B": {
-        svgShape: {
-          type: "polygon",
-          points: `
-            51.17,62.91
-            65.96,63.79
-            63.83,74.70
-            49.83,73.84
-          `
-        }
-      }
-    }
-  },
-
-  "AVON BUTLER": {
-    canonical: "AVON BUTLER",
-    label: "Butler",
-    image: "/haysa-scheduler-ui/assets/butler-layout.jpg",
-    fields: {
-      "FULL": { left: 5, top: 5, width: 0, height: 0 },
-
-      "3": { left: 56,  top: 27,   width: 13, height: 10 },
-      "4": { left: 71.5,top: 27,   width: 13, height: 10 },
-
-      "1": { left: 56,  top: 40,   width: 13, height: 10 },
-      "2": { left: 70,  top: 40,   width: 13, height: 10 },
-
-      "5": { left: 56,  top: 58,   width: 15, height: 9 },
-      "6": { left: 56,  top: 68.5, width: 15, height: 9 },
-
-      "BU1": { left: 55, top: 40, width: 0, height: 0 },
-      "BU2": { left: 55, top: 45, width: 0, height: 0 },
-
-      "Softball Diamond": {
-        svgShape: {
-          type: "polygon",
-          points: `
-            42.41,80.03
-            50.43,76.65
-            58.11,79.65
-            60.61,86.91
-            48.09,90.29
-          `
-        }
+    "FULL": {
+      svgShape: {
+        type: "polygon",
+        points: `
+          22.00,14.75
+          76.00,14.75
+          75.50,77.47
+          22.33,77.11
+        `
       }
     }
   }
-};
+},
 
 // =========================
 // FETCH SNAPSHOT
