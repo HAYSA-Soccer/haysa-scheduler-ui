@@ -399,8 +399,9 @@ function buildAvailabilityTimelines(events) {
     const title = (ev.title || "").toLowerCase();
     if (!title.includes("available")) return;
 
-    const canonical = ev.extendedProps?.canonical;
-    const fieldList = ev.extendedProps?.fields;
+    const canonical = ev.field;
+    const fieldList = String(ev.surface);
+
     if (!canonical || !fieldList) return;
 
     const start = new Date(ev.start).getTime();
