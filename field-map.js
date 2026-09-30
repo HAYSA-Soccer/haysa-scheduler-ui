@@ -20,16 +20,16 @@ function isSameDay(a, b) {
          a.getDate() === b.getDate();
 }
 
+function toLocalDate(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
 function filterEventsForDay(events, day) {
   return events.filter(ev => {
     const evDate = toLocalDate(new Date(ev.start));
     const dayDate = toLocalDate(day);
     return isSameDay(evDate, dayDate);
   });
-
-
-function toLocalDate(d) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
 
