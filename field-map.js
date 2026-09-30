@@ -45,7 +45,7 @@ const COMPLEX_MAPS = {
     fields: {
       //"FULL": { left: 22, top: 15, width: 54, height: 62 },
       "1": { left: 22, top: 15, width: 27, height: 62 },
-      "2": { left: 49, top: 15, width: 27, height: 62 }
+      "2": { left: 49, top: 15, width: 27, height: 62 },
 
       "FULL": {
         svgShape: {
