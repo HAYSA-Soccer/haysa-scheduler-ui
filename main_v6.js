@@ -340,10 +340,19 @@ function decorateEvents(events) {
     const ext = ev.extendedProps || {};
 
     let newTitle = ev.title;
+
+    // Rewrite game titles
     if (ext.type === "game") {
       const home = ext.homeTeam || "";
       const away = ext.awayTeam || "";
       if (home || away) newTitle = `${home} vs ${away}`.trim();
+    }
+
+    // ⭐ Append surface + canonical for calendar visibility
+    if (ext.surface && ext.canonical) {
+      newTitle += ` — ${ext.canonical} ${ext.surface}`;
+    } else if (ext.surface) {
+      newTitle += ` (${ext.surface})`;
     }
 
     const backendTooltip = ext.tooltip;
@@ -366,6 +375,7 @@ function decorateEvents(events) {
     };
   });
 }
+
 
 // ===== FILTERS =====
 
