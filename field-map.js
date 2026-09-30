@@ -11,6 +11,14 @@ let debugMode = false;
 const ALLOWED_START_MIN = 8 * 60;   // 8:00 AM
 const ALLOWED_END_MIN   = 21 * 60;  // 9:00 PM;
 
+
+// Listen for reload requests from the search page
+window.addEventListener("message", (e) => {
+  if (e.data?.type === "radarReload") {
+    init();  // re-run radar logic without reloading iframe
+  }
+});
+
 // =========================
 // DAY HELPERS
 // =========================
