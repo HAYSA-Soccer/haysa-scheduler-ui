@@ -722,6 +722,10 @@ async function init() {
   const events = snapshot.events || [];
 
   let dayEvents = filterEventsForDay(events, currentDate);
+  console.log("DAY:", currentDate.toISOString().slice(0,10));
+  console.log("DAY EVENTS:", dayEvents.length, dayEvents);
+
+  
   let dayTimelines = buildAvailabilityTimelines(dayEvents);
 
   const active = Object.keys(COMPLEX_MAPS);
