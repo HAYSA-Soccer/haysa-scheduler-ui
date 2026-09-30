@@ -51,15 +51,16 @@ const COMPLEX_MAPS = {
         svgShape: {
           type: "polygon",
           points: `
-            22.00, 14.75
-            76.00, 14.75 
-            75.50, 77.47 
-            22.33, 77.11`}},
+            22.00,14.75
+            76.00,14.75 
+            75.50,77.47 
+            22.33,77.11
+          `
+        }
+      }
     }
   },
 
-
-  
   "BROOKVILLE": {
     canonical: "BROOKVILLE",
     label: "Brookville",
@@ -79,7 +80,6 @@ const COMPLEX_MAPS = {
     }
   },
 
-      
   "SUMNER/SEAN JOYCE": {
     canonical: "SUMNER/SEAN JOYCE",
     label: "Sumner/Sean Joyce",
@@ -101,36 +101,42 @@ const COMPLEX_MAPS = {
         svgShape: {
           type: "polygon",
           points: `
-            38.91, 62.19 
-            65.96, 63.79 
-            63.83, 74.70 
-            37.67, 73.39`}},
+            38.91,62.19 
+            65.96,63.79 
+            63.83,74.70 
+            37.67,73.39
+          `
+        }
+      },
 
       "4A": {
         svgShape: {
           type: "polygon",
           points: `
-            38.91, 62.19 
-            51.17, 62.91 
-            49.83, 73.84 
-            37.67, 73.39`}},
+            38.91,62.19 
+            51.17,62.91 
+            49.83,73.84 
+            37.67,73.39
+          `
+        }
+      },
 
       "4B": {
         svgShape: {
           type: "polygon",
           points: `
-            51.17, 62.91
-            65.96, 63.79 
-            63.83, 74.70 
-            49.83, 73.84`}},
+            51.17,62.91
+            65.96,63.79 
+            63.83,74.70 
+            49.83,73.84
+          `
+        }
+      }
 
-            
-            
-      
-       // "4A": { left: 38, top: 63.5, width: 15.5,   height: 10 },
-       // "4B": { left: 51, top: 64.5, width: 15.5,   height: 10 }
-     }
-   },
+      // "4A": { left: 38, top: 63.5, width: 15.5,   height: 10 },
+      // "4B": { left: 51, top: 64.5, width: 15.5,   height: 10 }
+    }
+  },
 
   "AVON BUTLER": {
     canonical: "AVON BUTLER",
@@ -157,14 +163,12 @@ const COMPLEX_MAPS = {
           type: "polygon",
           //points: "42.13,17.89 60.02,20.11 55.77,35.44 35.90,32.00"
           points: `
-          42.41, 80.03 
-          50.43, 76.65 
-          58.11, 79.65 
-          60.61, 86.91 
-          48.09, 90.29`
-
-        
-        
+            42.41,80.03 
+            50.43,76.65 
+            58.11,79.65 
+            60.61,86.91 
+            48.09,90.29
+          `
         }
       }     
     }
@@ -344,9 +348,6 @@ function drawSvgLabel(el, text) {
   layer.appendChild(t);
 }
 
-
-
-
 // =========================
 // UPDATE OVERLAY (FINAL LOGIC)
 // =========================
@@ -451,7 +452,6 @@ function updateUsageOverlay(usage, timelines, dt) {
   });
 }
 
-
 // =========================
 // RENDER MAPS
 // =========================
@@ -483,8 +483,7 @@ function renderAllComplexes(active) {
     svgTextLayer.classList.add("svg-text-layer");
     svg.appendChild(svgTextLayer);
 
-
-    // ⭐ NEW: Render SVG shapes
+    // Render SVG shapes
     Object.entries(map.fields).forEach(([field, pos]) => {
       if (pos.svgShape) {
         let shape;
@@ -509,10 +508,7 @@ function renderAllComplexes(active) {
           shape.setAttribute("r", pos.svgShape.r);
         }
 
-        // Style class
         shape.classList.add("field-shape");
-
-        // Label for usage overlay
         shape.dataset.label = `${canonical} – ${field}`;
 
         svg.appendChild(shape);
@@ -545,7 +541,6 @@ function renderAllComplexes(active) {
   });
 }
 
-
 // =========================
 // INIT
 // =========================
@@ -572,7 +567,6 @@ async function init() {
     document.querySelectorAll(".map-svg").forEach(svg => {
       svg.style.pointerEvents = debugMode ? "auto" : "none";
 
-      // remove any existing listener by cloning (simple way)
       const newSvg = svg.cloneNode(true);
       svg.parentNode.replaceChild(newSvg, svg);
 
@@ -601,7 +595,6 @@ async function init() {
     });
   }
 
-  // Handle jump from search
   const jump = JSON.parse(localStorage.getItem("radarJump") || "null");
   if (jump) {
     currentDate = new Date(jump.start);
