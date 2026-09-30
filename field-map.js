@@ -268,6 +268,27 @@ function polygonCentroid(pointsStr) {
   return { cx, cy };
 }
 
+function drawSvgLabel(el, text) {
+  const svg = el.closest(".map-wrapper").querySelector("svg");
+  const layer = svg.querySelector(".svg-text-layer");
+
+  const points = el.getAttribute("points");
+  const { cx, cy } = polygonCentroid(points);
+
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", cx);
+  t.setAttribute("y", cy);
+  t.setAttribute("text-anchor", "middle");
+  t.setAttribute("dominant-baseline", "middle");
+  t.setAttribute("font-size", "4");
+  t.setAttribute("fill", "#000");
+  t.dataset.label = el.dataset.label;
+  t.textContent = text;
+
+  layer.appendChild(t);
+}
+
+
 
 
 // =========================
