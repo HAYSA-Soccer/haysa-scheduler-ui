@@ -124,10 +124,10 @@ const COMPLEX_MAPS = {
         svgShape: {
           type: "polygon",
           points: `
-            40,15
-            55.5,15
-            55.5,32
-            40,32
+            43,15
+            53.5,15
+            53.5,32
+            43,32
           `
         }
       },
