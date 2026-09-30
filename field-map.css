@@ -219,8 +219,8 @@ html, body {
    ============================================ */
 
 .field-label {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 6;
+  font-weight: 500;
   fill: #111;
   pointer-events: none;
 }
