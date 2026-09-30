@@ -43,9 +43,18 @@ const COMPLEX_MAPS = {
     label: "Turf",
     image: "/haysa-scheduler-ui/assets/turf.jpg",
     fields: {
-      "FULL": { left: 22, top: 15, width: 54, height: 62 },
+      //"FULL": { left: 22, top: 15, width: 54, height: 62 },
       "1": { left: 22, top: 15, width: 27, height: 62 },
       "2": { left: 49, top: 15, width: 27, height: 62 }
+
+      "FULL": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            22.00, 14.75
+            76.00, 14.75 
+            75.50, 77.47 
+            22.33, 77.11`}},
     }
   },
 
