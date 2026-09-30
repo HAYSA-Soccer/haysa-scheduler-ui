@@ -37,47 +37,315 @@ function updateDayLabel() {
 // =========================
 // COMPLEX MAPS
 // =========================
-"TURF": {
-  canonical: "TURF",
-  label: "Turf",
-  image: "/haysa-scheduler-ui/assets/turf.jpg",
-  fields: {
-    "1": {
-      svgShape: {
-        type: "polygon",
-        points: `
-          22,15
-          49,15
-          49,77
-          22,77
-        `
+const COMPLEX_MAPS = {
+  "TURF": {
+    canonical: "TURF",
+    label: "Turf",
+    image: "/haysa-scheduler-ui/assets/turf.jpg",
+    fields: {
+      "1": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            22,15
+            49,15
+            49,77
+            22,77
+          `
+        }
+      },
+      "2": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            49,15
+            76,15
+            76,77
+            49,77
+          `
+        }
+      },
+      "FULL": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            22.00,14.75
+            76.00,14.75
+            75.50,77.47
+            22.33,77.11
+          `
+        }
       }
-    },
-    "2": {
-      svgShape: {
-        type: "polygon",
-        points: `
-          49,15
-          76,15
-          76,77
-          49,77
-        `
-      }
-    },
+    }
+  },
 
-    "FULL": {
-      svgShape: {
-        type: "polygon",
-        points: `
-          22.00,14.75
-          76.00,14.75
-          75.50,77.47
-          22.33,77.11
-        `
+  "BROOKVILLE": {
+    canonical: "BROOKVILLE",
+    label: "Brookville",
+    image: "/haysa-scheduler-ui/assets/brookville.jpg",
+    fields: {
+      "FULL": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            50.17,84.38
+            61.00,73.74
+            44.17,54.04
+            32.33,64.68
+          `
+        }
+      }
+    }
+  },
+
+  "SUMNER/SEAN JOYCE": {
+    canonical: "SUMNER/SEAN JOYCE",
+    label: "Sumner/Sean Joyce",
+    image: "/haysa-scheduler-ui/assets/sumner.jpg",
+    fields: {
+      "1": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            40,15
+            55.5,15
+            55.5,32
+            40,32
+          `
+        }
+      },
+      "1A": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            40,23.5
+            55.5,23.5
+            55.5,32
+            40,32
+          `
+        }
+      },
+      "1B": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            40,15
+            55.5,15
+            55.5,23.5
+            40,23.5
+          `
+        }
+      },
+
+      "2": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            60,15
+            75.5,15
+            75.5,32
+            60,32
+          `
+        }
+      },
+      "2A": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            60,23.5
+            75.5,23.5
+            75.5,32
+            60,32
+          `
+        }
+      },
+      "2B": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            60,15
+            75.5,15
+            75.5,23.5
+            60,23.5
+          `
+        }
+      },
+
+      "3": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            15,69.5
+            30.5,69.5
+            30.5,86.5
+            15,86.5
+          `
+        }
+      },
+
+      "4": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            38.91,62.19
+            65.96,63.79
+            63.83,74.70
+            37.67,73.39
+          `
+        }
+      },
+
+      "4A": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            38.91,62.19
+            51.17,62.91
+            49.83,73.84
+            37.67,73.39
+          `
+        }
+      },
+
+      "4B": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            51.17,62.91
+            65.96,63.79
+            63.83,74.70
+            49.83,73.84
+          `
+        }
+      }
+    }
+  },
+
+  "AVON BUTLER": {
+    canonical: "AVON BUTLER",
+    label: "Butler",
+    image: "/haysa-scheduler-ui/assets/butler-layout.jpg",
+    fields: {
+      "FULL": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            5,5
+            5,5
+            5,5
+            5,5
+          `
+        }
+      },
+
+      "3": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            56,27
+            69,27
+            69,37
+            56,37
+          `
+        }
+      },
+      "4": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            71.5,27
+            84.5,27
+            84.5,37
+            71.5,37
+          `
+        }
+      },
+
+      "1": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            56,40
+            69,40
+            69,50
+            56,50
+          `
+        }
+      },
+      "2": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            70,40
+            83,40
+            83,50
+            70,50
+          `
+        }
+      },
+
+      "5": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            56,58
+            71,58
+            71,67
+            56,67
+          `
+        }
+      },
+      "6": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            56,68.5
+            71,68.5
+            71,77.5
+            56,77.5
+          `
+        }
+      },
+
+      "BU1": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            55,40
+            55,40
+            55,40
+            55,40
+          `
+        }
+      },
+      "BU2": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            55,45
+            55,45
+            55,45
+            55,45
+          `
+        }
+      },
+
+      "Softball Diamond": {
+        svgShape: {
+          type: "polygon",
+          points: `
+            42.41,80.03
+            50.43,76.65
+            58.11,79.65
+            60.61,86.91
+            48.09,90.29
+          `
+        }
       }
     }
   }
-},
+};
+
 
 // =========================
 // FETCH SNAPSHOT
