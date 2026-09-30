@@ -602,6 +602,7 @@ function addFieldPolygon(polyLayer, canonical, surface, fieldDef) {
 // UPDATE OVERLAY
 // =========================
 function updateUsageOverlay(usage, timelines, dt) {
+
   const minutes = dt.getHours() * 60 + dt.getMinutes();
   const ts = dt.getTime();
 
@@ -610,6 +611,9 @@ function updateUsageOverlay(usage, timelines, dt) {
   document.querySelectorAll("polygon.field-poly").forEach(poly => {
     const canonical = poly.dataset.canonical;
     const surface = normalizeSurface(poly.dataset.surface);
+
+    console.log("Checking:", canonical, surface, usage[canonical]?.[surface]);
+    
     const svg = poly.ownerSVGElement;
 
     const u = usage[canonical]?.[surface];
