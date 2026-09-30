@@ -399,15 +399,17 @@ function buildAvailabilityTimelines(events) {
     const title = (ev.title || "").toLowerCase();
     if (!title.includes("available")) return;
 
+    // FIXED: read from ICS fields
     const canonical = ev.field;
     const fieldList = String(ev.surface);
-
     if (!canonical || !fieldList) return;
 
     const start = new Date(ev.start).getTime();
     const end = new Date(ev.end).getTime();
 
-    const fields = fieldList.split(",").map(f => f.trim());
+    // FIXED: ICS only has one surface, not a list
+    const fields = [ fieldList ];
+
     fields.forEach(raw => {
       const surface = normalizeSurface(raw);
 
