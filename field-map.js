@@ -627,7 +627,6 @@ function updateUsageOverlay(usage, timelines, dt) {
   // SURFACE INHERITANCE MAP
   // ===============================
   const SURFACE_RELATIONS = {
-    // SUMNER / SEAN JOYCE
     "1": ["1A", "1B"],
     "1A": ["1"],
     "1B": ["1"],
@@ -644,17 +643,45 @@ function updateUsageOverlay(usage, timelines, dt) {
     "4A": ["4"],
     "4B": ["4"],
 
-    // AVON BUTLER
     "FULL": ["BU1", "BU2"],
     "BU1": ["FULL"],
     "BU2": ["FULL"]
   };
 
+  // ===============================
+  // CENTROID CALCULATOR
+  // ===============================
+  function getPolygonCentroid(poly) {
+    const pts = poly.points;
+    let x = 0, y = 0, len = pts.numberOfItems;
+
+    for (let i = 0; i < len; i++) {
+      x += pts.getItem(i).x;
+      y += pts.getItem(i).y;
+    }
+    return { x: x / len, y: y / len };
+  }
+
+  // ===============================
+  // CLEAN LABEL PLACEMENT
+  // ===============================
+  function placeShortLabel(svg, poly, text) {
+    const centroid = getPolygonCentroid(poly);
+
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("x", centroid.x);
+    label.setAttribute("y", centroid.y);
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("dominant-baseline", "middle");
+    label.setAttribute("class", "usage-label");
+    label.textContent = text;
+
+    svg.querySelector(".label-layer").appendChild(label);
+  }
+
   document.querySelectorAll("polygon.field-poly").forEach(poly => {
     const canonical = poly.dataset.canonical;
     const surface = normalizeSurface(poly.dataset.surface);
-
-    console.log("Checking:", canonical, surface, usage[canonical]?.[surface]);
 
     const svg = poly.ownerSVGElement;
 
@@ -703,15 +730,15 @@ function updateUsageOverlay(usage, timelines, dt) {
       poly.classList.add("booked");
 
       const startStr = new Date(u.start).toLocaleTimeString([], {
-        hour: "2-digit",
+        hour: "numeric",
         minute: "2-digit"
       });
       const endStr = new Date(u.end).toLocaleTimeString([], {
-        hour: "2-digit",
+        hour: "numeric",
         minute: "2-digit"
       });
 
-      placeSvgLabel(svg, poly, `Booked ${startStr}–${endStr}`);
+      placeShortLabel(svg, poly, `${startStr}–${endStr}`);
       return;
     }
 
@@ -720,11 +747,11 @@ function updateUsageOverlay(usage, timelines, dt) {
       poly.classList.add("available");
 
       const toStr = new Date(window.to).toLocaleTimeString([], {
-        hour: "2-digit",
+        hour: "numeric",
         minute: "2-digit"
       });
 
-      placeSvgLabel(svg, poly, `Available until ${toStr}`);
+      placeShortLabel(svg, poly, `until ${toStr}`);
       return;
     }
 
@@ -732,20 +759,25 @@ function updateUsageOverlay(usage, timelines, dt) {
     poly.classList.add("blocked");
   });
 
-  // FULL FIELD LOGIC
+  // ===============================
+  // FULL FIELD PARTIAL/FULL LOGIC
+  // ===============================
   Object.keys(timelines).forEach(canonical => {
     const fullPoly = document.querySelector(
       `polygon.field-poly[data-canonical="${canonical}"][data-surface="FULL"]`
     );
     if (!fullPoly) return;
 
-    const bookedCount = Object.keys(usage[canonical] || {}).length;
+    // Count only REAL booked surfaces (ignore inherited)
+    const realBooked = Object.keys(usage[canonical] || {}).filter(s => {
+      return !SURFACE_RELATIONS[s] || SURFACE_RELATIONS[s].includes("FULL");
+    });
 
     fullPoly.classList.remove("available", "booked", "blocked", "partial", "full");
 
-    if (bookedCount === 0) {
+    if (realBooked.length === 0) {
       fullPoly.classList.add("available");
-    } else if (bookedCount === 1) {
+    } else if (realBooked.length === 1) {
       fullPoly.classList.add("partial");
     } else {
       fullPoly.classList.add("full");
