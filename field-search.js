@@ -283,7 +283,7 @@ async function initSearch() {
       `;
 
       const btn = document.createElement("button");
-      btn.textContent = "Show on Radar";
+      btn.textContent = "Show on Map";
 
       btn.addEventListener("click", () => {
         localStorage.setItem(
