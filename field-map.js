@@ -541,6 +541,49 @@ function placeSvgLabel(svg, poly, text) {
   layer.appendChild(t);
 }
 
+function placeWrappedLabel(svg, poly, text) {
+  const pts = poly.getAttribute("points")
+    .trim()
+    .split(/\s+/)
+    .map(p => p.split(",").map(Number));
+
+  const xs = pts.map(p => p[0]);
+  const ys = pts.map(p => p[1]);
+
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+
+  const width = maxX - minX;
+  const height = maxY - minY;
+
+  const fo = document.createElementNS("http://www.w3.org/2000/svg", "foreignObject");
+  fo.setAttribute("x", minX);
+  fo.setAttribute("y", minY);
+  fo.setAttribute("width", width);
+  fo.setAttribute("height", height);
+
+  const div = document.createElement("div");
+  div.style.width = "100%";
+  div.style.height = "100%";
+  div.style.display = "flex";
+  div.style.alignItems = "center";
+  div.style.justifyContent = "center";
+  div.style.textAlign = "center";
+  div.style.fontSize = "6px";
+  div.style.lineHeight = "1.1";
+  div.style.color = "white";
+  div.style.webkitTextStroke = "0.5px black";
+
+  div.textContent = text;
+
+  fo.appendChild(div);
+  svg.querySelector(".label-layer").appendChild(fo);
+}
+
+
+
 function createComplexSVG(complexKey, complexDef) {
   const wrapper = document.createElement("div");
   wrapper.className = "complex-wrapper";
@@ -622,6 +665,8 @@ function updateUsageOverlay(usage, timelines, dt) {
   const ts = dt.getTime();
 
   document.querySelectorAll(".label-layer text").forEach(t => t.remove());
+  document.querySelectorAll(".label-layer foreignObject").forEach(fo => fo.remove());
+
 
   // SURFACE INHERITANCE MAP
   const SURFACE_RELATIONS = {
@@ -706,7 +751,7 @@ function updateUsageOverlay(usage, timelines, dt) {
         minute: "2-digit"
       });
 
-      placeSvgLabel(svg, poly, `${startStr}–${endStr}`);
+      placeWrappedLabel(svg, poly, `${startStr}–${endStr}`);
       return;
     }
 
@@ -719,7 +764,7 @@ function updateUsageOverlay(usage, timelines, dt) {
         minute: "2-digit"
       });
 
-      placeSvgLabel(svg, poly, `until ${toStr}`);
+      placeWrappedLabel(svg, poly, `until ${toStr}`);
       return;
     }
 
