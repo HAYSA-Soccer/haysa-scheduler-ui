@@ -920,6 +920,7 @@ async function init() {
 
   if (radarDate) {
     radarDate.value = currentDate.toISOString().slice(0, 10);
+    updateDayLabel();   // ⭐ ADD THIS
     radarDate.addEventListener("change", e => {
       currentDate = new Date(e.target.value);
       updateDayLabel();
@@ -954,7 +955,7 @@ async function init() {
       dayEvents = filterEventsForDay(events, currentDate);
       dayTimelines = buildAvailabilityTimelines(dayEvents);
 
-      const dt = new Date(currentDate);
+      const dt = new Date(currentDate);radarDate.value = currentDate.toISOString().slice(0, 10);
       dt.setHours(17, 0, 0, 0);
 
       slider.value = dt.getHours() * 60 + dt.getMinutes();
@@ -965,6 +966,7 @@ async function init() {
 
       if (radarDate) {
         radarDate.value = currentDate.toISOString().slice(0, 10);
+        updateDayLabel();
       }
     });
   }
